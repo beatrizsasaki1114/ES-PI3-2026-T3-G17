@@ -2,11 +2,11 @@
 
 ## Time 17
 
-* [Beatriz Naomi Ferreira Sasaki](https://github.com/beatrizsasaki1114)
-* [Bruno Lenitta Machado](https://github.com/BrunoM2422)
-* [Heloisa Lacerda Marinho](https://github.com/loisaaz)
-* [Luca Francesco Filippi](https://github.com/LucaFilippi)
-* [Sofia de Sousa](https://github.com/1SofiaSousa)
+* [Beatriz Naomi Ferreira Sasaki](https://github.com/beatrizsasaki1114) : 25016735
+* [Bruno Lenitta Machado](https://github.com/BrunoM2422) : 25008041
+* [Heloisa Lacerda Marinho](https://github.com/loisaaz) : 25893868
+* [Luca Francesco Filippi](https://github.com/LucaFilippi) : 25022556
+* [Sofia de Sousa](https://github.com/1SofiaSousa) : 25005435
 
 ## Sobre o Projeto
 
