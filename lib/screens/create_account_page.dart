@@ -146,9 +146,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           elevation: 2,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const LoginPage(),
+                                    ),
+                                  );
+                        },
                         child: const Text(
-                          'Entrar',
+                          'Criar Conta',
                           style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                       ),

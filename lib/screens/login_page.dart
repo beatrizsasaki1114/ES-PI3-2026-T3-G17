@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/create_account_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/forgotten_password_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/catalogue_page.dart';
 
 
 
@@ -114,7 +115,14 @@ class _LoginPageState extends State<LoginPage> {
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                           elevation: 2,
                         ),
-                        onPressed: () {},
+                        onPressed: () {
+                          Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const CataloguePage(),
+                                    ),
+                                  );
+                        },
                         child: const Text(
                           'Entrar',
                           style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),

@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/config_page.dart';
 
-
-
-class AppConfigPage extends StatefulWidget {
-  const AppConfigPage({super.key});
+class CataloguePage extends StatefulWidget {
+  const CataloguePage({super.key});
 
   @override
-  State<AppConfigPage> createState() => _AppConfigPageState();
+  State<CataloguePage> createState() => _CataloguePageState();
 }
 
-class _AppConfigPageState extends State<AppConfigPage> {
+class _CataloguePageState extends State<CataloguePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -68,31 +66,26 @@ class _AppConfigPageState extends State<AppConfigPage> {
       ),
 
       body: SafeArea(
-  child: SingleChildScrollView(
-    child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 40),
-          const Text(
-            "Informações do Aplicativo",
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+        child: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: const [
+                SizedBox(height: 40),
+                Text(
+                  "depois eu termino",
+                  style: TextStyle(fontSize: 18),
+                ),
+              ],
+            ),
           ),
-          const SizedBox(height: 40),
-
-          
-        ],
+        ),
       ),
-    ),
-  ),
-),
     );
   }
 }
 
-  
 
   
-
