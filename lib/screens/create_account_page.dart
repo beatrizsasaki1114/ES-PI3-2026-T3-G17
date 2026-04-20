@@ -73,7 +73,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                     const SizedBox(height: 40),
 
-                    // INPUT EMAIL
+
                     _buildFieldLabel("E-mail"),
                     const SizedBox(height: 4),
                     _buildCustomInput(hint: "Insira seu e-mail"),
@@ -119,20 +119,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
                     ),
 
-                    const SizedBox(height: 12),
 
-                   
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: TextButton(
-                        onPressed: () {},
-                        style: TextButton.styleFrom(padding: EdgeInsets.zero),
-                        child: const Text(
-                          'Esqueci minha senha',
-                          style: TextStyle(color: Color(0xFFF3009A), fontWeight: FontWeight.bold),
-                        ),
-                      ),
-                    ),
 
                     const SizedBox(height: 30),
 

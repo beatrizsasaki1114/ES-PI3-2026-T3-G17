@@ -49,7 +49,7 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                     const SizedBox(height: 40),
                     const Text(
-                      'Bem vindo de volta!',
+                      'Bem vindo!',
                       style: TextStyle(
                         color: Color(0xFFF3009A),
                         fontSize: 26,

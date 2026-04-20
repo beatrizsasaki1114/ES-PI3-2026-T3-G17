@@ -23,7 +23,6 @@ class _ConfigPageState extends State<ConfigPage> {
         elevation: 2,
         centerTitle: true,
 
-        // Botão de menu no canto esquerdo
         leading: IconButton(
             icon: Image.asset(
               'assets/images/menuIcon.png', 
