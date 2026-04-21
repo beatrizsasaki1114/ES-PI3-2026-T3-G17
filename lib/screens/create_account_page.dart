@@ -73,6 +73,17 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                     const SizedBox(height: 40),
 
+                    _buildFieldLabel("Nome"),
+                    const SizedBox(height: 4),
+                    _buildCustomInput(hint: "Insira seu nome"),
+
+                    const SizedBox(height: 8),
+
+                    _buildFieldLabel("Sobrenome"),
+                    const SizedBox(height: 4),
+                    _buildCustomInput(hint: "Insira seu sobrenome"),
+
+                    const SizedBox(height: 8),
 
                     _buildFieldLabel("E-mail"),
                     const SizedBox(height: 4),
