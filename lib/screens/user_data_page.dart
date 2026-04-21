@@ -1,6 +1,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/config_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/catalogue_page.dart';
 
 class UserConfigPage extends StatefulWidget {
   const UserConfigPage({super.key});
@@ -17,29 +18,60 @@ class _UserConfigPageState extends State<UserConfigPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 2,
         centerTitle: true,
+        toolbarHeight: 65,
+
         leading: IconButton(
-          icon: Image.asset('assets/images/menuIcon.png', height: 40, width: 40),
+          icon: Image.asset(
+            'assets/images/menuIcon.png',
+            height: 40,
+            width: 40,
+          ),
           onPressed: () {},
         ),
-        title: Image.asset(
-          'assets/images/logoMesclaInvest.png',
-          height: 80,
-          fit: BoxFit.contain,
+
+        title: InkWell(
+          onTap: () {
+            // Opção A: volta/abre a página de catálogo e remove a pilha anterior
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const CataloguePage()),
+              (route) => false,
+            );
+          },
+          borderRadius: BorderRadius.circular(8),
+          child: Transform.translate(
+            offset: const Offset(0, -6), 
+            child: Image.asset(
+              'assets/images/logoMesclaInvest.png',
+              height: 80,
+              fit: BoxFit.contain,
+            ),
+          ),
         ),
+
         actions: [
           IconButton(
-            icon: Image.asset('assets/images/userIcon.png', height: 40, width: 40),
+            icon: Image.asset(
+              'assets/images/userIcon.png',
+              height: 40,
+              width: 40,
+            ),
             onPressed: () {},
           ),
           IconButton(
-            icon: Image.asset('assets/images/configIcon.png', height: 40, width: 40),
+            icon: Image.asset(
+              'assets/images/configIcon.png',
+              height: 40,
+              width: 40,
+            ),
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) => const ConfigPage()),
+                MaterialPageRoute(
+                  builder: (context) => const ConfigPage(),
+                ),
               );
             },
           ),
