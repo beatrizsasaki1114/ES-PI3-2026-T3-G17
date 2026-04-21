@@ -1,4 +1,4 @@
-
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/catalogue_page.dart';
@@ -34,7 +34,6 @@ class _UserConfigPageState extends State<UserConfigPage> {
 
         title: InkWell(
           onTap: () {
-            // Opção A: volta/abre a página de catálogo e remove a pilha anterior
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const CataloguePage()),
               (route) => false,
@@ -86,10 +85,11 @@ class _UserConfigPageState extends State<UserConfigPage> {
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
                 const SizedBox(height: 40),
-                const Text(
-                  "Informações do Usuário",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
-                  textAlign: TextAlign.center,
+                Text(
+                  'Informações de Usuário',
+                  style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(fontSize: 35, fontWeight: FontWeight.bold),
+                  ),
                 ),
                 const SizedBox(height: 40),
 

@@ -74,7 +74,6 @@ class _CataloguePageState extends State<CataloguePage> {
 
         title: InkWell(
           onTap: () {
-            // Opção A: volta/abre a página de catálogo e remove a pilha anterior
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const CataloguePage()),
               (route) => false,
@@ -162,7 +161,6 @@ class _CataloguePageState extends State<CataloguePage> {
   }
 }
 
-/// Widget reutilizável do card da startup
 class StartupCard extends StatelessWidget {
   final Startup startup;
   final VoidCallback onTap;
@@ -211,7 +209,6 @@ Widget build(BuildContext context) {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Nome da startup (fonte Poppins, cor branca para contraste)
                 Text(
                   startup.name,
                   style: GoogleFonts.poppins(
@@ -223,7 +220,6 @@ Widget build(BuildContext context) {
                   ),
                 ),
                 const SizedBox(height: 6),
-                // Descrição (Poppins, tom levemente translúcido)
                 Text(
                   startup.description,
                   maxLines: 2,
@@ -232,7 +228,7 @@ Widget build(BuildContext context) {
                     textStyle: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: Colors.white.withOpacity(0.9),
+                      color: Colors.white.withValues(alpha:0.9),
                     ),
                   ),
                 ),
@@ -275,7 +271,7 @@ class _InfoChip extends StatelessWidget {
   const _InfoChip({
     required this.label,
     required this.color,
-    this.textColor = Colors.black87, // valor padrão opcional
+    this.textColor = Colors.black87,
   });
 
   @override

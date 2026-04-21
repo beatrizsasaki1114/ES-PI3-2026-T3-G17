@@ -3,6 +3,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/login_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/app_config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/user_data_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/catalogue_page.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 
 class ConfigPage extends StatefulWidget {
@@ -18,7 +19,6 @@ class _ConfigPageState extends State<ConfigPage> {
     return Scaffold(
       backgroundColor: Colors.white,
 
-      // Barra superior
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
         elevation: 2,
@@ -36,7 +36,6 @@ class _ConfigPageState extends State<ConfigPage> {
 
         title: InkWell(
           onTap: () {
-            // Opção A: volta/abre a página de catálogo e remove a pilha anterior
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const CataloguePage()),
               (route) => false,
@@ -89,10 +88,12 @@ class _ConfigPageState extends State<ConfigPage> {
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           const SizedBox(height: 40),
-          const Text(
-            "Configurações",
-            style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-          ),
+          Text(
+                  'Configurações',
+                  style: GoogleFonts.poppins(
+                    textStyle: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
+                  ),
+                ),
           const SizedBox(height: 40),
 
           _buildSettingsButton(
@@ -167,7 +168,7 @@ class _ConfigPageState extends State<ConfigPage> {
           borderRadius: BorderRadius.circular(15),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha:0.05),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -187,7 +188,7 @@ class _ConfigPageState extends State<ConfigPage> {
                 ),
               ),
             ),
-            Icon(Icons.arrow_forward_ios, color: color.withOpacity(0.3), size: 18),
+            Icon(Icons.arrow_forward_ios, color: color.withValues(alpha: 0.3), size: 18),
           ],
         ),
       ),
