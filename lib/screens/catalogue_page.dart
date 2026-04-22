@@ -25,28 +25,30 @@ class Startup {
   });
 }
 
+
+
 class _CataloguePageState extends State<CataloguePage> {
 
   final List<Startup> startups = [
     Startup(
       id: 'ex1',
-      name: 'EXEMPLO 1',
-      description: 'Plataforma de aklasgyuidagbdf iuavauyfvfy',
+      name: 'EcoTech',
+      description: 'Plataforma de monitoramento ambiental para empresas',
       stage: 'Operação',
-      tokenType: 'FINTECH',
+      tokenType: 'CLEANTECH',
     ),
     Startup(
       id: 'ex2',
-      name: 'EXEMPLO 2',
-      description: 'Soluções de iajfghuiayfhkban8y  GB8UIYaga78GObyuibUYJK',
-      stage: 'Validação',
+      name: 'LoginChain',
+      description: 'Sistema de rastreabilidade logística baseado em blockchain',
+      stage: 'Tração',
       tokenType: 'LOGTECH',
     ),
     Startup(
       id: 'ex3',
-      name: 'EXEMPLO 3',
-      description: 'Integração de ajofjiasfniajsflasbnifukabfiyualbfkjhbj',
-      stage: 'Tração',
+      name: 'EduFlow',
+      description: 'Solução de ensino adaptativo com inteligência artificial',
+      stage: 'Validação',
       tokenType: 'EDTECH',
     ),
   ];
