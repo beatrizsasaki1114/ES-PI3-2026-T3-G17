@@ -9,7 +9,6 @@ class CataloguePage extends StatefulWidget {
   State<CataloguePage> createState() => _CataloguePageState();
 }
 
-/// Modelo simples para representar uma startup
 class Startup {
   final String id;
   final String name;
@@ -32,7 +31,7 @@ class _CataloguePageState extends State<CataloguePage> {
     Startup(
       id: 'ex1',
       name: 'EXEMPLO 1',
-      description: 'Plataforma de aklasgyuidagbdf iuavauyfvfysfgbjka',
+      description: 'Plataforma de aklasgyuidagbdf iuavauyfvfy',
       stage: 'Operação',
       tokenType: 'FINTECH',
     ),
@@ -55,7 +54,7 @@ class _CataloguePageState extends State<CataloguePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 77, 51, 142),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
 
       appBar: AppBar(
         backgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -130,7 +129,7 @@ class _CataloguePageState extends State<CataloguePage> {
                     textStyle: const TextStyle(
                       fontSize: 36,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 77, 51, 142),
                     ),
                   ),
                 ),
@@ -175,7 +174,7 @@ Widget build(BuildContext context) {
     child: Container(
   padding: const EdgeInsets.all(14),
   decoration: BoxDecoration(
-    color: const Color.fromARGB(255, 182, 38, 111),
+    color: const Color.fromARGB(255, 255, 255, 255),
     borderRadius: BorderRadius.circular(24),
     boxShadow: const [
       BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3))
@@ -215,7 +214,7 @@ Widget build(BuildContext context) {
                     textStyle: const TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.w600,
-                      color: Colors.white,
+                      color: Color.fromARGB(255, 0, 0, 0),
                     ),
                   ),
                 ),
@@ -228,7 +227,7 @@ Widget build(BuildContext context) {
                     textStyle: TextStyle(
                       fontSize: 13,
                       fontWeight: FontWeight.w400,
-                      color: Colors.white.withValues(alpha:0.9),
+                      color: const Color.fromARGB(255, 0, 0, 0).withValues(alpha:0.9),
                     ),
                   ),
                 ),
@@ -237,14 +236,14 @@ Widget build(BuildContext context) {
                   children: [
                     _InfoChip(
                       label: startup.stage,
-                      color: Colors.green.shade50,
-                      textColor: Colors.black87,
+                      color: const Color.fromARGB(255, 73, 46, 143),
+                      textColor: const Color.fromARGB(221, 255, 255, 255),
                     ),
                     const SizedBox(width: 8),
                     _InfoChip(
                       label: startup.tokenType,
-                      color: Colors.orange.shade50,
-                      textColor: Colors.black87,
+                      color: const Color.fromARGB(255, 182, 38, 111),
+                      textColor: const Color.fromARGB(221, 255, 255, 255),
                     ),
                   ],
                 ),
@@ -252,7 +251,7 @@ Widget build(BuildContext context) {
             ),
           ),
           const SizedBox(width: 8),
-          const Icon(Icons.chevron_right, color: Colors.grey),
+          const Icon(Icons.chevron_right, color: Color.fromARGB(200, 182, 38, 111)),
         ],
       ),
     ),
@@ -262,7 +261,6 @@ Widget build(BuildContext context) {
   }
 
 
-/// Chip simples usado no card
 class _InfoChip extends StatelessWidget {
   final String label;
   final Color color;
