@@ -59,4 +59,5 @@ class DefaultFirebaseOptions {
     projectId: 'mesclainvest-db416',
     storageBucket: 'mesclainvest-db416.firebasestorage.app',
   );
+
 }
