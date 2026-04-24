@@ -1,14 +1,19 @@
-import * as functions from "firebase-functions";
 import {userRepository} from "../repositories/userRepository";
-import {Users} from "../types";
+import {CallableRequest, onCall} from "firebase-functions/v2/https";
+import type {Users} from "../types/index";
 
-export const createUser = functions.https.onCall(async (request) => {
-  const data= request.data as Users;
-  return userRepository.createUser({
-    uid: data.uid,
-    nome: data.nome,
-    email: data.email,
-    cpf: data.cpf,
-    telefone: data.telefone,
+// Function para criação do usuário no firebase
+export const createUser = onCall(
+  {
+    region: "southamerica-east1",
+  },
+  async (request: CallableRequest<Users>) => {
+    const data= request.data;
+    return userRepository.createUser({
+      uid: data.uid,
+      nome: data.nome,
+      email: data.email,
+      cpf: data.cpf,
+      telefone: data.telefone,
+    });
   });
-});

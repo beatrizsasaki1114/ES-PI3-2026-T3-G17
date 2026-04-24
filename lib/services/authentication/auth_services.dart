@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
+
 class AuthService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
 
@@ -18,15 +19,16 @@ class AuthService {
       password: password,
     );
 
-    await FirebaseFunctions.instance
-    .httpsCallable('createUser')
-    .call({
+    await FirebaseFunctions.instanceFor(
+      region: 'southamerica-east1',
+    ).httpsCallable('createUser').call({
       'uid': result.user!.uid,
       'nome': nome,
       'email': email,
       'cpf': cpf,
       'telefone': telefone,
     });
+
     return result.user;
   }
 }
