@@ -4,7 +4,6 @@ import 'package:projeto_integrador_3_grupo_17/screens/forgotten_password_page.da
 import 'package:projeto_integrador_3_grupo_17/screens/catalogue_page.dart';
 
 
-
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
@@ -76,7 +75,8 @@ class _LoginPageState extends State<LoginPage> {
                       hint: "Informe sua senha",
                       isPassword: true,
                       obscure: _obscurePassword,
-                      onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
+                      onToggle: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                     ),
 
                     const SizedBox(height: 12),
@@ -84,14 +84,15 @@ class _LoginPageState extends State<LoginPage> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: MouseRegion(
-                        cursor: SystemMouseCursors.click, 
+                        cursor: SystemMouseCursors.click,
                         child: GestureDetector(
                           onTap: () {
                             Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const  ForgottenPasswordPage(),
-                                  ),
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    const ForgottenPasswordPage(),
+                              ),
                             );
                           },
                           child: const Text(
@@ -112,20 +113,26 @@ class _LoginPageState extends State<LoginPage> {
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFF3009A),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
                           elevation: 2,
                         ),
                         onPressed: () {
                           Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const CataloguePage(),
-                                    ),
-                                  );
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => const CataloguePage(),
+                            ),
+                          );
                         },
                         child: const Text(
                           'Entrar',
-                          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                     ),
@@ -141,24 +148,25 @@ class _LoginPageState extends State<LoginPage> {
                           style: TextStyle(color: Colors.grey),
                         ),
                         MouseRegion(
-                            cursor: SystemMouseCursors.click, 
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const  CreateAccountPage(),
-                                  ),
-                            );
-                          },
-                          child: const Text(
-                            'Cadastre-se Aqui!',
-                            style: TextStyle(
-                              color: Color(0xFFF3009A),
-                              fontWeight: FontWeight.bold,
+                          cursor: SystemMouseCursors.click,
+                          child: GestureDetector(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      const CreateAccountPage(),
+                                ),
+                              );
+                            },
+                            child: const Text(
+                              'Cadastre-se Aqui!',
+                              style: TextStyle(
+                                color: Color(0xFFF3009A),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
                         ),
                       ],
                     ),
@@ -180,9 +188,16 @@ class _LoginPageState extends State<LoginPage> {
       child: RichText(
         text: TextSpan(
           text: label,
-          style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.black87,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
           children: const [
-            TextSpan(text: ' *', style: TextStyle(color: Colors.red)),
+            TextSpan(
+              text: ' *',
+              style: TextStyle(color: Colors.red),
+            ),
           ],
         ),
       ),
@@ -212,7 +227,10 @@ class _LoginPageState extends State<LoginPage> {
         decoration: InputDecoration(
           hintText: hint,
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 15),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 16,
+            vertical: 15,
+          ),
           suffixIcon: isPassword
               ? IconButton(
                   icon: Icon(
