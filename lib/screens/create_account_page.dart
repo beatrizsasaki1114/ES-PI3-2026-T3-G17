@@ -11,7 +11,8 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
-  TextEditingController nomeController = TextEditingController();
+  TextEditingController firstNameController = TextEditingController();
+  TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
   TextEditingController confirmEmailController = TextEditingController();
   TextEditingController telefoneController = TextEditingController();
@@ -78,14 +79,21 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     const SizedBox(height: 40),
 
                     _buildFieldLabel("Nome"),
-                    const SizedBox(height: 4),
-                    _buildCustomInput(hint: "Insira seu nome"),
+                    const SizedBox(
+                      height: 4),
+                    _buildCustomInput(
+                      hint: "Insira seu nome",
+                      controller: firstNameController,
+                      ),
 
                     const SizedBox(height: 8),
 
                     _buildFieldLabel("Sobrenome"),
-                    const SizedBox(height: 4),
-                    _buildCustomInput(hint: "Insira seu sobrenome"),
+                    const SizedBox(
+                      height: 4,),
+                    _buildCustomInput(
+                      hint: "Insira seu sobrenome",
+                      controller: lastNameController),
 
                     const SizedBox(height: 8),
 
@@ -164,7 +172,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                         ),
                         onPressed: () async {
                           if (emailController.text == "" ||
-                              nomeController.text == "" ||
+                              firstNameController == "" ||
+                              lastNameController.text == "" ||
                               passwordController.text == "" ||
                               confirmPasswordController.text == "" ||
                               telefoneController.text == "" ||
@@ -196,7 +205,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           } else {
                             try {
                               User? result = await AuthService().createAccount(
-                                nome: nomeController.text,
+                                nome: firstNameController.text,
+                                sobrenome: lastNameController.text,
                                 email: emailController.text,
                                 telefone: telefoneController.text,
                                 cpf: cpfController.text,

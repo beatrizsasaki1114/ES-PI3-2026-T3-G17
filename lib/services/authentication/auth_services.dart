@@ -9,6 +9,7 @@ class AuthService {
 
   Future<User?> createAccount({
     required String nome,
+    required String sobrenome,
     required String email,
     required String telefone,
     required String cpf,
@@ -24,6 +25,7 @@ class AuthService {
     ).httpsCallable('createUser').call({
       'uid': result.user!.uid,
       'nome': nome,
+      'sobrenome': sobrenome,
       'email': email,
       'cpf': cpf,
       'telefone': telefone,

@@ -12,6 +12,7 @@ export const createUser = onCall(
     return userRepository.createUser({
       uid: data.uid,
       nome: data.nome,
+      sobrenome: data.sobrenome,
       email: data.email,
       cpf: data.cpf,
       telefone: data.telefone,
