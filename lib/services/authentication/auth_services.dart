@@ -20,17 +20,36 @@ class AuthService {
       password: password,
     );
 
-    await FirebaseFunctions.instanceFor(
-      region: 'southamerica-east1',
-    ).httpsCallable('createUser').call({
-      'uid': result.user!.uid,
-      'nome': nome,
-      'sobrenome': sobrenome,
-      'email': email,
-      'cpf': cpf,
-      'telefone': telefone,
-    });
+    await FirebaseFunctions.instanceFor(region: 'southamerica-east1')
+        // Nome da função na Cloud Function
+        .httpsCallable('createUser')
+        .call({
+          'uid': result.user!.uid,
+          'nome': nome,
+          'sobrenome': sobrenome,
+          'email': email,
+          'cpf': cpf,
+          'telefone': telefone,
+        });
 
     return result.user;
   }
+
+  Future<User?> signIn({
+    required String email,
+    required String password,
+  }) async {
+    UserCredential result = await firebaseAuth.signInWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+
+    await FirebaseFunctions.instanceFor(
+      region: 'southamerica-east1',
+    ).httpsCallable('signInUser').call({
+      'uid': result.user!.uid,
+    });
+    return result.user;
+  }
+  
 }

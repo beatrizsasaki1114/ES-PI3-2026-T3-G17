@@ -1,4 +1,4 @@
-export interface Users{
+export type Users = {
     uid: string;
     nome: string;
     sobrenome: string;
@@ -6,3 +6,5 @@ export interface Users{
     telefone: string;
     email: string;
 }
+
+

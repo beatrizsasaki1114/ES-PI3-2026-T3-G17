@@ -1,2 +1,2 @@
-export {createUser} from "./investors/handlers/createUser";
+export {createUser} from "./Users/handlers/createUser";
 
