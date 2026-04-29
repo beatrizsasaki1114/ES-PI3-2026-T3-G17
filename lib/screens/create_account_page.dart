@@ -79,21 +79,20 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     const SizedBox(height: 40),
 
                     _buildFieldLabel("Nome"),
-                    const SizedBox(
-                      height: 4),
+                    const SizedBox(height: 4),
                     _buildCustomInput(
                       hint: "Insira seu nome",
                       controller: firstNameController,
-                      ),
+                    ),
 
                     const SizedBox(height: 8),
 
                     _buildFieldLabel("Sobrenome"),
-                    const SizedBox(
-                      height: 4,),
+                    const SizedBox(height: 4),
                     _buildCustomInput(
                       hint: "Insira seu sobrenome",
-                      controller: lastNameController),
+                      controller: lastNameController,
+                    ),
 
                     const SizedBox(height: 8),
 
@@ -129,7 +128,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     _buildCustomInput(
                       hint: "Insira seu CPF",
                       controller: cpfController,
-                      ),
+                    ),
 
                     const SizedBox(height: 8),
 
@@ -171,60 +170,61 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           elevation: 2,
                         ),
                         onPressed: () async {
-                          if (emailController.text == "" ||
-                              firstNameController == "" ||
-                              lastNameController.text == "" ||
-                              passwordController.text == "" ||
-                              confirmPasswordController.text == "" ||
-                              telefoneController.text == "" ||
-                              cpfController.text == "") {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  "Todos os campos são obrigatórios",
-                                ),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          } else if (passwordController.text !=
-                              confirmPasswordController.text) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("As senhas não coincidem"),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          } 
-                          else if (emailController.text != confirmEmailController.text) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text("E-mails não coincidem"),
-                                backgroundColor: Colors.red,
-                              ),
-                            );
-                          } else {
-                            try {
-                              User? result = await AuthService().createAccount(
-                                nome: firstNameController.text,
-                                sobrenome: lastNameController.text,
-                                email: emailController.text,
-                                telefone: telefoneController.text,
-                                cpf: cpfController.text,
-                                password: passwordController.text,
-                              );
-                              if (result != null) {
-                                debugPrint("Sucesso");
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const LoginPage(),
+                              if (emailController.text == "" ||
+                                  firstNameController.text == "" ||
+                                  lastNameController.text == "" ||
+                                  passwordController.text == "" ||
+                                  confirmPasswordController.text == "" ||
+                                  telefoneController.text == "" ||
+                                  cpfController.text == "") {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Todos os campos são obrigatórios",
+                                    ),
+                                    backgroundColor: Colors.red,
                                   ),
                                 );
+                              } else if (passwordController.text !=
+                                  confirmPasswordController.text) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text("As senhas não coincidem"),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              } else if (emailController.text !=
+                                  confirmEmailController.text) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text("E-mails não coincidem"),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              } else {
+                                try {
+                                  User? result = await AuthService().createAccount(
+                                    nome: firstNameController.text,
+                                    sobrenome: lastNameController.text,
+                                    email: emailController.text,
+                                    telefone: telefoneController.text,
+                                    cpf: cpfController.text,
+                                    password: passwordController.text,
+                                  );
+                                  if (result != null) {
+                                    debugPrint("Sucesso");
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => const LoginPage(),
+                                      ),
+                                    );
+                                  }
+                                } catch (e) {
+                                  debugPrint("ERRO: $e");
+                                }
                               }
-                            } catch (e) {
-                              debugPrint("ERRO: $e");
-                            }
-                          }
+                          
                         },
                         child: const Text(
                           'Criar Conta',
@@ -313,11 +313,15 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         color: const Color(0xFFF2F2F2),
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha:0.05), blurRadius: 5, offset: const Offset(0, 2)),
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.05),
+            blurRadius: 5,
+            offset: const Offset(0, 2),
+          ),
         ],
       ),
       child: TextField(
-        controller: controller, 
+        controller: controller,
         obscureText: isPassword ? obscure : false,
         decoration: InputDecoration(
           hintText: hint,

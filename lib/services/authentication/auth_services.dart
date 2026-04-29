@@ -3,7 +3,7 @@ import 'package:cloud_functions/cloud_functions.dart';
 
 class AuthService {
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-
+  // pegando o usuário principal
   User? get currentUser => firebaseAuth.currentUser;
   Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
 
@@ -35,21 +35,19 @@ class AuthService {
     return result.user;
   }
 
-  Future<User?> signIn({
+  Future<void> signIn({
     required String email,
     required String password,
   }) async {
-    UserCredential result = await firebaseAuth.signInWithEmailAndPassword(
+     await firebaseAuth.signInWithEmailAndPassword(
       email: email,
       password: password,
     );
-
-    await FirebaseFunctions.instanceFor(
-      region: 'southamerica-east1',
-    ).httpsCallable('signInUser').call({
-      'uid': result.user!.uid,
-    });
-    return result.user;
   }
-  
+
+  Future<void> resetPassword({required String email}) async {
+     await firebaseAuth.sendPasswordResetEmail(
+      email: email,
+    );
+  }
 }

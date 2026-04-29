@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/create_account_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/forgotten_password_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/catalogue_page.dart';
-
+import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,7 +14,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
-
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -65,7 +67,10 @@ class _LoginPageState extends State<LoginPage> {
 
                     _buildFieldLabel("E-mail"),
                     const SizedBox(height: 8),
-                    _buildCustomInput(hint: "Insira seu e-mail"),
+                    _buildCustomInput(
+                      hint: "Insira seu e-mail",
+                      controller: emailController,
+                    ),
 
                     const SizedBox(height: 20),
 
@@ -73,6 +78,7 @@ class _LoginPageState extends State<LoginPage> {
                     const SizedBox(height: 8),
                     _buildCustomInput(
                       hint: "Informe sua senha",
+                      controller: passwordController,
                       isPassword: true,
                       obscure: _obscurePassword,
                       onToggle: () =>
@@ -100,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
                             style: TextStyle(
                               color: Color(0xFFF3009A),
                               fontWeight: FontWeight.bold,
-                            ),
+                            ),  
                           ),
                         ),
                       ),
@@ -118,13 +124,51 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           elevation: 2,
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => const CataloguePage(),
-                            ),
-                          );
+                        onPressed: () async {
+                          if (emailController.text == "" ||
+                              passwordController.text == "") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Todos os campos são obrigatórios",
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } else {
+                            try {
+                              await AuthService().signIn(
+                                email: emailController.text,
+                                password: passwordController.text,
+                              );
+                              debugPrint("Sucesso");
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => const CataloguePage(),
+                                ),
+                              );
+                            } on FirebaseAuthException catch (e) {
+                              String mensagem;
+
+                              if (e.code == 'user-not-found') {
+                                mensagem = "Usuário não encontrado";
+
+                              } else if (e.code == 'wrong-password') {
+                                mensagem = "Senha incorreta";
+
+                              } else {
+                                mensagem = "Erro ao fazer login";
+                              }
+                              debugPrint(mensagem);
+                               ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(mensagem),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                            }
+                          }
                         },
                         child: const Text(
                           'Entrar',
@@ -206,6 +250,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildCustomInput({
     required String hint,
+    TextEditingController? controller,
     bool isPassword = false,
     bool obscure = false,
     VoidCallback? onToggle,
@@ -216,13 +261,14 @@ class _LoginPageState extends State<LoginPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.05),
+            color: Colors.black.withValues(alpha: 0.05),
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
         ],
       ),
       child: TextField(
+        controller: controller,
         obscureText: isPassword ? obscure : false,
         decoration: InputDecoration(
           hintText: hint,

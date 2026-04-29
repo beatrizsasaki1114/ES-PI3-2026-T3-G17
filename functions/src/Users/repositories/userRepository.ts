@@ -1,17 +1,15 @@
 import {Users} from "../types";
 import {db} from "../../shared/firebase";
-//import { getDataConnect } from "firebase-admin/data-connect";
-//import { CollectionGroup } from "firebase-admin/firestore";
-//import { getFirestore, collection, getDocs } from "firebase/firestore";
+// import { getDataConnect } from "firebase-admin/data-connect";
+// import { CollectionGroup } from "firebase-admin/firestore";
+// import { getFirestore, collection, getDocs } from "firebase/firestore";
 
 const usuariosCollection = db.collection("Usuários");
-/**
- * Cria um usuário no Firestore
- * @param {Users} data Dados do usuário
- * @return {Promise<void>}
- */
+
+// function que adiciona um novo usuário na coleção Usuários
 export async function setUser(data: Users) {
-  return usuariosCollection.doc(data.uid).set({
+
+  await  usuariosCollection.doc(data.uid).set({
     uid: data.uid,
     nome: data.nome,
     sobrenome: data.sobrenome,
@@ -19,6 +17,12 @@ export async function setUser(data: Users) {
     cpf: data.cpf,
     telefone: data.telefone,
   });
+
+   return {
+      message: "Usuário cadastrado com sucesso",
+      uid: data.uid,
+    };
+
 }
 
 export async function getUser(email: string) {
@@ -33,7 +37,6 @@ export async function getUser(email: string) {
     // id do Firestore
     id: doc.id,          
     nome: userData.nome, 
-    email: userData.email,
-    senha: userData.senha
+    email: userData.email
   };
 }
