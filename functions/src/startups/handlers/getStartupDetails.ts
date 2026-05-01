@@ -1,7 +1,7 @@
 // Sofia de Sousa - Lembrar de voltar para comentar dps 
 
 import { HttpsError, onCall } from "firebase-functions/v2/https";
-import { requireAuthenticatedUser } from "../shared/auth";
+import { requireAuthenticatedUser } from "../shared/auth"; // Único importe que eu não tenho
 import { normalizeString } from "../shared/validation";
 
 

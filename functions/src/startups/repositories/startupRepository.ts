@@ -5,7 +5,7 @@ import { getFirestore, FieldValue } from "firebase-admin/firestore";
 import {
     StartupDocument,
     StartupListItem
-} from "../types";
+} from "../types/startupTypes";
 
 const db = getFirestore();
 const startupsCollection = db.collection("startups");
@@ -490,9 +490,5 @@ export async function seedDemoStartups(): Promise<string[]> {
 
     await batch.commit();
 
-    return demoStartup.map(
-        (startup) => startup.ID
-    );
+    return demoStartup.map((startup) => startup.ID);
 }
-
-export default demoStartup;
