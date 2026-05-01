@@ -1,13 +1,15 @@
 
 // Sofia de Sousa - Lembrar de voltar para comentar dps 
 
-import { getFirestore, FieldValue } from "firebase-admin/firestore";
+import {FieldValue } from "firebase-admin/firestore";
 import {
     StartupDocument,
     StartupListItem
 } from "../types/startupTypes";
 
-const db = getFirestore();
+import {db} from "../../shared/firebase";
+
+
 const startupsCollection = db.collection("startups");
 const demoStartup: StartupDocument[] = [
     {

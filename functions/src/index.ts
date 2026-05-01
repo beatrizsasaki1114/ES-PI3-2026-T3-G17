@@ -1,7 +1,5 @@
-<<<<<<< Updated upstream
 export {createUser} from "./Users/handlers/createUser";
 
-=======
 /**
  * Import function triggers from their respective submodules:
  *
@@ -34,4 +32,3 @@ setGlobalOptions({ maxInstances: 10 });
 //   logger.info("Hello logs!", {structuredData: true});
 //   response.send("Hello from Firebase!");
 // });
->>>>>>> Stashed changes

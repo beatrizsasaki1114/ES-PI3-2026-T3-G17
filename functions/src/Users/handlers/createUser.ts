@@ -1,3 +1,5 @@
+// Beatriz Naomi
+
 import {setUser} from "../repositories/userRepository";
 import {CallableRequest, onCall, HttpsError} from "firebase-functions/v2/https";
 import type {Users} from "../types/index";

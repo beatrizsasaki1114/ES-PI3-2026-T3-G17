@@ -1,12 +1,15 @@
+// Beatriz Naomi
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
 class AuthService {
+  // instancia do firebaseAuth
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
   // pegando o usuário principal
   User? get currentUser => firebaseAuth.currentUser;
   Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
-
+  
   Future<User?> createAccount({
     required String nome,
     required String sobrenome,

@@ -2,9 +2,8 @@ import { FieldValue, Timestamp } from "firebase-admin/firestore";
 
 export type StartupStage =
     | "Nova"
-    | "Validacao"
     | "Expansao"
-    | "Operecao";
+    | "Operacao";
 
 export interface Fundador {
     Nome: string;

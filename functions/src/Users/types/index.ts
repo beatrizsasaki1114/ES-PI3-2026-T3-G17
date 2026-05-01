@@ -1,3 +1,5 @@
+// Beatriz Naomi
+
 export type Users = {
     uid: string;
     nome: string;

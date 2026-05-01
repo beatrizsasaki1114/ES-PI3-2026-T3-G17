@@ -1,3 +1,5 @@
+// Beatriz Naomi
+
 import {CallableRequest, HttpsError} from "firebase-functions/https";
 import {AuthenticatedUser} from "./types";
 
