@@ -4,6 +4,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
 
 class UserConfigPage extends StatefulWidget {
   const UserConfigPage({super.key});
@@ -13,6 +14,21 @@ class UserConfigPage extends StatefulWidget {
 }
 
 class _UserConfigPageState extends State<UserConfigPage> {
+  Widget _buildDrawerItem({
+  required IconData icon,
+  required String text,
+  required VoidCallback onTap,
+  Color color = const Color.fromARGB(255, 77, 51, 142),
+}) {
+  return ListTile(
+    leading: Icon(icon, color: color),
+    title: Text(
+      text,
+      style: GoogleFonts.poppins(fontSize: 16, color: color == Colors.red ? Colors.red : Colors.black87),
+    ),
+    onTap: onTap,
+  );
+}
   final _selectedIndex = 1;
   bool _obscurePassword = true;
 
@@ -26,13 +42,15 @@ class _UserConfigPageState extends State<UserConfigPage> {
         centerTitle: true,
         toolbarHeight: 65,
 
-        leading: IconButton(
-          icon: Image.asset(
-            'assets/images/menuIcon.png',
-            height: 40,
-            width: 40,
-          ),
-          onPressed: () {},
+        leading: Builder( 
+          builder: (BuildContext context) {
+            return IconButton(
+              icon: Image.asset('assets/images/menuIcon.png', height: 40, width: 40),
+              onPressed: () {
+                Scaffold.of(context).openDrawer(); 
+              },
+            );
+          },
         ),
 
         title: InkWell(
@@ -84,6 +102,81 @@ class _UserConfigPageState extends State<UserConfigPage> {
           ),
         ],
       ),
+      drawer: Drawer(
+  child: ListView(
+    padding: EdgeInsets.zero,
+    children: [
+      DrawerHeader(
+        decoration: const BoxDecoration(
+          color: Color.fromARGB(255, 77, 51, 142),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const CircleAvatar(
+              backgroundColor: Colors.white,
+              radius: 30,
+              child: Icon(Icons.person, size: 40, color: Color.fromARGB(255, 77, 51, 142)),
+            ),
+            const SizedBox(height: 10),
+            Text(
+              'Mescla Invest',
+              style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
+      ),
+      
+
+      _buildDrawerItem(
+        icon: Icons.business_center,
+        text: 'Catálogo de Startups',
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CataloguePage())),
+      ),
+      _buildDrawerItem(
+        icon: Icons.account_balance_wallet,
+        text: 'Minha Carteira',
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())),
+      ),
+      _buildDrawerItem(
+        icon: Icons.trending_up,
+        text: 'Investimentos',
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())), 
+      ),
+      _buildDrawerItem(
+        icon: Icons.person,
+        text: 'Meu Perfil',
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
+      ),
+      _buildDrawerItem(
+        icon: Icons.settings,
+        text: 'Configurações',
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
+      ),
+      
+      const Divider(), 
+      
+      _buildDrawerItem(
+        icon: Icons.exit_to_app,
+        text: 'Sair',
+        color: Colors.red,
+        onTap: () {
+          Navigator.push(
+                context,
+                MaterialPageRoute(
+                builder: (context) => const  LoginPage(),
+                ),
+              );
+        },
+      ),
+    ],
+  ),
+),
       body: SafeArea(
         child: SingleChildScrollView(
           child: Container(
@@ -157,22 +250,19 @@ class _UserConfigPageState extends State<UserConfigPage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed, // Mantém os ícones fixos
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           if (index == 0) {
-            // Dinheiro -> WalletPage
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const WalletPage()),
             );
           } else if (index == 1) {
-            // Home -> CataloguePage (Reinicia a navegação)
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const CataloguePage()),
               (route) => false,
             );
           } else if (index == 2) {
-            // Perfil -> UserProfilePage
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const UserProfilePage()),

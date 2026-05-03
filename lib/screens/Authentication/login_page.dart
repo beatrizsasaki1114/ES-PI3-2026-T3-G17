@@ -132,7 +132,6 @@ class _LoginPageState extends State<LoginPage> {
 
                     const SizedBox(height: 25),
 
-                    // RODAPÉ CADASTRO
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
