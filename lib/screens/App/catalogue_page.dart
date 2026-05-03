@@ -30,7 +30,7 @@ class Startup {
 
 
 class _CataloguePageState extends State<CataloguePage> {
-  final _selectedIndex = 1; // Começa no ícone do meio (Home
+  final _selectedIndex = 1; 
 
   final List<Startup> startups = [
     Startup(
@@ -168,22 +168,19 @@ class _CataloguePageState extends State<CataloguePage> {
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed, // Mantém os ícones fixos
+        type: BottomNavigationBarType.fixed, 
         onTap: (index) {
           if (index == 0) {
-            // Dinheiro -> WalletPage
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const WalletPage()),
             );
           } else if (index == 1) {
-            // Home -> CataloguePage (Reinicia a navegação)
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const CataloguePage()),
               (route) => false,
             );
           } else if (index == 2) {
-            // Perfil -> UserProfilePage
             Navigator.push(
               context,
               MaterialPageRoute(builder: (context) => const UserProfilePage()),
