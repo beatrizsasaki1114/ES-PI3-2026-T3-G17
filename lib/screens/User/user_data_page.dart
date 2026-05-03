@@ -1,7 +1,9 @@
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/config_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/catalogue_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
 
 class UserConfigPage extends StatefulWidget {
   const UserConfigPage({super.key});
@@ -11,6 +13,7 @@ class UserConfigPage extends StatefulWidget {
 }
 
 class _UserConfigPageState extends State<UserConfigPage> {
+  final _selectedIndex = 1;
   bool _obscurePassword = true;
 
   @override
@@ -57,7 +60,12 @@ class _UserConfigPageState extends State<UserConfigPage> {
               height: 40,
               width: 40,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            );
+            },
           ),
           IconButton(
             icon: Image.asset(
@@ -146,6 +154,49 @@ class _UserConfigPageState extends State<UserConfigPage> {
             ),
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        type: BottomNavigationBarType.fixed, // Mantém os ícones fixos
+        onTap: (index) {
+          if (index == 0) {
+            // Dinheiro -> WalletPage
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WalletPage()),
+            );
+          } else if (index == 1) {
+            // Home -> CataloguePage (Reinicia a navegação)
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const CataloguePage()),
+              (route) => false,
+            );
+          } else if (index == 2) {
+            // Perfil -> UserProfilePage
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            );
+          }
+        },
+        selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            label: 'Investimentos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
       ),
     );
   }

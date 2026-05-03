@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/config_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
 
 class CataloguePage extends StatefulWidget {
   const CataloguePage({super.key});
@@ -28,6 +30,7 @@ class Startup {
 
 
 class _CataloguePageState extends State<CataloguePage> {
+  final _selectedIndex = 1; // Começa no ícone do meio (Home
 
   final List<Startup> startups = [
     Startup(
@@ -98,7 +101,12 @@ class _CataloguePageState extends State<CataloguePage> {
               height: 40,
               width: 40,
             ),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            );
+            },
           ),
           IconButton(
             icon: Image.asset(
@@ -158,7 +166,51 @@ class _CataloguePageState extends State<CataloguePage> {
           ),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        type: BottomNavigationBarType.fixed, // Mantém os ícones fixos
+        onTap: (index) {
+          if (index == 0) {
+            // Dinheiro -> WalletPage
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const WalletPage()),
+            );
+          } else if (index == 1) {
+            // Home -> CataloguePage (Reinicia a navegação)
+            Navigator.of(context).pushAndRemoveUntil(
+              MaterialPageRoute(builder: (_) => const CataloguePage()),
+              (route) => false,
+            );
+          } else if (index == 2) {
+            // Perfil -> UserProfilePage
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+            );
+          }
+        },
+        selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            label: 'Investimentos',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Perfil',
+          ),
+        ],
+      ),
     );
+    
   }
 }
 
