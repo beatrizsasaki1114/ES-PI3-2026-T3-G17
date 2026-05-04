@@ -1,16 +1,16 @@
 // Beatriz Naomi
 
 import {CallableRequest, HttpsError} from "firebase-functions/https";
-import {AuthenticatedUser} from "./types";
+import {AuthenticatedUser} from "../types/authenticatedUser";
 
 export function requireAuthenticatedUser(
   request: CallableRequest
 ): AuthenticatedUser {
   if (!request.auth) {
- throw new HttpsError(
- "unauthenticated",
- "Usuario precisa estar autenticado para acessar esta funcao."
- );
+   throw new HttpsError(
+    "unauthenticated",
+    "Usuario precisa estar autenticado para acessar esta funcao."
+   );
  }
  
  return {

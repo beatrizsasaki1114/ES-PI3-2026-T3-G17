@@ -22,11 +22,11 @@ class Startup {
   //Transforma o json do back em um objeto (vem do json (fromJson))
   factory Startup.fromJson(Map<String, dynamic> json) {
     return Startup(
-      id: json['ID'] ?? '',
-      name: json['NomeStartup'] ?? '',
-      description: json['DescricaoCurta'] ?? '',
-      stage: _mapStage(json['Estagio']),
-      tokenType: _mapTokenType(json['tags']),
+      id: json['ID']?.toString() ?? '',
+      name: json['NomeStartup']?.toString() ?? '',
+      description: json['DescricaoCurta']?.toString() ?? '',
+      stage: _mapStage(json['Estagio']?.toString()),
+      tokenType: _mapTokenType(json['tags']is List ? List<dynamic>.from(json['tags']) : null),
     );
   }
 

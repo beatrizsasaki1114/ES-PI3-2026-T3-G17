@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/config_page.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_functions/cloud_functions.dart';
+import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
+import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
 
 class CataloguePage extends StatefulWidget {
   const CataloguePage({super.key});
@@ -10,76 +11,7 @@ class CataloguePage extends StatefulWidget {
   State<CataloguePage> createState() => _CataloguePageState();
 }
 
-// Parte do model correta com o banco 
-class Startup {
-  final String id;
-  final String name;
-  final String description;
-  final String stage;
-  final String tokenType;
-
-  Startup({
-    required this.id,
-    required this.name,
-    required this.description,
-    required this.stage,
-    required this.tokenType,
-  });
-
-  factory Startup.fromJson(Map<String, dynamic> json) {
-    return Startup(
-      id: json['ID'] ?? '',
-      name: json['NomeStartup'] ?? '',
-      description: json['DescricaoCurta'] ?? '',
-      stage: _mapStage(json['Estagio']),
-      tokenType: _mapTokenType(json['tags']),
-    );
-  }
-
-  static String _mapStage(String? stage) {
-    switch (stage?.toLowerCase()) {
-      case 'nova':
-        return 'Nova';
-      case 'operacao':
-        return 'Operação';
-      case 'expansao':
-        return 'Expansão';
-      default:
-        return 'Desconhecido';
-    }
-  }
-
-  // Até aqui é o model Startups.dart
-
-  static String _mapTokenType(List<dynamic>? tags) {
-    if (tags == null || tags.isEmpty) return 'N/A';
-    return tags.first.toString().toUpperCase();
-  }
-}
-
 class _CataloguePageState extends State<CataloguePage> {
-  // Essa função é a que busca as startups do backend usando Cloud Functions
-
-   //Chama a função do backend 'listStartupItems' e transforma o resultado em uma lista de objetos Startup
-  Future<List<Startup>> fetchStartups() async {
-
-     // A chamada da função do back qu é a listStartupItems 
-    final callable = FirebaseFunctions.instance.httpsCallable(
-      'listStartups',
-    );
-
-    // flutter vai enviar a requisição, o firebase vai executar a function
-     // Backend vai retornas os dados e o flutter vai receber as respostas 
-      // O await faz com que espere o back responder
-    final result = await callable.call();
-
-    // Acesso do json retornado pelo back (lista de dados)
-    final List data = result.data['data'];
-   
-   // Transforma a lista de json em uma lista de objetos Startup usando o fromJson do model
-    return data.map((item) => Startup.fromJson(item)).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -163,38 +95,32 @@ class _CataloguePageState extends State<CataloguePage> {
               ),
               const SizedBox(height: 20),
 
-            
               Expanded(
-
                 // Espera os dados do backend chegar e faz aquilo que o flutter vaz de construir a tela
                 child: FutureBuilder<List<Startup>>(
-
                   //Vai construir o UI baseando no resultado que a função retornar
                   // Fetch - função que chama o firebase e pega os dados
-                  future: fetchStartups(),
+                  future: StartupService().fetchStartups(),
                   builder: (context, snapshot) {
-
                     // Enquanto os dados não chegam, loading
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
-                    
+
                     // Se deu erro na chamada
                     if (snapshot.hasError) {
-                      return const Center(
-                        child: Text('Erro ao carregar startups'),
-                      );
+                      debugPrint('ERRO: ${snapshot.error}');
                     }
 
                     final startups = snapshot.data ?? [];
-                    
+
                     // Se não veio nada
                     if (startups.isEmpty) {
                       return const Center(
                         child: Text('Nenhuma startup disponível.'),
                       );
                     }
-                    
+
                     // Se tudo der certo (Deus queira que sim) os dados chegam aqui
                     return ListView.separated(
                       itemCount: startups.length,
@@ -221,7 +147,6 @@ class _CataloguePageState extends State<CataloguePage> {
     );
   }
 }
-
 
 class StartupCard extends StatelessWidget {
   final Startup startup;

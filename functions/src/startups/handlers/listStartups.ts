@@ -13,7 +13,9 @@ import { allowedStages } from "../shared/constants";
 import { listStartupItems } from "../repositories/startupRepository";
 import { StartupStage } from "../types/startupTypes";
 // Criando a função
-export const listStartups = onCall(async (request) => {
+export const listStartups = onCall(
+  { region: "southamerica-east1" },
+  async (request) => {
   // Se o usuário não estiver logado, a função retorna um erro
   requireAuthenticatedUser(request);
 

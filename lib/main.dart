@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
+import 'package:cloud_functions/cloud_functions.dart';
 import 'screens/login_page.dart'; // arquivo da tela de login
-
+import 'services/startups/startups_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 // void main() async {
 //   WidgetsFlutterBinding.ensureInitialized();
 //   // await Firebase.initializeApp(
@@ -11,12 +13,10 @@ import 'screens/login_page.dart'; // arquivo da tela de login
 //   runApp(const MyApp());
 // }
 
-
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-    await Firebase.initializeApp(
-      options: DefaultFirebaseOptions.currentPlatform,
-    );
+
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(MyApp());
 }
@@ -30,11 +30,8 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Página de Login',
-      theme: ThemeData(
-      ),
+      theme: ThemeData(),
       home: const LoginPage(),
     );
   }
 }
-
-

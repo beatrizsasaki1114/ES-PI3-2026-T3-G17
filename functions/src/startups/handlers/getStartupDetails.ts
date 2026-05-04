@@ -11,7 +11,9 @@ import {
 } from "../repositories/startupRepository";
 
 
-export const getStartupDetails = onCall(async (request) => {
+export const getStartupDetails = onCall(
+    { region: "southamerica-east1" },
+    async (request) => {
 
    
     const user = requireAuthenticatedUser(request);

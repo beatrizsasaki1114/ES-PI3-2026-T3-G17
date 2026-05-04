@@ -15,7 +15,7 @@ const demoStartup: StartupDocument[] = [
     {
         ID: "1",
         NomeStartup: "EduFlow",
-        Estagio: "Validacao",
+        Estagio: "Expansao",
 
         DescricaoCurta: "Especialista em educação digital",
 
@@ -207,7 +207,7 @@ const demoStartup: StartupDocument[] = [
     {
         ID: "4",
         NomeStartup: "EcoTech",
-        Estagio: "Operecao",
+        Estagio: "Operacao",
 
         DescricaoCurta: "Monitoramento ambiental para empresas",
 
@@ -465,7 +465,7 @@ export async function seedDemoStartups(): Promise<string[]> {
         const { ID, ...data } = startup as StartupDocument & { ID: string };
 
         const startupRef = startupsCollection.doc(ID);
-
+     
         batch.set(
             startupRef,
             {
@@ -491,6 +491,6 @@ export async function seedDemoStartups(): Promise<string[]> {
     }
 
     await batch.commit();
-
+  
     return demoStartup.map((startup) => startup.ID);
 }

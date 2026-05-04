@@ -1,5 +1,7 @@
 export {createUser} from "./Users/handlers/createUser";
-
+export { listStartups } from "./startups/handlers/listStartups";
+export { getStartupDetails } from "./startups/handlers/getStartupDetails";
+export { seedStartupCatalog } from "./startups/handlers/seedStartupCatalog";
 /**
  * Import function triggers from their respective submodules:
  *
@@ -10,8 +12,7 @@ export {createUser} from "./Users/handlers/createUser";
  */
 
 import {setGlobalOptions} from "firebase-functions";
-import {onRequest} from "firebase-functions/https";
-import * as logger from "firebase-functions/logger";
+
 
 // Start writing functions
 // https://firebase.google.com/docs/functions/typescript
