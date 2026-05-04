@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/create_account_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/forgotten_password_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/catalogue_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/authentication/create_account_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/authentication/forgotten_password_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/app/catalogue_page.dart';
 import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

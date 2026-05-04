@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/login_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/authentication/login_page.dart';
 import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 

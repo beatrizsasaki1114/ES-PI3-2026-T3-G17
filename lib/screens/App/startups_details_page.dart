@@ -5,7 +5,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.
 import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
-import 'package:projeto_integrador_3_grupo_17/models/startup_model.dart';
+import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 
 class StartupDetailsPage extends StatelessWidget {
   Widget _buildDrawerItem({
