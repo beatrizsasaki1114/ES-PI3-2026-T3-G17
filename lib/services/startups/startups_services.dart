@@ -14,4 +14,17 @@ class StartupService {
       return Startup.fromJson(Map<String, dynamic>.from(item as Map));
     }).toList();
   }
+
+  Future<Startup> fetchStartupDetails(String id) async {
+  final result = await FirebaseFunctions.instanceFor(
+    region: 'southamerica-east1',
+  ).httpsCallable('getStartupDetails').call({
+    'startupId': id,
+  });
+
+  final response = Map<String, dynamic>.from(result.data);
+  final data = Map<String, dynamic>.from(response['data']);
+
+  return Startup.fromJson(data);
+}
 }

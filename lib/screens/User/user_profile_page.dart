@@ -37,8 +37,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
   final String userBio = "Entusiasta de tecnologia e investimentos em startups de impacto socioambiental.";
 
   final List<Startup> userInvestments = [
-    Startup(id: 'ex1', name: 'EcoTech', description: 'Monitoramento ambiental', stage: 'Operação', tokenType: 'CLEANTECH'),
-    Startup(id: 'ex2', name: 'LoginChain', description: 'Blockchain logística', stage: 'Tração', tokenType: 'LOGTECH'),
+
     
   ];
   String get userStatus {

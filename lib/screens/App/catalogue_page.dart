@@ -261,10 +261,11 @@ class StartupCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   Text(startup.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.poppins(fontSize: 13)),
                   const SizedBox(height: 8),
-                  Row(
+                  Wrap(
+                    spacing: 8, // Espaço horizontal entre os chips
+                    runSpacing: 4, // Espaço vertical se ele pular de linha
                     children: [
                       InfoChip(label: startup.stage, color: const Color.fromARGB(255, 73, 46, 143)),
-                      const SizedBox(width: 8),
                       InfoChip(label: startup.tokenType, color: const Color.fromARGB(255, 182, 38, 111)),
                     ],
                   ),

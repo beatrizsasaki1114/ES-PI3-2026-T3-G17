@@ -29,7 +29,7 @@ const demoStartup: StartupDocument[] = [
         TotalTokensEmitidos: 400000,
         PrecoAtualToken: 0.9,
 
-        DemoVideo: "https://demo.eduflow.com",
+        DemoVideo: "https://youtu.be/FzS2cYpV_e8",
 
         Fundadores: [
             {
@@ -157,7 +157,7 @@ const demoStartup: StartupDocument[] = [
         TotalTokensEmitidos: 750000,
         PrecoAtualToken: 1.8,
 
-        DemoVideo: "https://demo.agrosmart.com",
+        DemoVideo: "https://www.youtube.com/watch?v=Wcud4sJzcZo",
 
         Fundadores: [
             {
@@ -221,7 +221,7 @@ const demoStartup: StartupDocument[] = [
         TotalTokensEmitidos: 1000000,
         PrecoAtualToken: 2.5,
 
-        DemoVideo: "",
+        DemoVideo: "https://youtu.be/WfUmpk_V3go",
 
         Fundadores: [
             {
@@ -285,7 +285,7 @@ const demoStartup: StartupDocument[] = [
         TotalTokensEmitidos: 800000,
         PrecoAtualToken: 1.8,
 
-        DemoVideo: "",
+        DemoVideo: "https://youtu.be/-S44gNxIXEY",
 
         Fundadores: [
             {
