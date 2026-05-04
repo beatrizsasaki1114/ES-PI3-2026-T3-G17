@@ -7,6 +7,8 @@ export type Users = {
     cpf: string;
     telefone: string;
     email: string;
+    saldo: number;   
+    descricao: string;
 }
 
 
