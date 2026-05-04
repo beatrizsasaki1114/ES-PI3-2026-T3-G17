@@ -1,6 +1,3 @@
-//Sofia de Sousa (uma parte feita pela Beatriz)
-
-
 class Founder {
   final String name;
   final String role;
@@ -21,8 +18,22 @@ class Founder {
   }
 }
 
-//Dados da startup, mapeados do backend
-//Os dados sõa em final porque o objeto não deve mudar depois dele ser criado(evitando bugs)
+class StartupDocument {
+  final String title;
+  final String url;
+  final String type;
+
+  StartupDocument({required this.title, required this.url, required this.type});
+
+  factory StartupDocument.fromJson(Map<String, dynamic> json) {
+    return StartupDocument(
+      title: json['Titulo']?.toString() ?? '',
+      url: json['URL']?.toString() ?? '',
+      type: json['Tipo']?.toString() ?? '',
+    );
+  }
+}
+
 class Startup {
   final String id;
   final String name;
@@ -32,9 +43,8 @@ class Startup {
   final String longDescription;
   final List<Founder> founders;
   final String videoUrl;
-  
+  final List<StartupDocument> publicDocuments;
 
-  //Required garante que nenhum campo venha vazio
   Startup({
     required this.id,
     required this.name,
@@ -43,16 +53,20 @@ class Startup {
     required this.tokenType,
     required this.longDescription,
     required this.founders,
-    required this.videoUrl
+    required this.videoUrl,
+    required this.publicDocuments, 
   });
 
-
-  //Transforma o json do back em um objeto (vem do json (fromJson))
   factory Startup.fromJson(Map<String, dynamic> json) {
 
     var foundersList = json['Fundadores'] as List? ?? [];
     List<Founder> parsedFounders = foundersList
         .map((f) => Founder.fromJson(Map<String, dynamic>.from(f)))
+        .toList();
+
+    var docsList = json['DocumentosPublicos'] as List? ?? [];
+    List<StartupDocument> parsedDocs = docsList
+        .map((d) => StartupDocument.fromJson(Map<String, dynamic>.from(d)))
         .toList();
 
     return Startup(
@@ -63,38 +77,23 @@ class Startup {
       videoUrl: json['DemoVideo']?.toString() ?? '',
       stage: _mapStage(json['Estagio']?.toString()),
       tokenType: _mapTokenType(json['tags'] is List ? List<dynamic>.from(json['tags']) : null),
-      founders: parsedFounders, // Lista já convertida
+      founders: parsedFounders,
+      publicDocuments: parsedDocs, 
     );
   }
 
-  
-
-  //  Converte estágio do backend 
-   // Exemplo - vem do backend "Estagio": "operacao"
-     // Vai para o UI como "Operação"
-
   static String _mapStage(String? stage) {
-
-    // Garante que o estágio seja comparado em minúsculas para evitar erros de capitalização
     switch (stage?.toLowerCase()) {
-      case 'nova':
-        return 'Nova';
-      case 'operacao':
-        return 'Operação';
-      case 'expansao':
-        return 'Expansão';
-      case 'validacao':
-        return 'Validação';
-      default:
-        return 'Desconhecido';
+      case 'nova': return 'Nova';
+      case 'operacao': return 'Operação';
+      case 'expansao': return 'Expansão';
+      case 'validacao': return 'Validação';
+      default: return 'Desconhecido';
     }
   }
 
-  //  pega primeira tag como tipo de token
   static String _mapTokenType(List<dynamic>? tags) {
     if (tags == null || tags.isEmpty) return 'N/A';
-
-    // Pega a primeira tag e transforma ou converte para uma string a deixando em maiúscula
     return tags.first.toString().toUpperCase();
   }
 }

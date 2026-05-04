@@ -58,12 +58,12 @@ const demoStartup: StartupDocument[] = [
             {
                 Tipo: "PDF",
                 Titulo: "Pitch EduFlow",
-                URL: "https://docs.eduflow.com/eduflow_pitch.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FEduFlow_Pitch.pdf?alt=media&token=9968723e-a694-4f50-973a-09ec5d100b54"
             },
             {
                 Tipo: "PDF",
                 Titulo: "Plano de Negocio EduFlow",
-                URL: "https://docs.eduflow.com/eduflow_plano.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FEduFlow_Plano_de_Negocios.pdf?alt=media&token=7a562836-2c8e-463f-a60d-a6bb06d30c62"
             }
         ],
 
@@ -122,12 +122,12 @@ const demoStartup: StartupDocument[] = [
             {
                 Tipo: "PDF",
                 Titulo: "Pitch FinFlow",
-                URL: "https://docs.finflow.com/finflow_pitch.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FFinFlow_Pitch.pdf?alt=media&token=19232fb2-6b00-46ba-b8e5-f2315588d686"
             },
             {
                 Tipo: "PDF",
                 Titulo: "Plano de Negocio FinFlow",
-                URL: "https://docs.finflow.com/finflow_plano.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FFinFlow_Plano_de_Negocios.pdf?alt=media&token=b1d42bc1-7bbd-4179-9532-0bee26c30c88"
             }
         ],
 
@@ -186,12 +186,12 @@ const demoStartup: StartupDocument[] = [
             {
                 Tipo: "PDF",
                 Titulo: "Pitch AgroSmart",
-                URL: "https://docs.agrosmart.com/agrosmart_pitch.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FAgroSmart_Pitch.pdf?alt=media&token=8c8b4532-b60b-4ad1-900d-6a44fc69ad21"
             },
             {
                 Tipo: "PDF",
                 Titulo: "Plano de Negocio AgroSmart",
-                URL: "https://docs.agrosmart.com/agrosmart_plano.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FAgroSmart_Plano_de_Negocios.pdf?alt=media&token=64c2a762-26a7-4a8e-903c-a532c7fc8a47"
             }
         ],
 
@@ -250,12 +250,12 @@ const demoStartup: StartupDocument[] = [
             {
                 Tipo: "PDF",
                 Titulo: "Pitch EcoTech",
-                URL: "https://docs.ecotech.com/ecotech_pitch.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FEcoTech_Pitch.pdf?alt=media&token=4ccaf531-5a45-426a-a893-d8685aef1a8e"
             },
             {
                 Tipo: "PDF",
                 Titulo: "Plano de Negocio EcoTech",
-                URL: "https://docs.ecotech.com/ecotech_plano.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FEcoTech_Plano_de_Negocios.pdf?alt=media&token=b4ac9cb3-03fb-4d47-af84-3386ff4da845"
             }
         ],
 
@@ -314,12 +314,12 @@ const demoStartup: StartupDocument[] = [
             {
                 Tipo: "PDF",
                 Titulo: "Pitch HealthSync",
-                URL: "https://docs.healthsync.com/healthsync_pitch.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FHealthSync_Pitch.pdf?alt=media&token=0dad8419-43e5-4cdc-8a0c-7df4d7d1b2bb"
             },
             {
                 Tipo: "PDF",
                 Titulo: "Plano de Negocio HealthSync",
-                URL: "https://docs.healthsync.com/healthsync_plano.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FHealthSync_Plano_de_Negocios.pdf?alt=media&token=281dac14-7e69-4c1c-9124-eb19ac2640a4"
             }
         ],
 
@@ -378,12 +378,12 @@ const demoStartup: StartupDocument[] = [
             {
                 Tipo: "PDF",
                 Titulo: "LoginChain Pitch",
-                URL: "https://docs.loginchain.com/loginchain_pitch.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FLoginChain_Pitch.pdf?alt=media&token=732693fa-9e64-4dfd-8c34-14b7dfecdf62"
             },
             {
                 Tipo: "PDF",
                 Titulo: "LoginChain Plano de Negocio",
-                URL: "https://docs.loginchain.com/loginchain_plano.pdf"
+                URL: "https://firebasestorage.googleapis.com/v0/b/mesclainvest-db416.firebasestorage.app/o/documentos_startup%2FLoginChain_Plano_de_Negocios.pdf?alt=media&token=b1057c10-1c45-4f00-a07c-6f1b79c0811a"
             }
         ],
 

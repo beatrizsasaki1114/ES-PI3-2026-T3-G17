@@ -8,6 +8,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class StartupDetailsPage extends StatefulWidget {
   final Startup startup;
@@ -19,6 +20,7 @@ class StartupDetailsPage extends StatefulWidget {
 }
 
 class _StartupDetailsPageState extends State<StartupDetailsPage> {
+  final int _selectedIndex = 1;
   YoutubePlayerController? _controller;
 
   void _initializeVideo(String url) {
@@ -167,7 +169,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     Container(
                       width: 80, height: 80,
                       decoration: BoxDecoration(
-                        color: const Color.fromARGB(255, 77, 51, 142).withOpacity(0.1),
+                        color: const Color.fromARGB(255, 77, 51, 142).withValues(alpha:0.1),
                         borderRadius: BorderRadius.circular(20),
                       ),
                       child: Center(
@@ -255,6 +257,31 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 )),
 
+                const SizedBox(height: 30),
+                Text(
+                  "Documentos Oficiais",
+                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: const Color.fromARGB(255, 77, 51, 142)),
+                ),
+                const SizedBox(height: 12),
+
+                ...fullStartup.publicDocuments.map((doc) => Card(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  elevation: 0,
+                  color: Colors.grey[100],
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  child: ListTile(
+                    leading: const Icon(Icons.picture_as_pdf, color: Colors.red),
+                    title: Text(doc.title, style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.w500)),
+                    trailing: const Icon(Icons.download, color: Color.fromARGB(255, 77, 51, 142)),
+                    onTap: () async {
+                      final Uri url = Uri.parse(doc.url);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(url, mode: LaunchMode.externalApplication);
+                      }
+                    },
+                  ),
+                )),
+
                 const SizedBox(height: 40),
                 SizedBox(
                   width: double.infinity,
@@ -275,6 +302,24 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
             ),
           );
         },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          if (index == 0) Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage()));
+          if (index == 1) Navigator.push(context, MaterialPageRoute(builder: (_) => const CataloguePage()));
+          if (index == 2) Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        },
+        selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Investimentos'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        ],
       ),
     );
   }
