@@ -1,14 +1,12 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-// Imports de Telas
 import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/startups_details_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
-
-// Imports de Model e Service (Ajuste os nomes dos arquivos conforme sua estrutura real)
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart'; 
 import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
 
@@ -20,9 +18,8 @@ class CataloguePage extends StatefulWidget {
 }
 
 class _CataloguePageState extends State<CataloguePage> {
-  final int _selectedIndex = 1; // Home selecionada por padrão
+  final int _selectedIndex = 1; 
 
-  // Função auxiliar para construir itens do Drawer (do Arquivo 1)
   Widget _buildDrawerItem({
     required IconData icon,
     required String text,
@@ -47,7 +44,6 @@ class _CataloguePageState extends State<CataloguePage> {
     return Scaffold(
       backgroundColor: Colors.white,
       
-      // --- APP BAR (Unificada com Logo e Ações) ---
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
@@ -78,7 +74,6 @@ class _CataloguePageState extends State<CataloguePage> {
         ],
       ),
 
-      // --- DRAWER (Menu Lateral do Arquivo 1) ---
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -138,7 +133,6 @@ class _CataloguePageState extends State<CataloguePage> {
         ),
       ),
 
-      // --- BODY (Lógica de Backend do Arquivo 2) ---
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
@@ -158,7 +152,7 @@ class _CataloguePageState extends State<CataloguePage> {
               const SizedBox(height: 20),
               Expanded(
                 child: FutureBuilder<List<Startup>>(
-                  future: StartupService().fetchStartups(), // Chamada real ao Service
+                  future: StartupService().fetchStartups(), 
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
@@ -175,7 +169,7 @@ class _CataloguePageState extends State<CataloguePage> {
 
                     return ListView.separated(
                       itemCount: startups.length,
-                      separatorBuilder: (_, __) => const SizedBox(height: 20),
+                      separatorBuilder: (_, _) => const SizedBox(height: 20),
                       itemBuilder: (context, index) {
                         final s = startups[index];
                         return StartupCard(
@@ -195,13 +189,12 @@ class _CataloguePageState extends State<CataloguePage> {
         ),
       ),
 
-      // --- BOTTOM NAVIGATION BAR (Arquivo 1) ---
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
           if (index == 0) Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage()));
-          if (index == 1) return; // Já está na home
+          if (index == 1) return; 
           if (index == 2) Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
         },
         selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
@@ -218,7 +211,7 @@ class _CataloguePageState extends State<CataloguePage> {
   }
 }
 
-// --- WIDGETS DE APOIO (StartupCard e InfoChip) ---
+
 
 class StartupCard extends StatelessWidget {
   final Startup startup;
@@ -262,8 +255,8 @@ class StartupCard extends StatelessWidget {
                   Text(startup.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.poppins(fontSize: 13)),
                   const SizedBox(height: 8),
                   Wrap(
-                    spacing: 8, // Espaço horizontal entre os chips
-                    runSpacing: 4, // Espaço vertical se ele pular de linha
+                    spacing: 8, 
+                    runSpacing: 4, 
                     children: [
                       InfoChip(label: startup.stage, color: const Color.fromARGB(255, 73, 46, 143)),
                       InfoChip(label: startup.tokenType, color: const Color.fromARGB(255, 182, 38, 111)),

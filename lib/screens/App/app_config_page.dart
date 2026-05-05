@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:google_fonts/google_fonts.dart';

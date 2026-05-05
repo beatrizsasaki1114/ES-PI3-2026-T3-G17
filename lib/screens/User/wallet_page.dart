@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -26,7 +28,6 @@ class _WalletPageState extends State<WalletPage> {
     _loadUserBalance();
   }
 
-  /// Busca o saldo inicial salvo no Firestore
   Future<void> _loadUserBalance() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -47,7 +48,6 @@ class _WalletPageState extends State<WalletPage> {
     }
   }
 
-  /// Sincroniza o novo saldo com o banco de dados
   Future<void> _addFunds(double amount) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -55,7 +55,6 @@ class _WalletPageState extends State<WalletPage> {
     final newBalance = _currentBalance + amount;
 
     try {
-      // Atualiza no Firestore antes de mudar a interface
       await FirebaseFirestore.instance.collection('Usuários').doc(user.uid).update({
         'saldo': newBalance,
       });

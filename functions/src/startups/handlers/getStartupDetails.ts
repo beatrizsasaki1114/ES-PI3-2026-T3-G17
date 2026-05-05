@@ -1,4 +1,4 @@
-// Sofia de Sousa - Lembrar de voltar para comentar dps 
+// Sofia de Sousa, Bruno Machado
 
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { requireAuthenticatedUser } from "../shared/auth";

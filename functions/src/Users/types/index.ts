@@ -1,4 +1,4 @@
-// Beatriz Naomi
+// Beatriz Naomi, Bruno Machado
 
 export type Users = {
     uid: string;

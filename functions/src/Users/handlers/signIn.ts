@@ -1,8 +1,3 @@
-/**
-import {CallableRequest, onCall} from "firebase-functions/v2/https";
-import type {Users} from "../types/index";
- */
-
 import {getUser} from "../repositories/userRepository";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 

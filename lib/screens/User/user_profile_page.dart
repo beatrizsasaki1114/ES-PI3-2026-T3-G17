@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -49,7 +51,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
-  /// Abre um modal para editar a descrição
   void _editBioDialog() {
     final TextEditingController bioController = TextEditingController(text: userBio);
 
@@ -87,6 +88,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     userBio = newBio;
                   });
                 }
+                if (!context.mounted) return;
                 Navigator.pop(context);
               },
               child: const Text("Salvar", style: TextStyle(color: Colors.white)),
@@ -96,8 +98,6 @@ class _UserProfilePageState extends State<UserProfilePage> {
       },
     );
   }
-
-  // --- UI Original ---
 
   Widget _buildDrawerItem({
     required IconData icon,
@@ -280,9 +280,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                   ),
 
-                  // DESCRIÇÃO EDITÁVEL
                   InkWell(
-                    onTap: _editBioDialog, // Abre a edição ao clicar
+                    onTap: _editBioDialog, 
                     borderRadius: BorderRadius.circular(10),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 10),
@@ -294,7 +293,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                             style: GoogleFonts.poppins(fontSize: 14, color: Colors.grey.shade700),
                           ),
                           const SizedBox(height: 4),
-                          const Icon(Icons.edit, size: 14, color: Colors.grey), // Ícone sutil de editar
+                          const Icon(Icons.edit, size: 14, color: Colors.grey), 
                         ],
                       ),
                     ),

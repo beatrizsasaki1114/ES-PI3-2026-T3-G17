@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -16,13 +18,12 @@ class UserConfigPage extends StatefulWidget {
 }
 
 class _UserConfigPageState extends State<UserConfigPage> {
-  // Controllers para os campos editáveis
+
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
 
-  // Variáveis para campos apenas de leitura
   String _cpf = "";
 
   bool _isLoading = true;
@@ -43,7 +44,6 @@ class _UserConfigPageState extends State<UserConfigPage> {
     super.dispose();
   }
 
-  /// Carrega os dados do Firestore
   Future<void> _loadUserData() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -71,7 +71,6 @@ class _UserConfigPageState extends State<UserConfigPage> {
     }
   }
 
-  /// Salva as alterações no Firestore
   Future<void> _updateUserData() async {
     setState(() => _isLoading = true);
     try {
@@ -96,6 +95,7 @@ class _UserConfigPageState extends State<UserConfigPage> {
       }
     } catch (e) {
       debugPrint("Erro ao atualizar: $e");
+      
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erro ao salvar alterações.")),
       );
@@ -159,8 +159,6 @@ class _UserConfigPageState extends State<UserConfigPage> {
       bottomNavigationBar: _buildBottomNav(),
     );
   }
-
-  // --- Widgets Auxiliares ---
 
   Widget _buildSaveButton() {
     return SizedBox(
@@ -260,6 +258,7 @@ class _UserConfigPageState extends State<UserConfigPage> {
           _buildDrawerItem(Icons.account_balance_wallet, 'Carteira', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage()))),
           _buildDrawerItem(Icons.person, 'Perfil', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()))),
           const Divider(),
+          
           _buildDrawerItem(Icons.exit_to_app, 'Sair', () => FirebaseAuth.instance.signOut().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()))), color: Colors.red),
         ],
       ),

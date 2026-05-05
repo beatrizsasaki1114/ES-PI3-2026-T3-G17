@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import {setUser} from "../repositories/userRepository";
 import {CallableRequest, onCall, HttpsError} from "firebase-functions/v2/https";
 import type {Users} from "../types/index";
@@ -13,7 +15,6 @@ export const createUser = onCall(
 
       const data = request.data;
 
-      // Validações existentes
       if (!data.nome || typeof data.nome !== "string") {
         throw new HttpsError("invalid-argument", "Campo nome obrigatório");
       }

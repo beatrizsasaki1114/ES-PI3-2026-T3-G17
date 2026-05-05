@@ -1,9 +1,7 @@
-// Beatriz Naomi
+// Beatriz Naomi, Bruno Machado
+
 import {Users} from "../types";
 import {db} from "../../shared/firebase";
-// import { getDataConnect } from "firebase-admin/data-connect";
-// import { CollectionGroup } from "firebase-admin/firestore";
-// import { getFirestore, collection, getDocs } from "firebase/firestore";
 
 const usuariosCollection = db.collection("Usuários");
 
@@ -27,7 +25,7 @@ export async function setUser(data: Users) {
   };
 }
 
-// Aproveite para atualizar o getUser para que ele também retorne esses dados
+// Aproveita para atualizar o getUser para que ele também retorne esses dados
 export async function getUser(email: string) {
   const querySnapshot = await usuariosCollection.where('email', '==', email).get();
   

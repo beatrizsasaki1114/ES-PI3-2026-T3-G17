@@ -1,6 +1,6 @@
+//Bruno Machado
 
 import 'package:flutter/material.dart';
-
 import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
 
 class ForgottenPasswordPage extends StatefulWidget {
@@ -93,6 +93,7 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
                                 await AuthService().resetPassword(
                                   email: emailController.text,
                                 );
+                                if (!context.mounted) return;
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text("Email enviado!"),
@@ -112,7 +113,7 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
                           
                           child: const Text(
                               'Enviar Email',
-                            style: const TextStyle(
+                            style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/authentication/login_page.dart';
 import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
@@ -213,6 +215,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                   );
                                   if (result != null) {
                                     debugPrint("Sucesso");
+                                    if (!context.mounted) return;
                                     Navigator.push(
                                       context,
                                       MaterialPageRoute(

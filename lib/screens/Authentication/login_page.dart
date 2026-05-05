@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/authentication/create_account_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/authentication/forgotten_password_page.dart';
@@ -142,6 +144,7 @@ class _LoginPageState extends State<LoginPage> {
                                 password: passwordController.text,
                               );
                               debugPrint("Sucesso");
+                              if (!context.mounted) return;
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
@@ -161,6 +164,7 @@ class _LoginPageState extends State<LoginPage> {
                                 mensagem = "Erro ao fazer login";
                               }
                               debugPrint(mensagem);
+                              if (!context.mounted) return;
                                ScaffoldMessenger.of(context).showSnackBar(
                                   SnackBar(
                                     content: Text(mensagem),
@@ -183,7 +187,6 @@ class _LoginPageState extends State<LoginPage> {
 
                     const SizedBox(height: 25),
 
-                    // RODAPÉ CADASTRO
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
