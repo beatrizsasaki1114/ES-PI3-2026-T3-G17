@@ -6,7 +6,10 @@ import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
+<<<<<<< HEAD
 import 'package:projeto_integrador_3_grupo_17/screens/App/token_market_page.dart';
+=======
+>>>>>>> c6d172fc9248897ae5295f6eae3191946aeb8da2
 
 
 class ConfigPage extends StatefulWidget {
@@ -149,7 +152,11 @@ class _ConfigPageState extends State<ConfigPage> {
       _buildDrawerItem(
         icon: Icons.trending_up,
         text: 'Investimentos',
+<<<<<<< HEAD
         onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TokenMarketPage())), 
+=======
+        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())), 
+>>>>>>> c6d172fc9248897ae5295f6eae3191946aeb8da2
       ),
       _buildDrawerItem(
         icon: Icons.person,
