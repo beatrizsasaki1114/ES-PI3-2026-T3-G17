@@ -1,4 +1,4 @@
-//Bruno Machado
+//Beatriz Naomi, Bruno Machado
 
 import {setUser} from "../repositories/userRepository";
 import {CallableRequest, onCall, HttpsError} from "firebase-functions/v2/https";

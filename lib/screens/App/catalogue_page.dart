@@ -7,7 +7,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/startups_details_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
-import 'package:projeto_integrador_3_grupo_17/models/startups.dart'; 
+import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
 
 class CataloguePage extends StatefulWidget {
@@ -18,7 +18,9 @@ class CataloguePage extends StatefulWidget {
 }
 
 class _CataloguePageState extends State<CataloguePage> {
-  final int _selectedIndex = 1; 
+  final int _selectedIndex = 1;
+  final _minhaRequisicao = StartupService().fetchStartups();
+  String _categoriaSelecionada = 'Todos';
 
   Widget _buildDrawerItem({
     required IconData icon,
@@ -43,7 +45,7 @@ class _CataloguePageState extends State<CataloguePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      
+
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
@@ -51,25 +53,42 @@ class _CataloguePageState extends State<CataloguePage> {
         toolbarHeight: 65,
         leading: Builder(
           builder: (context) => IconButton(
-            icon: Image.asset('assets/images/menuIcon.png', height: 40, width: 40),
+            icon: Image.asset(
+              'assets/images/menuIcon.png',
+              height: 40,
+              width: 40,
+            ),
             onPressed: () => Scaffold.of(context).openDrawer(),
           ),
         ),
         title: InkWell(
-          onTap: () => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const CataloguePage())),
+          onTap: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const CataloguePage()),
+          ),
           child: Transform.translate(
             offset: const Offset(0, -6),
-            child: Image.asset('assets/images/logoMesclaInvest.png', height: 80, fit: BoxFit.contain),
+            child: Image.asset(
+              'assets/images/logoMesclaInvest.png',
+              height: 80,
+              fit: BoxFit.contain,
+            ),
           ),
         ),
+
+        //Parte busca realizada por Beatriz Naomi
         actions: [
           IconButton(
-            icon: Image.asset('assets/images/userIcon.png', height: 40, width: 40),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
-          ),
-          IconButton(
-            icon: Image.asset('assets/images/configIcon.png', height: 40, width: 40),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
+            icon: const Icon(
+              Icons.search,
+              size: 30.0
+              ),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: MySearchDelegate(minhaRequisicao: _minhaRequisicao),
+              );
+            },
           ),
         ],
       ),
@@ -79,7 +98,9 @@ class _CataloguePageState extends State<CataloguePage> {
           padding: EdgeInsets.zero,
           children: [
             DrawerHeader(
-              decoration: const BoxDecoration(color: Color.fromARGB(255, 77, 51, 142)),
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 77, 51, 142),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -87,12 +108,20 @@ class _CataloguePageState extends State<CataloguePage> {
                   const CircleAvatar(
                     backgroundColor: Colors.white,
                     radius: 30,
-                    child: Icon(Icons.person, size: 40, color: Color.fromARGB(255, 77, 51, 142)),
+                    child: Icon(
+                      Icons.person,
+                      size: 40,
+                      color: Color.fromARGB(255, 77, 51, 142),
+                    ),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     'Mescla Invest',
-                    style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ],
               ),
@@ -105,29 +134,45 @@ class _CataloguePageState extends State<CataloguePage> {
             _buildDrawerItem(
               icon: Icons.account_balance_wallet,
               text: 'Minha Carteira',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const WalletPage()),
+              ),
             ),
             _buildDrawerItem(
               icon: Icons.trending_up,
               text: 'Investimentos',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const WalletPage()),
+              ),
             ),
             _buildDrawerItem(
               icon: Icons.person,
               text: 'Meu Perfil',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const UserProfilePage()),
+              ),
             ),
             _buildDrawerItem(
               icon: Icons.settings,
               text: 'Configurações',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const ConfigPage()),
+              ),
             ),
             const Divider(),
             _buildDrawerItem(
               icon: Icons.exit_to_app,
               text: 'Sair',
               color: Colors.red,
-              onTap: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const LoginPage()), (route) => false),
+              onTap: () => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+                (route) => false,
+              ),
             ),
           ],
         ),
@@ -139,47 +184,92 @@ class _CataloguePageState extends State<CataloguePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Text(
-                  'Catálogo de Startups',
-                  style: GoogleFonts.poppins(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: const Color.fromARGB(255, 77, 51, 142),
-                  ),
+              Text(
+                'Catálogo de Startups',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 77, 51, 142),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+             
               Expanded(
                 child: FutureBuilder<List<Startup>>(
-                  future: StartupService().fetchStartups(), 
+                  future: _minhaRequisicao,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (snapshot.hasError) {
-                      return Center(child: Text('Erro ao carregar dados: ${snapshot.error}'));
+                      return Center(
+                        child: Text(
+                          'Erro ao carregar dados: ${snapshot.error}',
+                        ),
+                      );
                     }
 
                     final startups = snapshot.data ?? [];
+                    final categorias = [
+                          'Todos',
+                          ...startups.map((s) => s.stage).toSet().toList()
+                      ];
 
-                    if (startups.isEmpty) {
-                      return const Center(child: Text('Nenhuma startup disponível.'));
-                    }
+                    final startupsExibidas = _categoriaSelecionada == 'Todos'
+                        ? startups
+                        .toList()
+                        : startups.where((s) => s.stage.toLowerCase() == _categoriaSelecionada.toLowerCase()).toList();
 
-                    return ListView.separated(
-                      itemCount: startups.length,
-                      separatorBuilder: (_, _) => const SizedBox(height: 20),
-                      itemBuilder: (context, index) {
-                        final s = startups[index];
-                        return StartupCard(
-                          startup: s,
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => StartupDetailsPage(startup: s)),
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                          SizedBox(
+                            height: 30,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: categorias.length, 
+                              itemBuilder: (context, index) {
+                                final cat = categorias[index];
+                                final isSelected = _categoriaSelecionada == cat;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: InfoChip(
+                                    label: cat,
+                                    color: isSelected ? const Color.fromARGB(255, 77, 51, 142) : Colors.grey[300]!,
+                                    onTap: () {
+                                      setState(() {
+                                        _categoriaSelecionada = cat;
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
                           ),
-                        );
-                      },
+                    
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: startupsExibidas.isEmpty 
+                      ? const Center(child: Text ('Nenhuma startup encontrada.'))
+                      : ListView.separated(
+                        itemCount: startupsExibidas.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 20),
+                        itemBuilder: (context, index) {                            
+                          final s = startupsExibidas[index];
+                            return StartupCard(
+                              startup: s,
+                              onTap: () => Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      StartupDetailsPage(startup: s),
+                                  ),
+                                ),
+                              );
+                            },
+                          )
+                        ),
+                      ]
                     );
                   },
                 ),
@@ -193,16 +283,27 @@ class _CataloguePageState extends State<CataloguePage> {
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
-          if (index == 0) Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage()));
-          if (index == 1) return; 
-          if (index == 2) Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+          if (index == 0)
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const WalletPage()),
+            );
+          if (index == 1) return;
+          if (index == 2)
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const UserProfilePage()),
+            );
         },
         selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
         unselectedItemColor: Colors.grey,
         showSelectedLabels: false,
         showUnselectedLabels: false,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Investimentos'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.attach_money),
+            label: 'Investimentos',
+          ),
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
@@ -210,8 +311,6 @@ class _CataloguePageState extends State<CataloguePage> {
     );
   }
 }
-
-
 
 class StartupCard extends StatelessWidget {
   final Startup startup;
@@ -229,7 +328,13 @@ class StartupCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: const [BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3))],
+          boxShadow: const [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 6,
+              offset: Offset(0, 3),
+            ),
+          ],
           border: Border.all(color: Colors.white, width: 5),
         ),
         child: Row(
@@ -237,11 +342,18 @@ class StartupCard extends StatelessWidget {
             Container(
               width: 56,
               height: 56,
-              decoration: BoxDecoration(color: Colors.blue.shade50, borderRadius: BorderRadius.circular(16)),
+              decoration: BoxDecoration(
+                color: Colors.blue.shade50,
+                borderRadius: BorderRadius.circular(16),
+              ),
               child: Center(
                 child: Text(
                   startup.name.isNotEmpty ? startup.name[0].toUpperCase() : '?',
-                  style: GoogleFonts.poppins(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.blue),
+                  style: GoogleFonts.poppins(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue,
+                  ),
                 ),
               ),
             ),
@@ -250,22 +362,42 @@ class StartupCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(startup.name, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600)),
+                  Text(
+                    startup.name,
+                    style: GoogleFonts.poppins(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   const SizedBox(height: 6),
-                  Text(startup.description, maxLines: 2, overflow: TextOverflow.ellipsis, style: GoogleFonts.poppins(fontSize: 13)),
+                  Text(
+                    startup.description,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: GoogleFonts.poppins(fontSize: 13),
+                  ),
                   const SizedBox(height: 8),
                   Wrap(
-                    spacing: 8, 
-                    runSpacing: 4, 
+                    spacing: 8,
+                    runSpacing: 4,
                     children: [
-                      InfoChip(label: startup.stage, color: const Color.fromARGB(255, 73, 46, 143)),
-                      InfoChip(label: startup.tokenType, color: const Color.fromARGB(255, 182, 38, 111)),
+                      InfoChip(
+                        label: startup.stage,
+                        color: const Color.fromARGB(255, 73, 46, 143),
+                      ),
+                      InfoChip(
+                        label: startup.tokenType,
+                        color: const Color.fromARGB(255, 182, 38, 111),
+                      ),
                     ],
                   ),
                 ],
               ),
             ),
-            const Icon(Icons.chevron_right, color: Color.fromARGB(200, 182, 38, 111)),
+            const Icon(
+              Icons.chevron_right,
+              color: Color.fromARGB(200, 182, 38, 111),
+            ),
           ],
         ),
       ),
@@ -276,18 +408,93 @@ class StartupCard extends StatelessWidget {
 class InfoChip extends StatelessWidget {
   final String label;
   final Color color;
+  final VoidCallback? onTap;
 
-  const InfoChip({super.key, required this.label, required this.color});
+  const InfoChip({
+    super.key,
+    required this.label,
+    required this.color,
+    this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-      decoration: BoxDecoration(color: color, borderRadius: BorderRadius.circular(16)),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      decoration: BoxDecoration(
+        color: color,
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Text(
         label,
-        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.w600, color: Colors.white),
+        style: GoogleFonts.poppins(
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+          color: Colors.white,
+        
+        ),
       ),
+      )
+    );
+  }
+}
+
+//Beatriz Naomi
+class MySearchDelegate extends SearchDelegate {
+  final Future<List<Startup>> minhaRequisicao;
+  MySearchDelegate({required this.minhaRequisicao});
+  // Limpa a busca
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+    IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ""),
+  ];
+
+  // Botão de voltar
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => close(context, null),
+  );
+
+  // Mostra o resultado final ao pressionar "Enter"
+  @override
+  Widget buildResults(BuildContext context) => buildSuggestions(context);
+
+  // Mostra sugestões enquanto o usuário digita
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return FutureBuilder<List<Startup>>(
+      future: minhaRequisicao,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final startups = snapshot.data!;
+
+        final filtradas = startups
+            .where((s) => s.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+
+        return ListView.builder(
+          itemCount: filtradas.length,
+          itemBuilder: (context, index) {
+            final s = filtradas[index];
+            return ListTile(
+              title: Text(s.name),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => StartupDetailsPage(startup: s),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }
