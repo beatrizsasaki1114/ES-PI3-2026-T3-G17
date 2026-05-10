@@ -1,3 +1,5 @@
+// Criada por Sofia de Sousa 
+
 import { FieldValue } from "firebase-admin/firestore";
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 

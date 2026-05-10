@@ -1,3 +1,5 @@
+// Criada por Sofia de Sousa 
+
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { db } from "../../shared/firebase"; // Import a conexão com o Firebase Firesstore
 
