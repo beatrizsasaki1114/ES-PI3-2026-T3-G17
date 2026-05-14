@@ -26,13 +26,16 @@ export async function setUser(data: Users) {
 
 }
 
+// Feito por Heloisa
+
+// function que procura o usuário no banco
 export async function getUser(email: string) {
-  const querySnapshot = await usuariosCollection.where('email', '==', email).get();
+  const querySnapshot = await usuariosCollection.where('email', '==', email).get(); // verifica email
   if (querySnapshot.empty){
     return null;
   } 
   const doc = querySnapshot.docs[0]; // o documento do usuario
-  const userData = doc.data(); // informações do doc
+  const userData = doc.data(); // informações do documento
 
   return {
     // id do Firestore
