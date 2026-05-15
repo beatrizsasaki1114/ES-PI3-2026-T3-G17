@@ -1,5 +1,6 @@
 //Bruno Machado
 //Beatriz Naomi e Sofia
+
 class Founder {
   final String name;
   final String role;
@@ -46,6 +47,10 @@ class Startup {
   final List<Founder> founders;
   final String videoUrl;
   final List<StartupDocument> publicDocuments;
+  
+  // ADICIONADO: Listas para guardar o FAQ vindo do Firebase
+  final List<String> perguntas;
+  final List<String> respostas;
 
   Startup({
     required this.id,
@@ -57,6 +62,8 @@ class Startup {
     required this.founders,
     required this.videoUrl,
     required this.publicDocuments, 
+    required this.perguntas, // <-- Requerido no construtor
+    required this.respostas, // <-- Requerido no construtor
   });
 
   factory Startup.fromJson(Map<String, dynamic> json) {
@@ -71,6 +78,13 @@ class Startup {
         .map((d) => StartupDocument.fromJson(Map<String, dynamic>.from(d)))
         .toList();
 
+    // ADICIONADO: Mapeamento seguro das listas de strings do JSON
+    var perguntasJson = json['Perguntas'] as List? ?? [];
+    List<String> parsedPerguntas = perguntasJson.map((e) => e.toString()).toList();
+
+    var respostasJson = json['Respostas'] as List? ?? [];
+    List<String> parsedRespostas = respostasJson.map((e) => e.toString()).toList();
+
     return Startup(
       id: json['ID']?.toString() ?? '',
       name: json['NomeStartup']?.toString() ?? '',
@@ -81,6 +95,8 @@ class Startup {
       tokenType: _mapTokenType(json['tags'] is List ? List<dynamic>.from(json['tags']) : null),
       founders: parsedFounders,
       publicDocuments: parsedDocs, 
+      perguntas: parsedPerguntas, // <-- Passando a lista mapeada
+      respostas: parsedRespostas, // <-- Passando a lista mapeada
     );
   }
 

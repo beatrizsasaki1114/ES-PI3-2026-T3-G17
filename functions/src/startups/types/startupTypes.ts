@@ -12,6 +12,7 @@ export interface Fundador {
     DescricaoCurta: string;
 }
 
+
 export interface MembroExterno {
     Nome: string;
     Funcao: string;
@@ -42,6 +43,8 @@ export interface StartupDocument {
     tags?: string[];
     createdAt?: Timestamp | FieldValue;
     updatedAt?: Timestamp | FieldValue;
+    Perguntas?: String[];
+    Respostas?: String[];
 }
 
 export interface StartupListItem {

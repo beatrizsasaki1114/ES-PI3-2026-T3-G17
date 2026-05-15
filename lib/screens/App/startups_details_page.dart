@@ -1,20 +1,16 @@
-//Bruno Machado
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart'; 
-import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
+import 'package:url_launcher/url_launcher.dart';
+
+// Imports do projeto
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/invest_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/user_investments_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/society_structure.dart';
-import 'package:url_launcher/url_launcher.dart';
 
+// Import do seu MainLayout
+import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
 
 class StartupDetailsPage extends StatefulWidget {
   final Startup startup;
@@ -27,8 +23,18 @@ class StartupDetailsPage extends StatefulWidget {
 
 class _StartupDetailsPageState extends State<StartupDetailsPage> {
   int? _expandedFaqIndex;
-  final int _selectedIndex = 1;
+  final int _selectedIndex = 1; 
   YoutubePlayerController? _controller;
+  
+  // MODIFICAÇÃO 1: Criamos a variável que guardará o Future fixo
+  late Future<Startup> _startupDetailsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    // MODIFICAÇÃO 2: Inicializamos o Future uma única vez aqui!
+    _startupDetailsFuture = StartupService().fetchStartupDetails(widget.startup.id);
+  }
 
   void _initializeVideo(String url) {
     if (_controller != null || url.isEmpty) return;
@@ -50,24 +56,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
   void dispose() {
     _controller?.dispose();
     super.dispose();
-  }
-
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-    Color color = const Color.fromARGB(255, 77, 51, 142),
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(
-        text,
-        style: GoogleFonts.poppins(
-            fontSize: 16,
-            color: color == Colors.red ? Colors.red : Colors.black87),
-      ),
-      onTap: onTap,
-    );
   }
 
   Widget _buildDocumentButton({
@@ -136,6 +124,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
+          // MODIFICAÇÃO 4: Adicionamos uma chave para o ExpansionTile saber manter o estado visual
+          key: PageStorageKey('faq_$index'),
+          initiallyExpanded: isExpanded,
           title: Text(
             question,
             style: GoogleFonts.poppins(
@@ -148,7 +139,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
             isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
             color: Colors.black54,
           ),
-          onExpansionChanged:(expanded) {
+          onExpansionChanged: (expanded) {
             setState(() {
               _expandedFaqIndex = expanded ? index : null;
             });
@@ -156,12 +147,15 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
           children: [
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-              child: Text(
-                answer,
-                style: GoogleFonts.poppins(
-                  fontSize: 13,
-                  color: Colors.black54,
-                  height: 1.5,
+              child: Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  answer,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.black54,
+                    height: 1.5,
+                  ),
                 ),
               ),
             ),
@@ -171,99 +165,23 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     );
   }
 
+  Widget _buildPriceInfo(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54)),
+        Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Color.fromARGB(255, 77, 51, 142)),
-        title: Text(
-          widget.startup.name,
-          style: GoogleFonts.poppins(
-            color: const Color.fromARGB(255, 77, 51, 142),
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 77, 51, 142),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 30,
-                    child: Icon(Icons.person,
-                        size: 40, color: Color.fromARGB(255, 77, 51, 142)),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Mescla Invest',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            _buildDrawerItem(
-              icon: Icons.business_center,
-              text: 'Catálogo de Startups',
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const CataloguePage())),
-            ),
-            _buildDrawerItem(
-              icon: Icons.account_balance_wallet,
-              text: 'Minha Carteira',
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const WalletPage())),
-            ),
-            _buildDrawerItem(
-              icon: Icons.trending_up,
-              text: 'Investimentos',
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const UserInvestmentsPage())),
-            ),
-            _buildDrawerItem(
-              icon: Icons.person,
-              text: 'Meu Perfil',
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const UserProfilePage())),
-            ),
-            _buildDrawerItem(
-              icon: Icons.settings,
-              text: 'Configurações',
-              onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const ConfigPage())),
-            ),
-            const Divider(),
-            _buildDrawerItem(
-              icon: Icons.exit_to_app,
-              text: 'Sair',
-              color: Colors.red,
-              onTap: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const LoginPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
+    return MainLayout(
+      selectedIndex: _selectedIndex,
       body: FutureBuilder<Startup>(
-        future: StartupService().fetchStartupDetails(widget.startup.id),
+        // MODIFICAÇÃO 3: Apontamos para a variável estável do initState
+        future: _startupDetailsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -288,7 +206,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header
+                // Header da Startup
                 Row(
                   children: [
                     Container(
@@ -350,7 +268,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     _buildPriceInfo('Valor Atual', 'R\$ "0,00"'),
                   ],
                 ),
-                
                 const SizedBox(height: 24),
 
                 // Botão Investir
@@ -382,9 +299,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     ),
                   ),
                 ),
-            
                 const SizedBox(height: 24),
-                // Gráfico de Apresentação (placeholder)
+
+                // Gráfico de Valorização
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
@@ -395,7 +312,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                   child: Column(
                     children: [
-                      // Aqui seria o gráfico
                       Container(
                         height: 120,
                         decoration: BoxDecoration(
@@ -427,11 +343,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   fullStartup.longDescription,
                   style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
                 ),
-                
-
                 const SizedBox(height: 24),
 
-                // Player de Vídeo
+                // Player de Vídeo Pitch
                 if (fullStartup.videoUrl.isNotEmpty && _controller != null)
                   Container(
                     width: double.infinity,
@@ -466,7 +380,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                       ],
                     ),
                   ),
-                
                 const SizedBox(height: 32),
 
                 // Documentos Oficiais
@@ -480,16 +393,15 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                 ),
                 const SizedBox(height: 12),
                 ...fullStartup.publicDocuments.map((doc) => _buildDocumentButton(
-                  title: doc.title,
-                  size: 'PDF - Acessar arquivo',
-                  onTap: () async {
-                    final Uri url = Uri.parse(doc.url);
-                    if (await canLaunchUrl(url)) {
-                      await launchUrl(url, mode: LaunchMode.externalApplication);
-                    }
-                  },
-                )),
-
+                      title: doc.title,
+                      size: 'PDF - Acessar arquivo',
+                      onTap: () async {
+                        final Uri url = Uri.parse(doc.url);
+                        if (await canLaunchUrl(url)) {
+                          await launchUrl(url, mode: LaunchMode.externalApplication);
+                        }
+                      },
+                    )),
                 const SizedBox(height: 32),
 
                 // FAQ
@@ -502,17 +414,34 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                _buildFaqItem(
-                  question: 'A tokenização da ${fullStartup.name} está validada?',
-                  answer: 'Sim, a plataforma possui validação técnica e conformidade regulatória.',
-                  index: 0,
-                ),
-                _buildFaqItem(
-                  question: 'Quais são os próximos passos?',
-                  answer: 'Expansão de mercado e novas funcionalidades na plataforma.',
-                  index: 1,
-                ),
+                
+                // Renderiza a lista de perguntas dinamicamente
+                if (fullStartup.perguntas.isNotEmpty)
+                  ...List.generate(
+                    fullStartup.perguntas.length,
+                    (index) {
+                      // Prevenção de erro: garante que existe uma resposta para o índice atual
+                      String resposta = 'Resposta não encontrada.';
+                      if (index < fullStartup.respostas.length) {
+                        resposta = fullStartup.respostas[index];
+                      }
 
+                      return _buildFaqItem(
+                        question: fullStartup.perguntas[index],
+                        answer: resposta,
+                        index: index,
+                      );
+                    },
+                  )
+                else
+                  Text(
+                    'Nenhuma pergunta frequente cadastrada.',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  
                 const SizedBox(height: 32),
 
                 // Estrutura Societária
@@ -553,37 +482,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
           );
         },
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          if (index == 0) Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage()));
-          if (index == 1) Navigator.push(context, MaterialPageRoute(builder: (_) => const CataloguePage()));
-          if (index == 2) Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
-        },
-        selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Investimentos'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
-      ),
-    );
-  }
-  Widget _buildPriceInfo(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54)),
-        Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
-      ],
     );
   }
 }
-  
 
 class InfoChip extends StatelessWidget {
   final String label;
