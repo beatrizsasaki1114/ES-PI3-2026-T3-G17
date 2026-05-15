@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/authentication/create_account_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/authentication/forgotten_password_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/app/catalogue_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/Authentication/two_factor_auth_page.dart';
 import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -108,13 +109,12 @@ class _LoginPageState extends State<LoginPage> {
                             style: TextStyle(
                               color: Color(0xFFF3009A),
                               fontWeight: FontWeight.bold,
-                            ),  
+                            ),
                           ),
                         ),
                       ),
                     ),
                     const SizedBox(height: 30),
-
                     SizedBox(
                       width: double.infinity,
                       height: 55,
@@ -127,6 +127,7 @@ class _LoginPageState extends State<LoginPage> {
                           elevation: 2,
                         ),
                         onPressed: () async {
+                          // Beatriz Naomi
                           if (emailController.text == "" ||
                               passwordController.text == "") {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -139,38 +140,56 @@ class _LoginPageState extends State<LoginPage> {
                             );
                           } else {
                             try {
-                              await AuthService().signIn(
+                              final userCredential = await AuthService().signIn(
                                 email: emailController.text,
                                 password: passwordController.text,
                               );
-                              debugPrint("Sucesso");
-                              if (!context.mounted) return;
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const CataloguePage(),
-                                ),
-                              );
+                              if (userCredential != null) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const CataloguePage(),
+                                  ),
+                                );
+                              }
+                            } on FirebaseAuthMultiFactorException catch (e) {
+                             await AuthService().sendLoginSms(
+                                  resolver: e.resolver,
+                                  onSmsSent: (vId) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TwoFactorAuthPage(
+                                          resolver: e.resolver,
+                                          verificationId: vId, // Agora o vId chega com sucesso!
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  onError: (error) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(error), backgroundColor: Colors.red),
+                                    );
+                                  },
+                                );
                             } on FirebaseAuthException catch (e) {
                               String mensagem;
 
                               if (e.code == 'user-not-found') {
                                 mensagem = "Usuário não encontrado";
-
                               } else if (e.code == 'wrong-password') {
                                 mensagem = "Senha incorreta";
-
                               } else {
                                 mensagem = "Erro ao fazer login";
                               }
                               debugPrint(mensagem);
                               if (!context.mounted) return;
-                               ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text(mensagem),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(mensagem),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
                             }
                           }
                         },
@@ -217,7 +236,6 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 50),
                   ],
                 ),

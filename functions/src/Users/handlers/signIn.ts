@@ -2,15 +2,15 @@ import {getUser} from "../repositories/userRepository";
 import {onCall, HttpsError} from "firebase-functions/v2/https";
 
 export const signInUser = onCall({ region: "southamerica-east1" }, async (request) => {
-  const { email, password } = request.data; 
+  const { email } = request.data; 
 
   try {
     if (!request.auth) {
       throw new HttpsError("unauthenticated", "Usuário não autenticado");
     }
     // validar se os campos estão preenchidos
-    if (!email || !password) {
-      throw new HttpsError("invalid-argument", "E-mail e senha são obrigatórios.");
+    if (!email ) {
+      throw new HttpsError("invalid-argument", "E-mail é obrigatório.");
     }
 
     // busca no db o usuário pelo email 
@@ -25,6 +25,8 @@ export const signInUser = onCall({ region: "southamerica-east1" }, async (reques
     return {
       uid: user.id,
       nome: user.nome,
+      email:user.email,
+      telefone:user.telefone
       //token: "0"  
     };
 

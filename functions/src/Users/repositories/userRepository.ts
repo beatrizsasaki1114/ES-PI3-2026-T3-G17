@@ -40,7 +40,9 @@ export async function getUser(email: string) {
     id: doc.id,          
     nome: userData.nome, 
     email: userData.email,
+    telefone: userData.telefone,
     saldo: userData.saldo,       
     descricao: userData.descricao 
   };
 }
+

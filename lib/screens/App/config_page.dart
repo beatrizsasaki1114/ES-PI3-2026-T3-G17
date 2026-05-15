@@ -8,6 +8,8 @@ import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/App/token_market_page.dart';
+
 
 
 class ConfigPage extends StatefulWidget {
@@ -84,7 +86,7 @@ class _ConfigPageState extends State<ConfigPage> {
             onPressed: () {
               Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+              MaterialPageRoute(builder: (context) => UserProfilePage()),
             );
             },
           ),
@@ -106,91 +108,91 @@ class _ConfigPageState extends State<ConfigPage> {
         ],
       ),
       drawer: Drawer(
-  child: ListView(
-    padding: EdgeInsets.zero,
-    children: [
-
-      DrawerHeader(
-        decoration: const BoxDecoration(
-          color: Color.fromARGB(255, 77, 51, 142),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.center,
+        child: ListView(
+          padding: EdgeInsets.zero,
           children: [
-            const CircleAvatar(
-              backgroundColor: Colors.white,
-              radius: 30,
-              child: Icon(Icons.person, size: 40, color: Color.fromARGB(255, 77, 51, 142)),
-            ),
-            const SizedBox(height: 10),
-            Text(
-              'Mescla Invest',
-              style: GoogleFonts.poppins(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
+
+            DrawerHeader(
+              decoration: const BoxDecoration(
+                color: Color.fromARGB(255, 77, 51, 142),
               ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const CircleAvatar(
+                    backgroundColor: Colors.white,
+                    radius: 30,
+                    child: Icon(Icons.person, size: 40, color: Color.fromARGB(255, 77, 51, 142)),
+                  ),
+                  const SizedBox(height: 10),
+                  Text(
+                    'Mescla Invest',
+                    style: GoogleFonts.poppins(
+                      color: Colors.white,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+
+            _buildDrawerItem(
+              icon: Icons.business_center,
+              text: 'Catálogo de Startups',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CataloguePage())),
+            ),
+            _buildDrawerItem(
+              icon: Icons.account_balance_wallet,
+              text: 'Minha Carteira',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())),
+            ),
+            _buildDrawerItem(
+              icon: Icons.trending_up,
+              text: 'Investimentos',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const TokenMarketPage())),
+            ),
+            _buildDrawerItem(
+              icon: Icons.person,
+              text: 'Meu Perfil',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) =>  UserProfilePage())),
+            ),
+            _buildDrawerItem(
+              icon: Icons.settings,
+              text: 'Configurações',
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
+            ),
+
+            const Divider(),
+
+            _buildDrawerItem(
+              icon: Icons.exit_to_app,
+              text: 'Sair',
+              color: Colors.red,
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const  LoginPage(),
+                  ),
+                );
+              },
             ),
           ],
         ),
       ),
-      
-
-      _buildDrawerItem(
-        icon: Icons.business_center,
-        text: 'Catálogo de Startups',
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CataloguePage())),
-      ),
-      _buildDrawerItem(
-        icon: Icons.account_balance_wallet,
-        text: 'Minha Carteira',
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())),
-      ),
-      _buildDrawerItem(
-        icon: Icons.trending_up,
-        text: 'Investimentos',
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage())), 
-      ),
-      _buildDrawerItem(
-        icon: Icons.person,
-        text: 'Meu Perfil',
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
-      ),
-      _buildDrawerItem(
-        icon: Icons.settings,
-        text: 'Configurações',
-        onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
-      ),
-      
-      const Divider(), 
-      
-      _buildDrawerItem(
-        icon: Icons.exit_to_app,
-        text: 'Sair',
-        color: Colors.red,
-        onTap: () {
-          Navigator.push(
-                context,
-                MaterialPageRoute(
-                builder: (context) => const  LoginPage(),
-                ),
-              );
-        },
-      ),
-    ],
-  ),
-),
       body: SafeArea(
-  child: SingleChildScrollView(
-    child: Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 30),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 40),
-          Text(
+        child: SingleChildScrollView(
+          child: Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 30),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                const SizedBox(height: 40),
+                Text(
                   'Configurações',
                   style: GoogleFonts.poppins(
                     textStyle: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
@@ -266,7 +268,7 @@ bottomNavigationBar: BottomNavigationBar(
 
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+              MaterialPageRoute(builder: (context) => UserProfilePage()),
             );
           }
         },

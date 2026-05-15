@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'firebase_options.dart';
-import 'screens/authentication/login_page.dart'; // arquivo da tela de login
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'screens/Authentication/login_page.dart'; // arquivo da tela de login
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-
-  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-
-  runApp(MyApp());
+  Firebase.initializeApp();
+  
+  runApp(const MyApp());
 }
-//TESTAR EM ANDROID EMULADOR NAO EM WEB!
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
@@ -21,8 +18,11 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Página de Login',
-      theme: ThemeData(),
+      theme: ThemeData(
+      ),
       home: const LoginPage(),
     );
   }
 }
+
+

@@ -224,7 +224,13 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                     );
                                   }
                                 } catch (e) {
-                                  debugPrint("ERRO: $e");
+                                  if (!context.mounted) return;
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(e.toString()), 
+                                    backgroundColor: Colors.red),
+                                  );
+                                    debugPrint("ERRO: $e");
                                 }
                               }
                           

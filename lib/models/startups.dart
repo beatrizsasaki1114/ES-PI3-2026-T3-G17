@@ -1,5 +1,5 @@
 //Bruno Machado
-
+//Beatriz Naomi e Sofia
 class Founder {
   final String name;
   final String role;

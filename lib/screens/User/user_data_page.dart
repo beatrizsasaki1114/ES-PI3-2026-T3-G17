@@ -18,7 +18,6 @@ class UserConfigPage extends StatefulWidget {
 }
 
 class _UserConfigPageState extends State<UserConfigPage> {
-
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -80,11 +79,11 @@ class _UserConfigPageState extends State<UserConfigPage> {
             .collection('Usuários')
             .doc(user.uid)
             .update({
-          'nome': _firstNameController.text.trim(),
-          'sobrenome': _lastNameController.text.trim(),
-          'email': _emailController.text.trim(),
-          'telefone': _phoneController.text.trim(),
-        });
+              'nome': _firstNameController.text.trim(),
+              'sobrenome': _lastNameController.text.trim(),
+              'email': _emailController.text.trim(),
+              'telefone': _phoneController.text.trim(),
+            });
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -95,7 +94,7 @@ class _UserConfigPageState extends State<UserConfigPage> {
       }
     } catch (e) {
       debugPrint("Erro ao atualizar: $e");
-      
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Erro ao salvar alterações.")),
       );
@@ -124,11 +123,14 @@ class _UserConfigPageState extends State<UserConfigPage> {
                         'Informações de Usuário',
                         textAlign: TextAlign.center,
                         style: GoogleFonts.poppins(
-                          textStyle: const TextStyle(fontSize: 30, fontWeight: FontWeight.bold),
+                          textStyle: const TextStyle(
+                            fontSize: 30,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(height: 40),
-                      
+
                       _buildFieldLabel("Nome"),
                       _buildCustomInput(controller: _firstNameController),
                       const SizedBox(height: 20),
@@ -138,11 +140,17 @@ class _UserConfigPageState extends State<UserConfigPage> {
                       const SizedBox(height: 20),
 
                       _buildFieldLabel("E-mail"),
-                      _buildCustomInput(controller: _emailController, keyboardType: TextInputType.emailAddress),
+                      _buildCustomInput(
+                        controller: _emailController,
+                        keyboardType: TextInputType.emailAddress,
+                      ),
                       const SizedBox(height: 20),
 
                       _buildFieldLabel("Telefone"),
-                      _buildCustomInput(controller: _phoneController, keyboardType: TextInputType.phone),
+                      _buildCustomInput(
+                        controller: _phoneController,
+                        keyboardType: TextInputType.phone,
+                      ),
                       const SizedBox(height: 20),
 
                       _buildFieldLabel("CPF"),
@@ -167,12 +175,18 @@ class _UserConfigPageState extends State<UserConfigPage> {
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: const Color(0xFFF3009A),
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
+          ),
         ),
         onPressed: _updateUserData,
         child: const Text(
           "Salvar Alterações",
-          style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(
+            color: Colors.white,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -185,7 +199,11 @@ class _UserConfigPageState extends State<UserConfigPage> {
         padding: const EdgeInsets.only(bottom: 8.0),
         child: Text(
           label,
-          style: const TextStyle(color: Colors.black87, fontSize: 15, fontWeight: FontWeight.bold),
+          style: const TextStyle(
+            color: Colors.black87,
+            fontSize: 15,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
     );
@@ -229,17 +247,25 @@ class _UserConfigPageState extends State<UserConfigPage> {
       ),
       title: InkWell(
         onTap: () => Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (_) => const CataloguePage()), (route) => false),
+          MaterialPageRoute(builder: (_) => const CataloguePage()),
+          (route) => false,
+        ),
         child: Image.asset('assets/images/logoMesclaInvest.png', height: 80),
       ),
       actions: [
         IconButton(
           icon: Image.asset('assets/images/userIcon.png', height: 40),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const UserProfilePage()),
+          ),
         ),
         IconButton(
           icon: Image.asset('assets/images/configIcon.png', height: 40),
-          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
+          onPressed: () => Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const ConfigPage()),
+          ),
         ),
       ],
     );
@@ -252,23 +278,70 @@ class _UserConfigPageState extends State<UserConfigPage> {
         children: [
           const DrawerHeader(
             decoration: BoxDecoration(color: Color.fromARGB(255, 77, 51, 142)),
-            child: Center(child: Text("Mescla Invest", style: TextStyle(color: Colors.white, fontSize: 20))),
+            child: Center(
+              child: Text(
+                "Mescla Invest",
+                style: TextStyle(color: Colors.white, fontSize: 20),
+              ),
+            ),
           ),
-          _buildDrawerItem(Icons.business_center, 'Catálogo', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CataloguePage()))),
-          _buildDrawerItem(Icons.account_balance_wallet, 'Carteira', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage()))),
-          _buildDrawerItem(Icons.person, 'Perfil', () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()))),
+          _buildDrawerItem(
+            Icons.business_center,
+            'Catálogo',
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CataloguePage()),
+            ),
+          ),
+          _buildDrawerItem(
+            Icons.account_balance_wallet,
+            'Carteira',
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const WalletPage()),
+            ),
+          ),
+          _buildDrawerItem(
+            Icons.person,
+            'Perfil',
+            () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const UserProfilePage()),
+            ),
+          ),
           const Divider(),
-          
-          _buildDrawerItem(Icons.exit_to_app, 'Sair', () => FirebaseAuth.instance.signOut().then((_) => Navigator.pushReplacement(context, MaterialPageRoute(builder: (_) => const LoginPage()))), color: Colors.red),
+
+          _buildDrawerItem(
+            Icons.exit_to_app,
+            'Sair',
+            () => FirebaseAuth.instance.signOut().then(
+              (_) => Navigator.pushReplacement(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+              ),
+            ),
+            color: Colors.red,
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildDrawerItem(IconData icon, String text, VoidCallback onTap, {Color color = const Color.fromARGB(255, 77, 51, 142)}) {
+  Widget _buildDrawerItem(
+    IconData icon,
+    String text,
+    VoidCallback onTap, {
+    Color color = const Color.fromARGB(255, 77, 51, 142),
+  }) {
     return ListTile(
       leading: Icon(icon, color: color),
-      title: Text(text, style: GoogleFonts.poppins(fontSize: 16, color: color == Colors.red ? Colors.red : Colors.black87)),
+      title: Text(
+        text,
+        style: GoogleFonts.poppins(
+          fontSize: 16,
+          color: color == Colors.red ? Colors.red : Colors.black87,
+        ),
+      ),
       onTap: onTap,
     );
   }
@@ -278,13 +351,28 @@ class _UserConfigPageState extends State<UserConfigPage> {
       currentIndex: _selectedIndex,
       type: BottomNavigationBarType.fixed,
       onTap: (index) {
-        if (index == 0) Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage()));
-        if (index == 1) Navigator.of(context).pushAndRemoveUntil(MaterialPageRoute(builder: (_) => const CataloguePage()), (route) => false);
-        if (index == 2) Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        if (index == 0)
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const WalletPage()),
+          );
+        if (index == 1)
+          Navigator.of(context).pushAndRemoveUntil(
+            MaterialPageRoute(builder: (_) => const CataloguePage()),
+            (route) => false,
+          );
+        if (index == 2)
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const UserProfilePage()),
+          );
       },
       selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
       items: const [
-        BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Investimentos'),
+        BottomNavigationBarItem(
+          icon: Icon(Icons.attach_money),
+          label: 'Investimentos',
+        ),
         BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
         BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
       ],

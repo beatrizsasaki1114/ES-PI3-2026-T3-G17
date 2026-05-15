@@ -9,6 +9,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/App/startups_details_page.
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/App/token_market_page.dart';
 
 class CataloguePage extends StatefulWidget {
   const CataloguePage({super.key});
@@ -45,7 +46,6 @@ class _CataloguePageState extends State<CataloguePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
@@ -144,7 +144,9 @@ class _CataloguePageState extends State<CataloguePage> {
               text: 'Investimentos',
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const WalletPage()),
+                MaterialPageRoute(
+                  builder: (_) => const TokenMarketPage(),
+                ),
               ),
             ),
             _buildDrawerItem(
@@ -152,7 +154,9 @@ class _CataloguePageState extends State<CataloguePage> {
               text: 'Meu Perfil',
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const UserProfilePage()),
+                MaterialPageRoute(
+                  builder: (_) => UserProfilePage(),
+                ),
               ),
             ),
             _buildDrawerItem(
@@ -278,7 +282,6 @@ class _CataloguePageState extends State<CataloguePage> {
           ),
         ),
       ),
-
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,

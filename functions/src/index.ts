@@ -1,4 +1,5 @@
 export {createUser} from "./Users/handlers/createUser";
+export {signInUser} from "./Users/handlers/signIn";
 export { listStartups } from "./startups/handlers/listStartups";
 export { getStartupDetails } from "./startups/handlers/getStartupDetails";
 export { seedStartupCatalog } from "./startups/handlers/seedStartupCatalog";
