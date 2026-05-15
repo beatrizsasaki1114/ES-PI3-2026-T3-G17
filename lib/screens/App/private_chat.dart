@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:projeto_integrador_3_grupo_17/models/startup_model.dart';
+import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 
 class PrivateChatPage extends StatefulWidget {
   final Startup startup;

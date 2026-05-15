@@ -1,14 +1,20 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart'; 
 import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
-import 'package:projeto_integrador_3_grupo_17/models/startup_model.dart';
+import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
+import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/invest_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/token_market_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/society_structure.dart';
+import 'package:url_launcher/url_launcher.dart';
+
 
 class StartupDetailsPage extends StatefulWidget {
   final Startup startup;
@@ -21,6 +27,30 @@ class StartupDetailsPage extends StatefulWidget {
 
 class _StartupDetailsPageState extends State<StartupDetailsPage> {
   int? _expandedFaqIndex;
+  final int _selectedIndex = 1;
+  YoutubePlayerController? _controller;
+
+  void _initializeVideo(String url) {
+    if (_controller != null || url.isEmpty) return;
+
+    final videoId = YoutubePlayer.convertUrlToId(url);
+    if (videoId != null) {
+      _controller = YoutubePlayerController(
+        initialVideoId: videoId,
+        flags: const YoutubePlayerFlags(
+          autoPlay: false,
+          mute: false,
+          isLive: false,
+        ),
+      );
+    }
+  }
+
+  @override
+  void dispose() {
+    _controller?.dispose();
+    super.dispose();
+  }
 
   Widget _buildDrawerItem({
     required IconData icon,
@@ -118,7 +148,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
             isExpanded ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
             color: Colors.black54,
           ),
-          onExpansionChanged: (expanded) {
+          onExpansionChanged:(expanded) {
             setState(() {
               _expandedFaqIndex = expanded ? index : null;
             });
@@ -148,8 +178,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        iconTheme:
-        const IconThemeData(color: Color.fromARGB(255, 77, 51, 142)),
+        iconTheme: const IconThemeData(color: Color.fromARGB(255, 77, 51, 142)),
         title: Text(
           widget.startup.name,
           style: GoogleFonts.poppins(
@@ -224,382 +253,341 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
               text: 'Sair',
               color: Colors.red,
               onTap: () {
-                Navigator.push(
+                Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
-                  ),
+                  MaterialPageRoute(builder: (context) => const LoginPage()),
                 );
               },
             ),
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header com logo e informações
-            Row(
+      body: FutureBuilder<Startup>(
+        future: StartupService().fetchStartupDetails(widget.startup.id),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          }
+
+          if (snapshot.hasError) {
+            return Center(child: Text('Erro: ${snapshot.error}'));
+          }
+
+          if (!snapshot.hasData) {
+            return const Center(child: Text('Nenhum dado encontrado.'));
+          }
+
+          final fullStartup = snapshot.data!;
+
+          if (fullStartup.videoUrl.isNotEmpty) {
+            _initializeVideo(fullStartup.videoUrl);
+          }
+
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 70,
-                  height: 70,
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Center(
-                    child: Text(
-                      widget.startup.name[0].toUpperCase(),
-                      style: GoogleFonts.poppins(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.blue,
+                // Header
+                Row(
+                  children: [
+                    Container(
+                      width: 75,
+                      height: 75,
+                      decoration: BoxDecoration(
+                        color: Colors.blue.shade50,
+                        borderRadius: BorderRadius.circular(16),
                       ),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        widget.startup.name,
-                        style: GoogleFonts.poppins(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                      child: Center(
+                        child: Text(
+                          fullStartup.name.isNotEmpty ? fullStartup.name[0].toUpperCase() : 'S',
+                          style: GoogleFonts.poppins(
+                            fontSize: 28,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.blue,
+                          ),
                         ),
                       ),
-                      const SizedBox(height: 6),
-                      Row(
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          InfoChip(
-                            label: widget.startup.stage,
-                            color: const Color.fromARGB(255, 73, 46, 143),
+                          Text(
+                            fullStartup.name,
+                            style: GoogleFonts.poppins(
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                          const SizedBox(width: 8),
-                          InfoChip(
-                            label: widget.startup.tokenType,
-                            color: const Color.fromARGB(255, 182, 38, 111),
+                          const SizedBox(height: 6),
+                          Row(
+                            children: [
+                              InfoChip(
+                                label: fullStartup.stage,
+                                color: const Color.fromARGB(255, 73, 46, 143),
+                              ),
+                              const SizedBox(width: 8),
+                              InfoChip(
+                                label: fullStartup.tokenType,
+                                color: const Color.fromARGB(255, 182, 38, 111),
+                              ),
+                            ],
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Preço e Informações
-            Row(
-              children: [
-                Text(
-                  'Preço/Token',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: Colors.black54,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Text(
-                  'Valora. Atual',
-                  style: GoogleFonts.poppins(
-                    fontSize: 13,
-                    color: Colors.black54,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Row(
-              children: [
-                Text(
-                  'R\$ 1',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(width: 24),
-                Text(
-                  'R\$ X.XXX,XX',
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Botão Investir
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => InvestPage(startup: widget.startup),
                     ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFE91E63),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
+                  ],
                 ),
-                child: Text(
-                  "Investir em AQTP",
-                  style: GoogleFonts.poppins(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(height: 32),
+                const SizedBox(height: 24),
 
-            // Gráfico de Apresentação (placeholder)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.grey.shade50,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: Colors.grey.shade200),
-              ),
-              child: Column(
-                children: [
-                  // Aqui seria o gráfico
-                  Container(
-                    height: 120,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Center(
-                      child: Text(
-                        'Gráfico de Valorização',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.black38,
+                // Preços
+                Row(
+                  children: [
+                    _buildPriceInfo('Preço/Token', 'R\$ 1,00'),
+                    const SizedBox(width: 24),
+                    _buildPriceInfo('Valor Atual', 'R\$ "0,00"'),
+                  ],
+                ),
+                
+                const SizedBox(height: 24),
+
+                // Botão Investir
+                SizedBox(
+                  width: double.infinity,
+                  height: 55,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => InvestPage(startup: fullStartup),
                         ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFFE91E63),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 24),
-
-            // Apresentação (vídeo)
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                gradient: const LinearGradient(
-                  colors: [Color(0xFF9C27B0), Color(0xFFE91E63)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                ),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Apresentação',
-                    style: GoogleFonts.poppins(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Container(
-                    height: 100,
-                    decoration: BoxDecoration(
-                      color: Colors.black87,
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: const Center(
-                      child: Icon(
-                        Icons.play_circle_filled,
-                        size: 50,
+                    child: Text(
+                      "Investir em ${fullStartup.tokenType}",
+                      style: GoogleFonts.poppins(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
                         color: Colors.white,
                       ),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                ),
+            
+                const SizedBox(height: 24),
+                // Gráfico de Apresentação (placeholder)
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.grey.shade200),
+                  ),
+                  child: Column(
                     children: [
-                      Text(
-                        '0:00',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.white70,
+                      // Aqui seria o gráfico
+                      Container(
+                        height: 120,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ),
-                      Text(
-                        '3:24',
-                        style: GoogleFonts.poppins(
-                          fontSize: 12,
-                          color: Colors.white70,
+                        child: Center(
+                          child: Text(
+                            'Gráfico de Valorização',
+                            style: GoogleFonts.poppins(
+                              fontSize: 12,
+                              color: Colors.black38,
+                            ),
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 4),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(4),
-                    child: LinearProgressIndicator(
-                      value: 0.0,
-                      backgroundColor: Colors.white30,
-                      valueColor: const AlwaysStoppedAnimation<Color>(Colors.white),
-                      minHeight: 4,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Quem somos?
-            Text(
-              'Quem somos?',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              widget.startup.description,
-              style: GoogleFonts.poppins(
-                fontSize: 14,
-                height: 1.6,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 32),
-
-            // Documentos
-            Text(
-              'Documentos',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildDocumentButton(
-              title: 'Plano de negócios',
-              size: 'PDF - 2.5 MB',
-              onTap: () {
-                // TODO: Abrir documento
-              },
-            ),
-            _buildDocumentButton(
-              title: 'Pitch Deck',
-              size: 'PDF - 3.2 MB',
-              onTap: () {
-                // TODO: Abrir documento
-              },
-            ),
-            const SizedBox(height: 32),
-
-            // FAQ
-            Text(
-              'FAQ',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 12),
-            _buildFaqItem(
-              question: 'A tokenização da Agrotech está validada?',
-              answer:
-              'Sim, a plataforma possui validação técnica e todos os processos estão em conformidade com as regulações vigentes.',
-              index: 0,
-            ),
-            _buildFaqItem(
-              question: 'Quais são os próximos passos?',
-              answer:
-              'Os próximos passos incluem expansão para novos mercados, desenvolvimento de parcerias estratégicas e implementação de novas funcionalidades na plataforma.',
-              index: 1,
-            ),
-            _buildFaqItem(
-              question: 'Para onde vai o dinheiro investido?',
-              answer:
-              'O capital investido é destinado ao desenvolvimento de tecnologia, expansão da equipe, marketing e operações necessárias para o crescimento sustentável da startup.',
-              index: 2,
-            ),
-            const SizedBox(height: 32),
-
-            // Estrutura Societária
-            Text(
-              'Estrutura Societária',
-              style: GoogleFonts.poppins(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                color: Colors.black87,
-              ),
-            ),
-            const SizedBox(height: 12),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const SocietyStructurePage(),
-                    ),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey.shade200,
-                  foregroundColor: Colors.black87,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
                 ),
-                child: Text(
-                  'Acessar Estrutura Societária',
+                const SizedBox(height: 32),
+
+                // Descrição
+                Text(
+                  "Sobre a Startup",
+                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  fullStartup.longDescription,
+                  style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
+                ),
+                
+
+                const SizedBox(height: 24),
+
+                // Player de Vídeo
+                if (fullStartup.videoUrl.isNotEmpty && _controller != null)
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      gradient: const LinearGradient(
+                        colors: [Color(0xFF9C27B0), Color(0xFFE91E63)],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Pitch de Apresentação',
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white,
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: YoutubePlayer(
+                            controller: _controller!,
+                            showVideoProgressIndicator: true,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                
+                const SizedBox(height: 32),
+
+                // Documentos Oficiais
+                Text(
+                  'Documentos Oficiais',
                   style: GoogleFonts.poppins(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 77, 51, 142),
                   ),
                 ),
-              ),
+                const SizedBox(height: 12),
+                ...fullStartup.publicDocuments.map((doc) => _buildDocumentButton(
+                  title: doc.title,
+                  size: 'PDF - Acessar arquivo',
+                  onTap: () async {
+                    final Uri url = Uri.parse(doc.url);
+                    if (await canLaunchUrl(url)) {
+                      await launchUrl(url, mode: LaunchMode.externalApplication);
+                    }
+                  },
+                )),
+
+                const SizedBox(height: 32),
+
+                // FAQ
+                Text(
+                  'FAQ',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                _buildFaqItem(
+                  question: 'A tokenização da ${fullStartup.name} está validada?',
+                  answer: 'Sim, a plataforma possui validação técnica e conformidade regulatória.',
+                  index: 0,
+                ),
+                _buildFaqItem(
+                  question: 'Quais são os próximos passos?',
+                  answer: 'Expansão de mercado e novas funcionalidades na plataforma.',
+                  index: 1,
+                ),
+
+                const SizedBox(height: 32),
+
+                // Estrutura Societária
+                Text(
+                  'Estrutura Societária',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const SocietyStructurePage()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey.shade200,
+                      foregroundColor: Colors.black87,
+                      elevation: 0,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    ),
+                    child: Text(
+                      'Acessar Estrutura Societária',
+                      style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 40),
+              ],
             ),
-            const SizedBox(height: 24),
-          ],
-        ),
+          );
+        },
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _selectedIndex,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) {
+          if (index == 0) Navigator.push(context, MaterialPageRoute(builder: (_) => const WalletPage()));
+          if (index == 1) Navigator.push(context, MaterialPageRoute(builder: (_) => const CataloguePage()));
+          if (index == 2) Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
+        },
+        selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: false,
+        showUnselectedLabels: false,
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Investimentos'),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
+        ],
       ),
     );
   }
+  Widget _buildPriceInfo(String label, String value) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54)),
+        Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+      ],
+    );
+  }
 }
+  
 
 class InfoChip extends StatelessWidget {
   final String label;
   final Color color;
-
   const InfoChip({super.key, required this.label, required this.color});
 
   @override

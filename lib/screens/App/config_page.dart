@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/app_config_page.dart';
@@ -6,7 +8,6 @@ import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
-
 import 'package:projeto_integrador_3_grupo_17/screens/App/token_market_page.dart';
 
 
@@ -20,20 +21,20 @@ class ConfigPage extends StatefulWidget {
 
 class _ConfigPageState extends State<ConfigPage> {
   Widget _buildDrawerItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-    Color color = const Color.fromARGB(255, 77, 51, 142),
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(
-        text,
-        style: GoogleFonts.poppins(fontSize: 16, color: color == Colors.red ? Colors.red : Colors.black87),
-      ),
-      onTap: onTap,
-    );
-  }
+  required IconData icon,
+  required String text,
+  required VoidCallback onTap,
+  Color color = const Color.fromARGB(255, 77, 51, 142),
+}) {
+  return ListTile(
+    leading: Icon(icon, color: color),
+    title: Text(
+      text,
+      style: GoogleFonts.poppins(fontSize: 16, color: color == Colors.red ? Colors.red : Colors.black87),
+    ),
+    onTap: onTap,
+  );
+}
   final _selectedIndex = 1;
   @override
   Widget build(BuildContext context) {
@@ -46,12 +47,12 @@ class _ConfigPageState extends State<ConfigPage> {
         centerTitle: true,
         toolbarHeight: 65,
 
-        leading: Builder(
+        leading: Builder( 
           builder: (BuildContext context) {
             return IconButton(
               icon: Image.asset('assets/images/menuIcon.png', height: 40, width: 40),
               onPressed: () {
-                Scaffold.of(context).openDrawer();
+                Scaffold.of(context).openDrawer(); 
               },
             );
           },
@@ -61,12 +62,12 @@ class _ConfigPageState extends State<ConfigPage> {
           onTap: () {
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const CataloguePage()),
-                  (route) => false,
+              (route) => false,
             );
           },
           borderRadius: BorderRadius.circular(8),
           child: Transform.translate(
-            offset: const Offset(0, -6),
+            offset: const Offset(0, -6), 
             child: Image.asset(
               'assets/images/logoMesclaInvest.png',
               height: 80,
@@ -84,9 +85,9 @@ class _ConfigPageState extends State<ConfigPage> {
             ),
             onPressed: () {
               Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const UserProfilePage()),
-              );
+              context,
+              MaterialPageRoute(builder: (context) => UserProfilePage()),
+            );
             },
           ),
           IconButton(
@@ -156,7 +157,7 @@ class _ConfigPageState extends State<ConfigPage> {
             _buildDrawerItem(
               icon: Icons.person,
               text: 'Meu Perfil',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
+              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) =>  UserProfilePage())),
             ),
             _buildDrawerItem(
               icon: Icons.settings,
@@ -197,59 +198,59 @@ class _ConfigPageState extends State<ConfigPage> {
                     textStyle: const TextStyle(fontSize: 36, fontWeight: FontWeight.bold),
                   ),
                 ),
-                const SizedBox(height: 40),
+          const SizedBox(height: 40),
 
-                _buildSettingsButton(
-                  label: "Configurações de Usuário",
-                  icon: Icons.person_outline,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const  UserConfigPage(),
-                      ),
-                    );
-                  },
+          _buildSettingsButton(
+            label: "Configurações de Usuário",
+            icon: Icons.person_outline,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                builder: (context) => const  UserConfigPage(),
                 ),
-
-                const SizedBox(height: 20),
-
-                _buildSettingsButton(
-                  label: "Configurações do App",
-                  icon: Icons.settings_applications_outlined,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const  AppConfigPage(),
-                      ),
-                    );
-                  },
-                ),
-
-                const SizedBox(height: 20),
-
-                _buildSettingsButton(
-                  label: "Sair",
-                  icon: Icons.logout,
-                  color: Colors.redAccent,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const  LoginPage(),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
+              );
+            },
           ),
-        ),
+
+          const SizedBox(height: 20),
+
+          _buildSettingsButton(
+            label: "Configurações do App",
+            icon: Icons.settings_applications_outlined,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                builder: (context) => const  AppConfigPage(),
+                ),
+              );
+            },
+          ),
+
+          const SizedBox(height: 20),
+
+          _buildSettingsButton(
+            label: "Sair",
+            icon: Icons.logout,
+            color: Colors.redAccent,
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                builder: (context) => const  LoginPage(),
+                ),
+              );
+            },
+          ),
+        ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
+    ),
+  ),
+),
+bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
+        type: BottomNavigationBarType.fixed, 
         onTap: (index) {
           if (index == 0) {
 
@@ -261,13 +262,13 @@ class _ConfigPageState extends State<ConfigPage> {
 
             Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const CataloguePage()),
-                  (route) => false,
+              (route) => false,
             );
           } else if (index == 2) {
 
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => const UserProfilePage()),
+              MaterialPageRoute(builder: (context) => UserProfilePage()),
             );
           }
         },
@@ -295,9 +296,9 @@ class _ConfigPageState extends State<ConfigPage> {
 }
 
 
+  
 
-
-Widget _buildSettingsButton({
+  Widget _buildSettingsButton({
   required String label,
   required IconData icon,
   required VoidCallback onTap,
@@ -341,3 +342,5 @@ Widget _buildSettingsButton({
     ),
   );
 }
+
+  

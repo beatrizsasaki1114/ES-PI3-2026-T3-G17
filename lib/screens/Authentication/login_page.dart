@@ -1,8 +1,12 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/Authentication/create_account_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/Authentication/forgotten_password_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/authentication/create_account_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/authentication/forgotten_password_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/app/catalogue_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/two_factor_auth_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
+import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -13,7 +17,8 @@ class LoginPage extends StatefulWidget {
 
 class _LoginPageState extends State<LoginPage> {
   bool _obscurePassword = true;
-
+  TextEditingController emailController = TextEditingController();
+  TextEditingController passwordController = TextEditingController();
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
@@ -59,29 +64,32 @@ class _LoginPageState extends State<LoginPage> {
                     const Text(
                       'Entre em sua conta para acessar o aplicativo',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: Color(0xFF313131),
-                        fontSize: 16,
-                      ),
+                      style: TextStyle(color: Color(0xFF313131), fontSize: 16),
                     ),
                     const SizedBox(height: 40),
+
                     _buildFieldLabel("E-mail"),
                     const SizedBox(height: 8),
                     _buildCustomInput(
                       hint: "Insira seu e-mail",
+                      controller: emailController,
                     ),
+
                     const SizedBox(height: 20),
+
                     _buildFieldLabel("Senha"),
                     const SizedBox(height: 8),
                     _buildCustomInput(
                       hint: "Informe sua senha",
+                      controller: passwordController,
                       isPassword: true,
                       obscure: _obscurePassword,
-                      onToggle: () => setState(
-                        () => _obscurePassword = !_obscurePassword,
-                      ),
+                      onToggle: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                     ),
+
                     const SizedBox(height: 12),
+
                     Align(
                       alignment: Alignment.centerLeft,
                       child: MouseRegion(
@@ -118,14 +126,72 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                           elevation: 2,
                         ),
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  const TwoFactorAuthPage(),
-                            ),
-                          );
+                        onPressed: () async {
+                          // Beatriz Naomi
+                          if (emailController.text == "" ||
+                              passwordController.text == "") {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  "Todos os campos são obrigatórios",
+                                ),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          } else {
+                            try {
+                              final userCredential = await AuthService().signIn(
+                                email: emailController.text,
+                                password: passwordController.text,
+                              );
+                              if (userCredential != null) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const CataloguePage(),
+                                  ),
+                                );
+                              }
+                            } on FirebaseAuthMultiFactorException catch (e) {
+                             await AuthService().sendLoginSms(
+                                  resolver: e.resolver,
+                                  onSmsSent: (vId) {
+                                    Navigator.pushReplacement(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => TwoFactorAuthPage(
+                                          resolver: e.resolver,
+                                          verificationId: vId, // Agora o vId chega com sucesso!
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  onError: (error) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      SnackBar(content: Text(error), backgroundColor: Colors.red),
+                                    );
+                                  },
+                                );
+                            } on FirebaseAuthException catch (e) {
+                              String mensagem;
+
+                              if (e.code == 'user-not-found') {
+                                mensagem = "Usuário não encontrado";
+                              } else if (e.code == 'wrong-password') {
+                                mensagem = "Senha incorreta";
+                              } else {
+                                mensagem = "Erro ao fazer login";
+                              }
+                              debugPrint(mensagem);
+                              if (!context.mounted) return;
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(mensagem),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                            }
+                          }
                         },
                         child: const Text(
                           'Entrar',
@@ -137,15 +203,15 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                     ),
+
                     const SizedBox(height: 25),
+
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Text(
                           'Não tem uma conta? ',
-                          style: TextStyle(
-                            color: Colors.grey,
-                          ),
+                          style: TextStyle(color: Colors.grey),
                         ),
                         MouseRegion(
                           cursor: SystemMouseCursors.click,
@@ -205,6 +271,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildCustomInput({
     required String hint,
+    TextEditingController? controller,
     bool isPassword = false,
     bool obscure = false,
     VoidCallback? onToggle,
@@ -222,6 +289,7 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
       child: TextField(
+        controller: controller,
         obscureText: isPassword ? obscure : false,
         decoration: InputDecoration(
           hintText: hint,
@@ -233,9 +301,7 @@ class _LoginPageState extends State<LoginPage> {
           suffixIcon: isPassword
               ? IconButton(
                   icon: Icon(
-                    obscure
-                        ? Icons.visibility_off
-                        : Icons.visibility,
+                    obscure ? Icons.visibility_off : Icons.visibility,
                     color: Colors.grey,
                   ),
                   onPressed: onToggle,

@@ -1,17 +1,26 @@
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
 
 class TwoFactorAuthPage extends StatefulWidget {
-  const TwoFactorAuthPage({super.key});
+  final String? verificationId;
+  final MultiFactorResolver? resolver;
+
+  const TwoFactorAuthPage({super.key, this.verificationId, this.resolver});
 
   @override
   State<TwoFactorAuthPage> createState() => _TwoFactorAuthPageState();
 }
 
 class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
-  final List<TextEditingController> _controllers =
-  List.generate(6, (index) => TextEditingController());
-
+  late String _idAtivo;
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (index) => TextEditingController(),
+  );
+  // pega o código inteiro do usuário
+  String get _fullCode => _controllers.map((c) => c.text).join();
   @override
   void dispose() {
     for (var controller in _controllers) {
@@ -56,7 +65,7 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                     const SizedBox(height: 50),
 
                     const Text(
-                      'Digite seu código de 6 dígitos enviado para o seu email',
+                      'Digite seu código de 6 dígitos enviado para seu numero de telefone',
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         fontSize: 16,
@@ -71,7 +80,7 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: List.generate(
                         6,
-                            (index) => SizedBox(
+                        (index) => SizedBox(
                           width: 45,
                           height: 55,
                           child: TextField(
@@ -120,15 +129,33 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                       children: [
                         const Text(
                           'Não recebeu? ',
-                          style: TextStyle(
-                            color: Colors.grey,
-                            fontSize: 13,
-                          ),
+                          style: TextStyle(color: Colors.grey, fontSize: 13),
                         ),
-
                         GestureDetector(
-                          onTap: () {
-                            // futura lógica de reenviar código
+                          onTap: () async {
+                            await AuthService().sendLoginSms(
+                              resolver: widget.resolver!,
+                              onSmsSent: (vId) {
+                                setState(() {
+                                  _idAtivo = vId;
+                                });
+                                for (var c in _controllers) {
+                                  c.clear();
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Novo código enviado!"),
+                                  ),
+                                );
+                              },
+                              onError: (erro) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text('Erro ao reenviar'),
+                                  ),
+                                );
+                              },
+                            );
                           },
                           child: const Text(
                             'Reenviar código',
@@ -141,9 +168,7 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                         ),
                       ],
                     ),
-
                     const SizedBox(height: 35),
-
                     SizedBox(
                       width: double.infinity,
                       height: 55,
@@ -155,14 +180,56 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                           ),
                           elevation: 2,
                         ),
-                        onPressed: () {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                              const CataloguePage(),
-                            ),
-                          );
+                        onPressed: () async {
+                          // Beatriz Naomi
+                          String codigoFinal = _fullCode;
+                          if (codigoFinal.length == 6) {
+                            try{
+                                final String vId = widget.verificationId ?? "";
+
+                                if ( widget.resolver == null) {
+                                  if (vId.isEmpty) throw "ID de verificação ausente.";
+                                  await AuthService().validateCode(
+                                    verificationId: widget.verificationId ?? _idAtivo,
+                                    smsCode: codigoFinal,
+                                  );
+                                  Navigator.pop(context, true);
+                                } else if (widget.resolver != null) {
+                                  if (vId.isEmpty) throw "ID de verificação de login ausente.";
+                                  final credential = PhoneAuthProvider.credential(
+                                    verificationId: widget.verificationId!,
+                                    smsCode: codigoFinal,
+                                  );
+                                  final assertion =
+                                      PhoneMultiFactorGenerator.getAssertion(
+                                        credential,
+                                      );
+                                  await widget.resolver!.resolveSignIn(assertion);
+
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const CataloguePage(),
+                                    ),
+                                  );
+                                } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text("Código incompleto"),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                          } on FirebaseAuthException catch (e) {
+                                String mensagem = "Erro ao validar código";
+                                if (e.code == 'requires-recent-login') {
+                                  mensagem = "Sessão expirada. Por favor, saia e entre novamente no app antes de ativar o 2FA.";
+                                }
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(mensagem), backgroundColor: Colors.red),
+                                );
+                            }
+                          }
                         },
                         child: const Text(
                           'Entrar',
@@ -174,7 +241,6 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 50),
                   ],
                 ),

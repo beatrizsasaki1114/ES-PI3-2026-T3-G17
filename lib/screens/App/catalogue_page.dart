@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
@@ -5,7 +7,8 @@ import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/startups_details_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
-import 'package:projeto_integrador_3_grupo_17/models/startup_model.dart';
+import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
+import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/token_market_page.dart';
 
 class CataloguePage extends StatefulWidget {
@@ -16,7 +19,9 @@ class CataloguePage extends StatefulWidget {
 }
 
 class _CataloguePageState extends State<CataloguePage> {
-  final _selectedIndex = 1;
+  final int _selectedIndex = 1;
+  final _minhaRequisicao = StartupService().fetchStartups();
+  String _categoriaSelecionada = 'Todos';
 
   Widget _buildDrawerItem({
     required IconData icon,
@@ -37,30 +42,6 @@ class _CataloguePageState extends State<CataloguePage> {
     );
   }
 
-  final List<Startup> startups = [
-    Startup(
-      id: 'ex1',
-      name: 'EcoTech',
-      description: 'Plataforma de monitoramento ambiental para empresas',
-      stage: 'Operação',
-      tokenType: 'CLEANTECH',
-    ),
-    Startup(
-      id: 'ex2',
-      name: 'LoginChain',
-      description: 'Sistema de rastreabilidade logística baseado em blockchain',
-      stage: 'Tração',
-      tokenType: 'LOGTECH',
-    ),
-    Startup(
-      id: 'ex3',
-      name: 'EduFlow',
-      description: 'Solução de ensino adaptativo com inteligência artificial',
-      stage: 'Validação',
-      tokenType: 'EDTECH',
-    ),
-  ];
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,26 +52,20 @@ class _CataloguePageState extends State<CataloguePage> {
         centerTitle: true,
         toolbarHeight: 65,
         leading: Builder(
-          builder: (BuildContext context) {
-            return IconButton(
-              icon: Image.asset(
-                'assets/images/menuIcon.png',
-                height: 40,
-                width: 40,
-              ),
-              onPressed: () {
-                Scaffold.of(context).openDrawer();
-              },
-            );
-          },
+          builder: (context) => IconButton(
+            icon: Image.asset(
+              'assets/images/menuIcon.png',
+              height: 40,
+              width: 40,
+            ),
+            onPressed: () => Scaffold.of(context).openDrawer(),
+          ),
         ),
         title: InkWell(
-          onTap: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const CataloguePage()),
-              (route) => false,
-            );
-          },
+          onTap: () => Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (_) => const CataloguePage()),
+          ),
           child: Transform.translate(
             offset: const Offset(0, -6),
             child: Image.asset(
@@ -100,35 +75,24 @@ class _CataloguePageState extends State<CataloguePage> {
             ),
           ),
         ),
+
+        //Parte busca realizada por Beatriz Naomi
         actions: [
           IconButton(
-            icon: Image.asset(
-              'assets/images/userIcon.png',
-              height: 40,
-              width: 40,
-            ),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const UserProfilePage(),
+            icon: const Icon(
+              Icons.search,
+              size: 30.0
               ),
-            ),
-          ),
-          IconButton(
-            icon: Image.asset(
-              'assets/images/configIcon.png',
-              height: 40,
-              width: 40,
-            ),
-            onPressed: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const ConfigPage(),
-              ),
-            ),
+            onPressed: () {
+              showSearch(
+                context: context,
+                delegate: MySearchDelegate(minhaRequisicao: _minhaRequisicao),
+              );
+            },
           ),
         ],
       ),
+
       drawer: Drawer(
         child: ListView(
           padding: EdgeInsets.zero,
@@ -172,9 +136,7 @@ class _CataloguePageState extends State<CataloguePage> {
               text: 'Minha Carteira',
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const WalletPage(),
-                ),
+                MaterialPageRoute(builder: (_) => const WalletPage()),
               ),
             ),
             _buildDrawerItem(
@@ -193,7 +155,7 @@ class _CataloguePageState extends State<CataloguePage> {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => const UserProfilePage(),
+                  builder: (_) => UserProfilePage(),
                 ),
               ),
             ),
@@ -202,9 +164,7 @@ class _CataloguePageState extends State<CataloguePage> {
               text: 'Configurações',
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(
-                  builder: (_) => const ConfigPage(),
-                ),
+                MaterialPageRoute(builder: (_) => const ConfigPage()),
               ),
             ),
             const Divider(),
@@ -212,65 +172,111 @@ class _CataloguePageState extends State<CataloguePage> {
               icon: Icons.exit_to_app,
               text: 'Sair',
               color: Colors.red,
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const LoginPage(),
-                  ),
-                );
-              },
+              onTap: () => Navigator.pushAndRemoveUntil(
+                context,
+                MaterialPageRoute(builder: (_) => const LoginPage()),
+                (route) => false,
+              ),
             ),
           ],
         ),
       ),
+
       body: SafeArea(
         child: Padding(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 30,
-            vertical: 20,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: Text(
-                  'Catálogo de Startups',
-                  style: GoogleFonts.poppins(
-                    fontSize: 36,
-                    fontWeight: FontWeight.bold,
-                    color: const Color.fromARGB(255, 77, 51, 142),
-                  ),
+              Text(
+                'Catálogo de Startups',
+                style: GoogleFonts.poppins(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: const Color.fromARGB(255, 77, 51, 142),
                 ),
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 10),
+             
               Expanded(
-                child: startups.isEmpty
-                    ? const Center(
+                child: FutureBuilder<List<Startup>>(
+                  future: _minhaRequisicao,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (snapshot.hasError) {
+                      return Center(
                         child: Text(
-                          'Nenhuma startup disponível.',
+                          'Erro ao carregar dados: ${snapshot.error}',
                         ),
-                      )
-                    : ListView.separated(
-                        itemCount: startups.length,
-                        separatorBuilder: (_, _) =>
-                            const SizedBox(height: 20),
-                        itemBuilder: (context, index) {
-                          final s = startups[index];
-                          return StartupCard(
-                            startup: s,
-                            onTap: () {
-                              Navigator.push(
+                      );
+                    }
+
+                    final startups = snapshot.data ?? [];
+                    final categorias = [
+                          'Todos',
+                          ...startups.map((s) => s.stage).toSet().toList()
+                      ];
+
+                    final startupsExibidas = _categoriaSelecionada == 'Todos'
+                        ? startups
+                        .toList()
+                        : startups.where((s) => s.stage.toLowerCase() == _categoriaSelecionada.toLowerCase()).toList();
+
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                     children: [
+                          SizedBox(
+                            height: 30,
+                            child: ListView.builder(
+                              scrollDirection: Axis.horizontal,
+                              itemCount: categorias.length, 
+                              itemBuilder: (context, index) {
+                                final cat = categorias[index];
+                                final isSelected = _categoriaSelecionada == cat;
+                                return Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: InfoChip(
+                                    label: cat,
+                                    color: isSelected ? const Color.fromARGB(255, 77, 51, 142) : Colors.grey[300]!,
+                                    onTap: () {
+                                      setState(() {
+                                        _categoriaSelecionada = cat;
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                    
+                    const SizedBox(height: 20),
+                    Expanded(
+                      child: startupsExibidas.isEmpty 
+                      ? const Center(child: Text ('Nenhuma startup encontrada.'))
+                      : ListView.separated(
+                        itemCount: startupsExibidas.length,
+                        separatorBuilder: (_, __) => const SizedBox(height: 20),
+                        itemBuilder: (context, index) {                            
+                          final s = startupsExibidas[index];
+                            return StartupCard(
+                              startup: s,
+                              onTap: () => Navigator.push(
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) =>
                                       StartupDetailsPage(startup: s),
+                                  ),
                                 ),
                               );
                             },
-                          );
-                        },
-                      ),
+                          )
+                        ),
+                      ]
+                    );
+                  },
+                ),
               ),
             ],
           ),
@@ -280,30 +286,17 @@ class _CataloguePageState extends State<CataloguePage> {
         currentIndex: _selectedIndex,
         type: BottomNavigationBarType.fixed,
         onTap: (index) {
-          if (index == 0) {
+          if (index == 0)
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const TokenMarketPage(),
-              ),
+              MaterialPageRoute(builder: (_) => const WalletPage()),
             );
-          }
-          if (index == 1) {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const CataloguePage(),
-              ),
-            );
-          }
-          if (index == 2) {
+          if (index == 1) return;
+          if (index == 2)
             Navigator.push(
               context,
-              MaterialPageRoute(
-                builder: (_) => const UserProfilePage(),
-              ),
+              MaterialPageRoute(builder: (_) => const UserProfilePage()),
             );
-          }
         },
         selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
         unselectedItemColor: Colors.grey,
@@ -314,14 +307,8 @@ class _CataloguePageState extends State<CataloguePage> {
             icon: Icon(Icons.attach_money),
             label: 'Investimentos',
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Perfil',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
         ],
       ),
     );
@@ -332,11 +319,7 @@ class StartupCard extends StatelessWidget {
   final Startup startup;
   final VoidCallback onTap;
 
-  const StartupCard({
-    super.key,
-    required this.startup,
-    required this.onTap,
-  });
+  const StartupCard({super.key, required this.startup, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
@@ -353,12 +336,9 @@ class StartupCard extends StatelessWidget {
               color: Colors.black12,
               blurRadius: 6,
               offset: Offset(0, 3),
-            )
+            ),
           ],
-          border: Border.all(
-            color: Colors.white,
-            width: 5,
-          ),
+          border: Border.all(color: Colors.white, width: 5),
         ),
         child: Row(
           children: [
@@ -371,7 +351,7 @@ class StartupCard extends StatelessWidget {
               ),
               child: Center(
                 child: Text(
-                  startup.name[0].toUpperCase(),
+                  startup.name.isNotEmpty ? startup.name[0].toUpperCase() : '?',
                   style: GoogleFonts.poppins(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
@@ -397,18 +377,17 @@ class StartupCard extends StatelessWidget {
                     startup.description,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    style: GoogleFonts.poppins(
-                      fontSize: 13,
-                    ),
+                    style: GoogleFonts.poppins(fontSize: 13),
                   ),
                   const SizedBox(height: 8),
-                  Row(
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 4,
                     children: [
                       InfoChip(
                         label: startup.stage,
                         color: const Color.fromARGB(255, 73, 46, 143),
                       ),
-                      const SizedBox(width: 8),
                       InfoChip(
                         label: startup.tokenType,
                         color: const Color.fromARGB(255, 182, 38, 111),
@@ -432,20 +411,21 @@ class StartupCard extends StatelessWidget {
 class InfoChip extends StatelessWidget {
   final String label;
   final Color color;
+  final VoidCallback? onTap;
 
   const InfoChip({
     super.key,
     required this.label,
     required this.color,
+    this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(
-        horizontal: 8,
-        vertical: 4,
-      ),
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       decoration: BoxDecoration(
         color: color,
         borderRadius: BorderRadius.circular(16),
@@ -456,8 +436,68 @@ class InfoChip extends StatelessWidget {
           fontSize: 12,
           fontWeight: FontWeight.w600,
           color: Colors.white,
+        
         ),
       ),
+      )
+    );
+  }
+}
+
+//Beatriz Naomi
+class MySearchDelegate extends SearchDelegate {
+  final Future<List<Startup>> minhaRequisicao;
+  MySearchDelegate({required this.minhaRequisicao});
+  // Limpa a busca
+  @override
+  List<Widget>? buildActions(BuildContext context) => [
+    IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ""),
+  ];
+
+  // Botão de voltar
+  @override
+  Widget? buildLeading(BuildContext context) => IconButton(
+    icon: const Icon(Icons.arrow_back),
+    onPressed: () => close(context, null),
+  );
+
+  // Mostra o resultado final ao pressionar "Enter"
+  @override
+  Widget buildResults(BuildContext context) => buildSuggestions(context);
+
+  // Mostra sugestões enquanto o usuário digita
+  @override
+  Widget buildSuggestions(BuildContext context) {
+    return FutureBuilder<List<Startup>>(
+      future: minhaRequisicao,
+      builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return const Center(child: CircularProgressIndicator());
+        }
+        final startups = snapshot.data!;
+
+        final filtradas = startups
+            .where((s) => s.name.toLowerCase().contains(query.toLowerCase()))
+            .toList();
+
+        return ListView.builder(
+          itemCount: filtradas.length,
+          itemBuilder: (context, index) {
+            final s = filtradas[index];
+            return ListTile(
+              title: Text(s.name),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => StartupDetailsPage(startup: s),
+                  ),
+                );
+              },
+            );
+          },
+        );
+      },
     );
   }
 }

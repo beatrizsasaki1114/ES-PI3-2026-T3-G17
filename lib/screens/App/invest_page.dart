@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:projeto_integrador_3_grupo_17/models/startup_model.dart';
+import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/private_chat.dart';
 
 class InvestPage extends StatefulWidget {
