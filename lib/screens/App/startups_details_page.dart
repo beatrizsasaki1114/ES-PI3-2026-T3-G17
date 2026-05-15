@@ -11,7 +11,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dar
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/invest_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/token_market_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/App/user_investments_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/society_structure.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -233,7 +233,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
               icon: Icons.trending_up,
               text: 'Investimentos',
               onTap: () => Navigator.push(context,
-                  MaterialPageRoute(builder: (_) => const TokenMarketPage())),
+                  MaterialPageRoute(builder: (_) => const UserInvestmentsPage())),
             ),
             _buildDrawerItem(
               icon: Icons.person,
@@ -373,7 +373,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                       ),
                     ),
                     child: Text(
-                      "Investir em ${fullStartup.tokenType}",
+                      "Investir em ${fullStartup.name}",
                       style: GoogleFonts.poppins(
                         fontSize: 16,
                         fontWeight: FontWeight.w600,

@@ -145,6 +145,7 @@ class _LoginPageState extends State<LoginPage> {
                                 password: passwordController.text,
                               );
                               if (userCredential != null) {
+                                if (!context.mounted) return;
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(

@@ -122,8 +122,8 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFFE91E63).withOpacity(0.2),
-                    const Color(0xFFE91E63).withOpacity(0.1),
+                    const Color(0xFFE91E63).withValues(alpha:0.2),
+                    const Color(0xFFE91E63).withValues(alpha:0.1),
                   ],
                 ),
               ),
@@ -139,8 +139,8 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    const Color(0xFF9C27B0).withOpacity(0.25),
-                    const Color(0xFF9C27B0).withOpacity(0.15),
+                    const Color(0xFF9C27B0).withValues(alpha:0.25),
+                    const Color(0xFF9C27B0).withValues(alpha:0.15),
                   ],
                 ),
               ),
@@ -176,7 +176,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                   color: Colors.white,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: Colors.black.withValues(alpha:0.05),
                       blurRadius: 10,
                       offset: const Offset(0, -2),
                     ),
@@ -253,7 +253,7 @@ class MessageBubble extends StatelessWidget {
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFE91E63).withOpacity(0.15),
+                color: const Color(0xFFE91E63).withValues(alpha:0.15),
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),

@@ -1,13 +1,10 @@
-//Bruno Machado
-
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
 
 class WalletPage extends StatefulWidget {
   const WalletPage({super.key});
@@ -17,7 +14,7 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
-  final _selectedIndex = 0;
+  final _selectedIndex = 0; // Ícone de Investimentos/Carteira selecionado
   double _currentBalance = 0;
   bool _isLoading = true; 
   final TextEditingController _valueController = TextEditingController();
@@ -26,6 +23,12 @@ class _WalletPageState extends State<WalletPage> {
   void initState() {
     super.initState();
     _loadUserBalance();
+  }
+
+  @override
+  void dispose() {
+    _valueController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadUserBalance() async {
@@ -90,14 +93,14 @@ class _WalletPageState extends State<WalletPage> {
         title: Text('Quanto deseja adicionar?', style: GoogleFonts.poppins()),
         content: TextField(
           controller: _valueController,
-          keyboardType: TextInputType.number,
+          keyboardType: const TextInputType.numberWithOptions(decimal: true),
           decoration: const InputDecoration(prefixText: 'R\$ ', hintText: '0,00'),
         ),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
-              double? value = double.tryParse(_valueController.text);
+              double? value = double.tryParse(_valueController.text.replaceAll(',', '.'));
               if (value != null && value > 0) {
                 Navigator.pop(context);
                 isPix ? _showPixPayment(value) : _showCardPayment(value);
@@ -176,115 +179,20 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-    Color color = const Color.fromARGB(255, 77, 51, 142),
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(
-        text,
-        style: GoogleFonts.poppins(fontSize: 16, color: color == Colors.red ? Colors.red : Colors.black87),
-      ),
-      onTap: onTap,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 2,
-        centerTitle: true,
-        toolbarHeight: 65,
-        leading: Builder( 
-          builder: (context) => IconButton(
-            icon: Image.asset('assets/images/menuIcon.png', height: 40, width: 40),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+    return MainLayout(
+      selectedIndex: _selectedIndex,
+      appBarActions: [
+        IconButton(
+          icon: Image.asset('assets/images/userIcon.png', height: 40, width: 40),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
         ),
-        title: InkWell(
-          onTap: () {
-            Navigator.of(context).pushAndRemoveUntil(
-              MaterialPageRoute(builder: (_) => const CataloguePage()),
-              (route) => false,
-            );
-          },
-          child: Image.asset('assets/images/logoMesclaInvest.png', height: 80, fit: BoxFit.contain),
+        IconButton(
+          icon: Image.asset('assets/images/configIcon.png', height: 40, width: 40),
+          onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
         ),
-        actions: [
-          IconButton(
-            icon: Image.asset('assets/images/userIcon.png', height: 40, width: 40),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
-          ),
-          IconButton(
-            icon: Image.asset('assets/images/configIcon.png', height: 40, width: 40),
-            onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
-          ),
-        ],
-      ),
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
-          children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(color: Color.fromARGB(255, 77, 51, 142)),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 30,
-                    child: Icon(Icons.person, size: 40, color: Color.fromARGB(255, 77, 51, 142)),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Mescla Invest',
-                    style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
-                ],
-              ),
-            ),
-            _buildDrawerItem(
-              icon: Icons.business_center,
-              text: 'Catálogo de Startups',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const CataloguePage())),
-            ),
-            _buildDrawerItem(
-              icon: Icons.account_balance_wallet,
-              text: 'Minha Carteira',
-              onTap: () => Navigator.pop(context),
-            ),
-            _buildDrawerItem(
-              icon: Icons.trending_up,
-              text: 'Investimentos',
-              onTap: () => Navigator.pop(context), 
-            ),
-            _buildDrawerItem(
-              icon: Icons.person,
-              text: 'Meu Perfil',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage())),
-            ),
-            _buildDrawerItem(
-              icon: Icons.settings,
-              text: 'Configurações',
-              onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ConfigPage())),
-            ),
-            const Divider(), 
-            _buildDrawerItem(
-              icon: Icons.exit_to_app,
-              text: 'Sair',
-              color: Colors.red,
-              onTap: () => Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const LoginPage()), (r) => false),
-            ),
-          ],
-        ),
-      ),
+      ],
       body: SingleChildScrollView(
         child: Center(
           child: Column(
@@ -305,15 +213,15 @@ class _WalletPageState extends State<WalletPage> {
                         style: GoogleFonts.poppins(fontSize: 18, color: Colors.grey[600]),
                       ),
                       _isLoading 
-                        ? const CircularProgressIndicator()
-                        : Text(
-                            'R\$ ${_currentBalance.toStringAsFixed(2)}',
-                            style: GoogleFonts.poppins(
-                              fontSize: 32,
-                              fontWeight: FontWeight.bold,
-                              color: const Color.fromARGB(255, 77, 51, 142),
+                          ? const CircularProgressIndicator()
+                          : Text(
+                              'R\$ ${_currentBalance.toStringAsFixed(2)}',
+                              style: GoogleFonts.poppins(
+                                fontSize: 32,
+                                fontWeight: FontWeight.bold,
+                                color: const Color.fromARGB(255, 77, 51, 142),
+                              ),
                             ),
-                          ),
                     ],
                   ),
                 ],
@@ -355,26 +263,6 @@ class _WalletPageState extends State<WalletPage> {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          if (index == 1) {
-            Navigator.pushAndRemoveUntil(context, MaterialPageRoute(builder: (_) => const CataloguePage()), (r) => false);
-          } else if (index == 2) {
-            Navigator.push(context, MaterialPageRoute(builder: (_) => const UserProfilePage()));
-          }
-        },
-        selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.attach_money), label: 'Investimentos'),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
       ),
     );
   }

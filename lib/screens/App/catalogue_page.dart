@@ -1,15 +1,9 @@
-//Bruno Machado
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/startups_details_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/token_market_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/App/startups_details_page.dart';
+import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart'; 
 
 class CataloguePage extends StatefulWidget {
   const CataloguePage({super.key});
@@ -19,297 +13,118 @@ class CataloguePage extends StatefulWidget {
 }
 
 class _CataloguePageState extends State<CataloguePage> {
-  final int _selectedIndex = 1;
+  final int _selectedIndex = 2;
   final _minhaRequisicao = StartupService().fetchStartups();
   String _categoriaSelecionada = 'Todos';
 
-  Widget _buildDrawerItem({
-    required IconData icon,
-    required String text,
-    required VoidCallback onTap,
-    Color color = const Color.fromARGB(255, 77, 51, 142),
-  }) {
-    return ListTile(
-      leading: Icon(icon, color: color),
-      title: Text(
-        text,
-        style: GoogleFonts.poppins(
-          fontSize: 16,
-          color: color == Colors.red ? Colors.red : Colors.black87,
-        ),
-      ),
-      onTap: onTap,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 2,
-        centerTitle: true,
-        toolbarHeight: 65,
-        leading: Builder(
-          builder: (context) => IconButton(
-            icon: Image.asset(
-              'assets/images/menuIcon.png',
-              height: 40,
-              width: 40,
-            ),
-            onPressed: () => Scaffold.of(context).openDrawer(),
-          ),
+    return MainLayout(
+      selectedIndex: _selectedIndex,
+      appBarActions: [
+        IconButton(
+          icon: const Icon(Icons.search, size: 30.0),
+          onPressed: () {
+            showSearch(
+              context: context,
+              delegate: MySearchDelegate(minhaRequisicao: _minhaRequisicao),
+            );
+          },
         ),
-        title: InkWell(
-          onTap: () => Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (_) => const CataloguePage()),
-          ),
-          child: Transform.translate(
-            offset: const Offset(0, -6),
-            child: Image.asset(
-              'assets/images/logoMesclaInvest.png',
-              height: 80,
-              fit: BoxFit.contain,
-            ),
-          ),
-        ),
-
-        //Parte busca realizada por Beatriz Naomi
-        actions: [
-          IconButton(
-            icon: const Icon(
-              Icons.search,
-              size: 30.0
-              ),
-            onPressed: () {
-              showSearch(
-                context: context,
-                delegate: MySearchDelegate(minhaRequisicao: _minhaRequisicao),
-              );
-            },
-          ),
-        ],
-      ),
-
-      drawer: Drawer(
-        child: ListView(
-          padding: EdgeInsets.zero,
+      ],
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            DrawerHeader(
-              decoration: const BoxDecoration(
-                color: Color.fromARGB(255, 77, 51, 142),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const CircleAvatar(
-                    backgroundColor: Colors.white,
-                    radius: 30,
-                    child: Icon(
-                      Icons.person,
-                      size: 40,
-                      color: Color.fromARGB(255, 77, 51, 142),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  Text(
-                    'Mescla Invest',
-                    style: GoogleFonts.poppins(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
+            Text(
+              'Catálogo de Startups',
+              style: GoogleFonts.poppins(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: const Color.fromARGB(255, 77, 51, 142),
               ),
             ),
-            _buildDrawerItem(
-              icon: Icons.business_center,
-              text: 'Catálogo de Startups',
-              onTap: () => Navigator.pop(context),
-            ),
-            _buildDrawerItem(
-              icon: Icons.account_balance_wallet,
-              text: 'Minha Carteira',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const WalletPage()),
-              ),
-            ),
-            _buildDrawerItem(
-              icon: Icons.trending_up,
-              text: 'Investimentos',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => const TokenMarketPage(),
-                ),
-              ),
-            ),
-            _buildDrawerItem(
-              icon: Icons.person,
-              text: 'Meu Perfil',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => UserProfilePage(),
-                ),
-              ),
-            ),
-            _buildDrawerItem(
-              icon: Icons.settings,
-              text: 'Configurações',
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ConfigPage()),
-              ),
-            ),
-            const Divider(),
-            _buildDrawerItem(
-              icon: Icons.exit_to_app,
-              text: 'Sair',
-              color: Colors.red,
-              onTap: () => Navigator.pushAndRemoveUntil(
-                context,
-                MaterialPageRoute(builder: (_) => const LoginPage()),
-                (route) => false,
+            const SizedBox(height: 10),
+            
+            Expanded(
+              child: FutureBuilder<List<Startup>>(
+                future: _minhaRequisicao,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(
+                      child: Text('Erro ao carregar dados: ${snapshot.error}'),
+                    );
+                  }
+
+                  final startups = snapshot.data ?? [];
+                  final categorias = [
+                    'Todos',
+                    ...startups.map((s) => s.stage).toSet() 
+                  ];
+
+                  final startupsExibidas = _categoriaSelecionada == 'Todos'
+                      ? startups.toList()
+                      : startups.where((s) => s.stage.toLowerCase() == _categoriaSelecionada.toLowerCase()).toList();
+
+                  return Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        height: 30,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: categorias.length, 
+                          itemBuilder: (context, index) {
+                            final cat = categorias[index];
+                            final isSelected = _categoriaSelecionada == cat;
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: InfoChip(
+                                label: cat,
+                                color: isSelected ? const Color.fromARGB(255, 77, 51, 142) : Colors.grey[300]!,
+                                onTap: () {
+                                  setState(() {
+                                    _categoriaSelecionada = cat;
+                                  });
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                  
+                      const SizedBox(height: 20),
+                      Expanded(
+                        child: startupsExibidas.isEmpty 
+                            ? const Center(child: Text('Nenhuma startup encontrada.'))
+                            : ListView.separated(
+                                itemCount: startupsExibidas.length,
+                                separatorBuilder: (_, _) => const SizedBox(height: 20),
+                                itemBuilder: (context, index) {                  
+                                  final s = startupsExibidas[index];
+                                  return StartupCard(
+                                    startup: s,
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => StartupDetailsPage(startup: s),
+                                      ),
+                                    ),
+                                  );
+                                },
+                              ),
+                      ),
+                    ],
+                  );
+                },
               ),
             ),
           ],
         ),
-      ),
-
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Catálogo de Startups',
-                style: GoogleFonts.poppins(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 77, 51, 142),
-                ),
-              ),
-              const SizedBox(height: 10),
-             
-              Expanded(
-                child: FutureBuilder<List<Startup>>(
-                  future: _minhaRequisicao,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text(
-                          'Erro ao carregar dados: ${snapshot.error}',
-                        ),
-                      );
-                    }
-
-                    final startups = snapshot.data ?? [];
-                    final categorias = [
-                          'Todos',
-                          ...startups.map((s) => s.stage).toSet().toList()
-                      ];
-
-                    final startupsExibidas = _categoriaSelecionada == 'Todos'
-                        ? startups
-                        .toList()
-                        : startups.where((s) => s.stage.toLowerCase() == _categoriaSelecionada.toLowerCase()).toList();
-
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                     children: [
-                          SizedBox(
-                            height: 30,
-                            child: ListView.builder(
-                              scrollDirection: Axis.horizontal,
-                              itemCount: categorias.length, 
-                              itemBuilder: (context, index) {
-                                final cat = categorias[index];
-                                final isSelected = _categoriaSelecionada == cat;
-                                return Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: InfoChip(
-                                    label: cat,
-                                    color: isSelected ? const Color.fromARGB(255, 77, 51, 142) : Colors.grey[300]!,
-                                    onTap: () {
-                                      setState(() {
-                                        _categoriaSelecionada = cat;
-                                      });
-                                    },
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                    
-                    const SizedBox(height: 20),
-                    Expanded(
-                      child: startupsExibidas.isEmpty 
-                      ? const Center(child: Text ('Nenhuma startup encontrada.'))
-                      : ListView.separated(
-                        itemCount: startupsExibidas.length,
-                        separatorBuilder: (_, __) => const SizedBox(height: 20),
-                        itemBuilder: (context, index) {                            
-                          final s = startupsExibidas[index];
-                            return StartupCard(
-                              startup: s,
-                              onTap: () => Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      StartupDetailsPage(startup: s),
-                                  ),
-                                ),
-                              );
-                            },
-                          )
-                        ),
-                      ]
-                    );
-                  },
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        type: BottomNavigationBarType.fixed,
-        onTap: (index) {
-          if (index == 0)
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const WalletPage()),
-            );
-          if (index == 1) return;
-          if (index == 2)
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (_) => const UserProfilePage()),
-            );
-        },
-        selectedItemColor: const Color.fromARGB(255, 77, 51, 142),
-        unselectedItemColor: Colors.grey,
-        showSelectedLabels: false,
-        showUnselectedLabels: false,
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.attach_money),
-            label: 'Investimentos',
-          ),
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Perfil'),
-        ],
       ),
     );
   }

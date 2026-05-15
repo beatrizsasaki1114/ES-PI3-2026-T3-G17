@@ -4,10 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 class SocietyStructurePage extends StatelessWidget {
   const SocietyStructurePage({super.key});
 
-  // Método que futuramente buscará dados do banco
   Future<List<Founder>> _fetchFounders() async {
-    // TODO: Implementar busca do banco de dados
-    // Por enquanto retorna dados mockados
+
     await Future.delayed(const Duration(milliseconds: 500));
 
     return [
@@ -52,7 +50,7 @@ class SocietyStructurePage extends StatelessWidget {
                   children: [
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.3),
+                        color: Colors.white.withValues(alpha:0.3),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: IconButton(

@@ -193,6 +193,7 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                                     verificationId: widget.verificationId ?? _idAtivo,
                                     smsCode: codigoFinal,
                                   );
+                                  if (!context.mounted) return;
                                   Navigator.pop(context, true);
                                 } else if (widget.resolver != null) {
                                   if (vId.isEmpty) throw "ID de verificação de login ausente.";
@@ -205,6 +206,7 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                                         credential,
                                       );
                                   await widget.resolver!.resolveSignIn(assertion);
+                                  if (!context.mounted) return;
 
                                   Navigator.pushReplacement(
                                     context,

@@ -53,8 +53,8 @@ class _InvestPageState extends State<InvestPage> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    Colors.pink.shade200.withOpacity(0.5),
-                    Colors.purple.shade200.withOpacity(0.5),
+                    Colors.pink.shade200.withValues(alpha:0.5),
+                    Colors.purple.shade200.withValues(alpha:0.5),
                   ],
                 ),
               ),
@@ -70,8 +70,8 @@ class _InvestPageState extends State<InvestPage> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    Colors.purple.shade300.withOpacity(0.6),
-                    Colors.purple.shade400.withOpacity(0.6),
+                    Colors.purple.shade300.withValues(alpha:0.6),
+                    Colors.purple.shade400.withValues(alpha:0.6),
                   ],
                 ),
               ),
