@@ -1,3 +1,5 @@
+//Bruno Machado
+
 import { StartupDocument } from "../types/startupTypes";
 
 export const demoStartup: StartupDocument[] = [

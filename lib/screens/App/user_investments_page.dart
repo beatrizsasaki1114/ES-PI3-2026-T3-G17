@@ -1,3 +1,4 @@
+//Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -46,13 +47,11 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                 final userData = snapshot.data!.data() as Map<String, dynamic>;
                 final List<dynamic> rawInvestments = userData['investimentos'] ?? [];
 
-                // Filtra os investimentos com base no texto digitado na barra de pesquisa
                 final filteredInvestments = rawInvestments.where((inv) {
                   final name = (inv['startupName'] ?? '').toString().toLowerCase();
                   return name.contains(_searchQuery.toLowerCase());
                 }).toList();
 
-                // Calcula o patrimônio total somando o valor gasto em cada investimento
                 double totalInvested = 0;
                 for (var inv in rawInvestments) {
                   totalInvested += (inv['amountSpent'] ?? 0).toDouble();
@@ -60,7 +59,6 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
 
                 return Stack(
                   children: [
-                    // Círculos decorativos de fundo
                     Positioned(
                       top: -50,
                       right: -50,
@@ -88,7 +86,6 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
 
                     Column(
                       children: [
-                        // Card de Patrimônio Total
                         Container(
                           margin: const EdgeInsets.all(16),
                           padding: const EdgeInsets.all(20),
@@ -137,7 +134,6 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                           ),
                         ),
 
-                        // Barra de Pesquisa
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Container(
@@ -172,7 +168,6 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
 
                         const SizedBox(height: 20),
 
-                        // Lista de Investimentos Ativos
                         Expanded(
                           child: filteredInvestments.isEmpty
                               ? Center(
@@ -214,7 +209,6 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
       ),
       child: Row(
         children: [
-          // Ícone redondo com a inicial da startup
           Container(
             width: 45,
             height: 45,
@@ -234,7 +228,6 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
           ),
           const SizedBox(width: 12),
 
-          // Informações de Nome e Tokens
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -259,7 +252,6 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
             ),
           ),
 
-          // Valor Financeiro Total
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [

@@ -18,7 +18,6 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
   @override
   void initState() {
     super.initState();
-    // Mensagens iniciais de exemplo
     _messages.addAll([
       ChatMessage(
         text: 'Seja bem-vindo ao chat com Agrotech!',
@@ -52,7 +51,6 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
 
     _messageController.clear();
 
-    // Simular resposta automática da startup (remover quando integrar com backend)
     Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
@@ -111,7 +109,6 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
       ),
       body: Stack(
         children: [
-          // Decorações de fundo
           Positioned(
             bottom: -50,
             left: -50,
@@ -146,10 +143,8 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
               ),
             ),
           ),
-          // Conteúdo
           Column(
             children: [
-              // Lista de mensagens
               Expanded(
                 child: _messages.isEmpty
                     ? Center(
@@ -169,7 +164,6 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                   },
                 ),
               ),
-              // Campo de input
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
@@ -303,7 +297,6 @@ class MessageBubble extends StatelessWidget {
   }
 }
 
-// Model para mensagens
 class ChatMessage {
   final String text;
   final bool isFromStartup;
@@ -315,7 +308,6 @@ class ChatMessage {
     required this.timestamp,
   });
 
-  // Factory para criar a partir de JSON do banco
   factory ChatMessage.fromJson(Map<String, dynamic> json) {
     return ChatMessage(
       text: json['text'] as String,
@@ -324,7 +316,6 @@ class ChatMessage {
     );
   }
 
-  // Converter para JSON para enviar ao banco
   Map<String, dynamic> toJson() {
     return {
       'text': text,

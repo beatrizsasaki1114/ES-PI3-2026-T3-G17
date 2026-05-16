@@ -1,15 +1,12 @@
+//Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:youtube_player_flutter/youtube_player_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
-
-// Imports do projeto
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/services/startups/startups_services.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/invest_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/society_structure.dart';
-
-// Import do seu MainLayout
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
 
 class StartupDetailsPage extends StatefulWidget {
@@ -23,16 +20,13 @@ class StartupDetailsPage extends StatefulWidget {
 
 class _StartupDetailsPageState extends State<StartupDetailsPage> {
   int? _expandedFaqIndex;
-  final int _selectedIndex = 1; 
+  final int _selectedIndex = 2; 
   YoutubePlayerController? _controller;
-  
-  // MODIFICAÇÃO 1: Criamos a variável que guardará o Future fixo
   late Future<Startup> _startupDetailsFuture;
 
   @override
   void initState() {
     super.initState();
-    // MODIFICAÇÃO 2: Inicializamos o Future uma única vez aqui!
     _startupDetailsFuture = StartupService().fetchStartupDetails(widget.startup.id);
   }
 
@@ -124,7 +118,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
       child: Theme(
         data: Theme.of(context).copyWith(dividerColor: Colors.transparent),
         child: ExpansionTile(
-          // MODIFICAÇÃO 4: Adicionamos uma chave para o ExpansionTile saber manter o estado visual
           key: PageStorageKey('faq_$index'),
           initiallyExpanded: isExpanded,
           title: Text(
@@ -180,7 +173,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     return MainLayout(
       selectedIndex: _selectedIndex,
       body: FutureBuilder<Startup>(
-        // MODIFICAÇÃO 3: Apontamos para a variável estável do initState
         future: _startupDetailsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -206,7 +198,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header da Startup
                 Row(
                   children: [
                     Container(
@@ -259,18 +250,15 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ],
                 ),
                 const SizedBox(height: 24),
-
-                // Preços
                 Row(
                   children: [
-                    _buildPriceInfo('Preço/Token', 'R\$ 1,00'),
-                    const SizedBox(width: 24),
-                    _buildPriceInfo('Valor Atual', 'R\$ "0,00"'),
+                    _buildPriceInfo(
+                      'Preço/Token', 
+                        'R\$ ${fullStartup.precoAtualToken.toStringAsFixed(2).replaceAll('.', ',')}',
+                      ),
                   ],
                 ),
                 const SizedBox(height: 24),
-
-                // Botão Investir
                 SizedBox(
                   width: double.infinity,
                   height: 55,
@@ -300,8 +288,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-
-                // Gráfico de Valorização
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
@@ -332,8 +318,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 32),
-
-                // Descrição
                 Text(
                   "Sobre a Startup",
                   style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
@@ -344,8 +328,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
                 ),
                 const SizedBox(height: 24),
-
-                // Player de Vídeo Pitch
                 if (fullStartup.videoUrl.isNotEmpty && _controller != null)
                   Container(
                     width: double.infinity,
@@ -381,8 +363,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     ),
                   ),
                 const SizedBox(height: 32),
-
-                // Documentos Oficiais
                 Text(
                   'Documentos Oficiais',
                   style: GoogleFonts.poppins(
@@ -403,8 +383,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                       },
                     )),
                 const SizedBox(height: 32),
-
-                // FAQ
                 Text(
                   'FAQ',
                   style: GoogleFonts.poppins(
@@ -414,13 +392,10 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                
-                // Renderiza a lista de perguntas dinamicamente
                 if (fullStartup.perguntas.isNotEmpty)
                   ...List.generate(
                     fullStartup.perguntas.length,
                     (index) {
-                      // Prevenção de erro: garante que existe uma resposta para o índice atual
                       String resposta = 'Resposta não encontrada.';
                       if (index < fullStartup.respostas.length) {
                         resposta = fullStartup.respostas[index];
@@ -441,10 +416,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                       color: Colors.black54,
                     ),
                   ),
-                  
                 const SizedBox(height: 32),
-
-                // Estrutura Societária
                 Text(
                   'Estrutura Societária',
                   style: GoogleFonts.poppins(
@@ -460,7 +432,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const SocietyStructurePage()),
+                        MaterialPageRoute(
+                          builder: (context) => SocietyStructurePage(startup: fullStartup),
+                        ),
                       );
                     },
                     style: ElevatedButton.styleFrom(

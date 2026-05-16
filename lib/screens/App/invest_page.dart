@@ -1,3 +1,4 @@
+//Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
@@ -26,8 +27,7 @@ class _InvestPageState extends State<InvestPage> {
     if (_amountController.text.isEmpty) return;
 
     final tokenQuantity = int.parse(_amountController.text);
-    // Usando o mesmo valor de R$ 10 por token que você definiu no _calculateEstimatedValue
-    final estimatedValue = tokenQuantity * 10.0; 
+    final estimatedValue = tokenQuantity * widget.startup.precoAtualToken;
 
     setState(() => _isProcessing = true);
 
@@ -47,33 +47,34 @@ class _InvestPageState extends State<InvestPage> {
           throw Exception("Saldo insuficiente para esta compra.");
         }
 
-        // Calcula o novo saldo
+
         final novoSaldo = saldoAtual - estimatedValue;
 
-        // Cria o objeto do investimento
+
         final novoInvestimento = {
-          'startupId': widget.startup.id, // Supondo que a model Startup tenha um 'id'
+          'startupId': widget.startup.id,
           'startupName': widget.startup.name,
           'tokenQuantity': tokenQuantity,
           'amountSpent': estimatedValue,
-          'date': Timestamp.now(), // Salva a data atual
+          'date': Timestamp.now(), 
         };
 
-        // Atualiza o saldo e insere no array de investimentos
         transaction.update(userRef, {
           'saldo': novoSaldo,
           'investimentos': FieldValue.arrayUnion([novoInvestimento]),
         });
       });
 
+      
       if (mounted) {
-        Navigator.pop(context); // Fecha o modal de confirmação
+        Navigator.pop(context); 
         _showSuccessMessage(context);
         _amountController.clear();
       }
     } catch (e) {
+      
       if (mounted) {
-        Navigator.pop(context); // Fecha o modal
+        Navigator.pop(context); 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(e.toString().replaceAll("Exception: ", "")),
@@ -115,7 +116,6 @@ class _InvestPageState extends State<InvestPage> {
       ),
       body: Stack(
         children: [
-          // Decoração de fundo
           Positioned(
             bottom: -100,
             right: -100,
@@ -150,13 +150,11 @@ class _InvestPageState extends State<InvestPage> {
               ),
             ),
           ),
-          // Conteúdo principal
           SingleChildScrollView(
             padding: const EdgeInsets.all(24),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Logo da startup
                 Center(
                   child: Container(
                     width: 100,
@@ -178,7 +176,6 @@ class _InvestPageState extends State<InvestPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Nome da startup
                 Center(
                   child: Text(
                     widget.startup.name,
@@ -190,7 +187,6 @@ class _InvestPageState extends State<InvestPage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                // Comprar AOTP
                 Text(
                   'Comprar AOTP',
                   style: GoogleFonts.poppins(
@@ -200,7 +196,6 @@ class _InvestPageState extends State<InvestPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Qtd de tokens
                 Text(
                   'Qtd de tokens',
                   style: GoogleFonts.poppins(
@@ -209,7 +204,6 @@ class _InvestPageState extends State<InvestPage> {
                   ),
                 ),
                 const SizedBox(height: 8),
-                // Campo de input
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
@@ -234,7 +228,6 @@ class _InvestPageState extends State<InvestPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // Valor estimado
                 Text(
                   'Valor estimado',
                   style: GoogleFonts.poppins(
@@ -260,10 +253,8 @@ class _InvestPageState extends State<InvestPage> {
                   ),
                 ),
                 const SizedBox(height: 40),
-                // Botões Investir e Chat Privado
                 Row(
                   children: [
-                    // Botão Investir
                     Expanded(
                       flex: 2,
                       child: SizedBox(
@@ -291,7 +282,6 @@ class _InvestPageState extends State<InvestPage> {
                       ),
                     ),
                     const SizedBox(width: 12),
-                    // Botão Chat Privado
                     Expanded(
                       flex: 1,
                       child: SizedBox(
@@ -340,8 +330,7 @@ class _InvestPageState extends State<InvestPage> {
     }
     try {
       final amount = int.parse(_amountController.text);
-      // Valor estimado por token (exemplo: R$ 10 por token)
-      final estimatedValue = amount * 10;
+      final estimatedValue = amount * widget.startup.precoAtualToken;
       return estimatedValue.toStringAsFixed(2).replaceAll('.', ',');
     } catch (e) {
       return '0,00';

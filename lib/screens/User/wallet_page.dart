@@ -1,3 +1,4 @@
+//Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,7 +15,7 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
-  final _selectedIndex = 0; // Ícone de Investimentos/Carteira selecionado
+  final _selectedIndex = 0; 
   double _currentBalance = 0;
   bool _isLoading = true; 
   final TextEditingController _valueController = TextEditingController();

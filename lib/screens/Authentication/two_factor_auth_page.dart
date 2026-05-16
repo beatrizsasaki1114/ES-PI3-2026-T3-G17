@@ -1,3 +1,4 @@
+//Beatriz Naomi
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -19,7 +20,6 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
     6,
     (index) => TextEditingController(),
   );
-  // pega o código inteiro do usuário
   String get _fullCode => _controllers.map((c) => c.text).join();
   @override
   void dispose() {
@@ -181,7 +181,6 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                           elevation: 2,
                         ),
                         onPressed: () async {
-                          // Beatriz Naomi
                           String codigoFinal = _fullCode;
                           if (codigoFinal.length == 6) {
                             try{

@@ -1,3 +1,4 @@
+//Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -42,7 +43,7 @@ class _ConfigPageState extends State<ConfigPage> {
           width: 40,
         ),
         onPressed: () {
-          // Já estamos na ConfigPage, não faz nada ou dá um feedback
+
         },
       ),
     ];
@@ -119,7 +120,6 @@ class _ConfigPageState extends State<ConfigPage> {
   }
 }
 
-// Widget auxiliar mantido fora da classe principal para organização
 Widget _buildSettingsButton({
   required String label,
   required IconData icon,

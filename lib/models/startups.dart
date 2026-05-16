@@ -1,5 +1,4 @@
-//Bruno Machado
-//Beatriz Naomi e Sofia
+//Beatriz Naomi, Sofia de Sousa e Bruno Machado
 
 class Founder {
   final String name;
@@ -47,10 +46,9 @@ class Startup {
   final List<Founder> founders;
   final String videoUrl;
   final List<StartupDocument> publicDocuments;
-  
-  // ADICIONADO: Listas para guardar o FAQ vindo do Firebase
   final List<String> perguntas;
   final List<String> respostas;
+  final double precoAtualToken;
 
   Startup({
     required this.id,
@@ -62,8 +60,9 @@ class Startup {
     required this.founders,
     required this.videoUrl,
     required this.publicDocuments, 
-    required this.perguntas, // <-- Requerido no construtor
-    required this.respostas, // <-- Requerido no construtor
+    required this.perguntas, 
+    required this.respostas,
+    required this.precoAtualToken,
   });
 
   factory Startup.fromJson(Map<String, dynamic> json) {
@@ -78,7 +77,6 @@ class Startup {
         .map((d) => StartupDocument.fromJson(Map<String, dynamic>.from(d)))
         .toList();
 
-    // ADICIONADO: Mapeamento seguro das listas de strings do JSON
     var perguntasJson = json['Perguntas'] as List? ?? [];
     List<String> parsedPerguntas = perguntasJson.map((e) => e.toString()).toList();
 
@@ -95,8 +93,9 @@ class Startup {
       tokenType: _mapTokenType(json['tags'] is List ? List<dynamic>.from(json['tags']) : null),
       founders: parsedFounders,
       publicDocuments: parsedDocs, 
-      perguntas: parsedPerguntas, // <-- Passando a lista mapeada
-      respostas: parsedRespostas, // <-- Passando a lista mapeada
+      perguntas: parsedPerguntas, 
+      respostas: parsedRespostas, 
+      precoAtualToken: (json['PrecoAtualToken'] ?? 0).toDouble(),
     );
   }
 

@@ -1,4 +1,4 @@
-//Bruno Machado
+//Bruno Machado, Beatriz Naomi
 
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/authentication/create_account_page.dart';
@@ -127,7 +127,6 @@ class _LoginPageState extends State<LoginPage> {
                           elevation: 2,
                         ),
                         onPressed: () async {
-                          // Beatriz Naomi
                           if (emailController.text == "" ||
                               passwordController.text == "") {
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -162,7 +161,7 @@ class _LoginPageState extends State<LoginPage> {
                                       MaterialPageRoute(
                                         builder: (context) => TwoFactorAuthPage(
                                           resolver: e.resolver,
-                                          verificationId: vId, // Agora o vId chega com sucesso!
+                                          verificationId: vId, 
                                         ),
                                       ),
                                     );

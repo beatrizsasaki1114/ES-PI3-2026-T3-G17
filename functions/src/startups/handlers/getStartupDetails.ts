@@ -10,7 +10,6 @@ import {
     userIsInvestor
 } from "../repositories/startupRepository";
 
-
 export const getStartupDetails = onCall(
     { region: "southamerica-east1" },
     async (request) => {

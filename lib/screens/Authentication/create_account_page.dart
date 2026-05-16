@@ -24,17 +24,16 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
   bool _obscurePassword = true;
 
-  // Variáveis de controle para a validação de senha
+
   bool _hasMinLength = false;
   bool _hasMinNumbers = false;
   bool _hasNoSpecialChars = false;
 
-  // Função que valida a senha em tempo real
+
   void _validatePassword(String value) {
     setState(() {
       _hasMinLength = value.length >= 6;
       _hasMinNumbers = RegExp(r'\d').allMatches(value).length >= 2;
-      // Válido se não for vazio e não contiver nada além de letras e números
       _hasNoSpecialChars = value.isNotEmpty && !RegExp(r'[^a-zA-Z0-9]').hasMatch(value);
     });
   }
@@ -154,12 +153,11 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                       isPassword: true,
                       obscure: _obscurePassword,
                       onToggle: () => setState(() => _obscurePassword = !_obscurePassword),
-                      onChanged: _validatePassword, // Adicionada a escuta de alterações
+                      onChanged: _validatePassword, 
                     ),
 
                     const SizedBox(height: 8),
 
-                    // Exibição dos requisitos da senha
                     _buildPasswordRule("Pelo menos 6 dígitos", _hasMinLength),
                     _buildPasswordRule("No mínimo 2 números", _hasMinNumbers),
                     _buildPasswordRule("Sem caracteres especiais", _hasNoSpecialChars),
@@ -190,7 +188,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           elevation: 2,
                         ),
                         onPressed: () async {
-                          // 1. Validação de campos vazios
                           if (emailController.text.trim().isEmpty ||
                               firstNameController.text.trim().isEmpty ||
                               lastNameController.text.trim().isEmpty ||
@@ -204,10 +201,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 backgroundColor: Colors.red,
                               ),
                             );
-                            return; // Interrompe a execução
+                            return; 
                           } 
                           
-                          // 2. Validação dos requisitos da senha
                           if (!_hasMinLength || !_hasMinNumbers || !_hasNoSpecialChars) {
                              ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -215,10 +211,9 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 backgroundColor: Colors.red,
                               ),
                             );
-                            return; // Interrompe a execução
+                            return; 
                           }
 
-                          // 3. Verificação se as senhas coincidem
                           if (passwordController.text != confirmPasswordController.text) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -226,10 +221,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 backgroundColor: Colors.red,
                               ),
                             );
-                            return; // Interrompe a execução
+                            return; 
                           } 
                           
-                          // 4. Verificação se os e-mails coincidem
+
                           if (emailController.text != confirmEmailController.text) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -237,10 +232,10 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                 backgroundColor: Colors.red,
                               ),
                             );
-                            return; // Interrompe a execução
+                            return; 
                           } 
                           
-                          // 5. Tentar criar a conta
+
                           try {
                             User? result = await AuthService().createAccount(
                               nome: firstNameController.text.trim(),
@@ -254,7 +249,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                               debugPrint("Sucesso");
                               if (!context.mounted) return;
                               
-                              // Aviso de sucesso ao criar a conta
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text("Conta criada com sucesso!"),
@@ -304,7 +298,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           cursor: SystemMouseCursors.click,
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.pushReplacement( // Usando pushReplacement para não empilhar telas
+                              Navigator.pushReplacement( 
                                 context,
                                 MaterialPageRoute(
                                   builder: (context) => const LoginPage(),
@@ -333,7 +327,6 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
-  // Widget auxiliar para exibir os requisitos da senha
   Widget _buildPasswordRule(String text, bool isValid) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0),
@@ -385,7 +378,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     bool isPassword = false,
     bool obscure = false,
     VoidCallback? onToggle,
-    ValueChanged<String>? onChanged, // Novo parâmetro para escutar mudanças no texto
+    ValueChanged<String>? onChanged, 
   }) {
     return Container(
       decoration: BoxDecoration(
@@ -393,7 +386,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.05), // Atenção: alterado para withOpacity por compatibilidade com versões mais antigas do Flutter, caso esteja usando.
+            color: Colors.black.withValues(alpha:0.05), 
             blurRadius: 5,
             offset: const Offset(0, 2),
           ),
@@ -402,7 +395,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       child: TextField(
         controller: controller,
         obscureText: isPassword ? obscure : false,
-        onChanged: onChanged, // Repassa o onChanged para o TextField
+        onChanged: onChanged, 
         decoration: InputDecoration(
           hintText: hint,
           border: InputBorder.none,

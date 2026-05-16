@@ -1,3 +1,4 @@
+//Bruno Machado, Beatriz Naomi
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
@@ -259,28 +260,27 @@ class InfoChip extends StatelessWidget {
   }
 }
 
-//Beatriz Naomi
+
 class MySearchDelegate extends SearchDelegate {
   final Future<List<Startup>> minhaRequisicao;
   MySearchDelegate({required this.minhaRequisicao});
-  // Limpa a busca
+
   @override
   List<Widget>? buildActions(BuildContext context) => [
     IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ""),
   ];
 
-  // Botão de voltar
+
   @override
   Widget? buildLeading(BuildContext context) => IconButton(
     icon: const Icon(Icons.arrow_back),
     onPressed: () => close(context, null),
   );
 
-  // Mostra o resultado final ao pressionar "Enter"
+
   @override
   Widget buildResults(BuildContext context) => buildSuggestions(context);
 
-  // Mostra sugestões enquanto o usuário digita
   @override
   Widget buildSuggestions(BuildContext context) {
     return FutureBuilder<List<Startup>>(
