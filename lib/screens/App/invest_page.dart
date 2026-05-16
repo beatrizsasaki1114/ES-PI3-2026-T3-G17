@@ -1,4 +1,3 @@
-//Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
@@ -17,7 +16,6 @@ class InvestPage extends StatefulWidget {
 
 class _InvestPageState extends State<InvestPage> {
   final TextEditingController _amountController = TextEditingController();
-
   bool _isProcessing = false;
 
   Future<void> _processInvestment(BuildContext context) async {
@@ -47,9 +45,7 @@ class _InvestPageState extends State<InvestPage> {
           throw Exception("Saldo insuficiente para esta compra.");
         }
 
-
         final novoSaldo = saldoAtual - estimatedValue;
-
 
         final novoInvestimento = {
           'startupId': widget.startup.id,
@@ -65,14 +61,12 @@ class _InvestPageState extends State<InvestPage> {
         });
       });
 
-      
       if (mounted) {
         Navigator.pop(context); 
         _showSuccessMessage(context);
         _amountController.clear();
       }
     } catch (e) {
-      
       if (mounted) {
         Navigator.pop(context); 
         ScaffoldMessenger.of(context).showSnackBar(
@@ -126,8 +120,8 @@ class _InvestPageState extends State<InvestPage> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    Colors.pink.shade200.withValues(alpha:0.5),
-                    Colors.purple.shade200.withValues(alpha:0.5),
+                    Colors.pink.shade200.withAlpha(128),
+                    Colors.purple.shade200.withAlpha(128),
                   ],
                 ),
               ),
@@ -143,8 +137,8 @@ class _InvestPageState extends State<InvestPage> {
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: [
-                    Colors.purple.shade300.withValues(alpha:0.6),
-                    Colors.purple.shade400.withValues(alpha:0.6),
+                    Colors.purple.shade300.withAlpha(153),
+                    Colors.purple.shade400.withAlpha(153),
                   ],
                 ),
               ),
@@ -214,6 +208,7 @@ class _InvestPageState extends State<InvestPage> {
                   child: TextField(
                     controller: _amountController,
                     keyboardType: TextInputType.number,
+                    onChanged: (value) => setState(() {}), // Atualiza o valor estimado dinamicamente
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.black87,
@@ -306,9 +301,9 @@ class _InvestPageState extends State<InvestPage> {
                               borderRadius: BorderRadius.circular(15),
                             ),
                           ),
-                          child: Icon(
+                          child: const Icon(
                             Icons.chat_bubble_outline,
-                            color: const Color(0xFFE91E63),
+                            color: Color(0xFFE91E63),
                             size: 24,
                           ),
                         ),
