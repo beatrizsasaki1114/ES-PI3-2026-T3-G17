@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/private_chat.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class InvestPage extends StatefulWidget {
   final Startup startup;
@@ -14,6 +16,77 @@ class InvestPage extends StatefulWidget {
 
 class _InvestPageState extends State<InvestPage> {
   final TextEditingController _amountController = TextEditingController();
+
+  bool _isProcessing = false;
+
+  Future<void> _processInvestment(BuildContext context) async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    if (_amountController.text.isEmpty) return;
+
+    final tokenQuantity = int.parse(_amountController.text);
+    // Usando o mesmo valor de R$ 10 por token que você definiu no _calculateEstimatedValue
+    final estimatedValue = tokenQuantity * 10.0; 
+
+    setState(() => _isProcessing = true);
+
+    try {
+      final userRef = FirebaseFirestore.instance.collection('Usuários').doc(user.uid);
+
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(userRef);
+        
+        if (!snapshot.exists) {
+          throw Exception("Usuário não encontrado.");
+        }
+
+        final double saldoAtual = (snapshot.data()?['saldo'] ?? 0).toDouble();
+
+        if (saldoAtual < estimatedValue) {
+          throw Exception("Saldo insuficiente para esta compra.");
+        }
+
+        // Calcula o novo saldo
+        final novoSaldo = saldoAtual - estimatedValue;
+
+        // Cria o objeto do investimento
+        final novoInvestimento = {
+          'startupId': widget.startup.id, // Supondo que a model Startup tenha um 'id'
+          'startupName': widget.startup.name,
+          'tokenQuantity': tokenQuantity,
+          'amountSpent': estimatedValue,
+          'date': Timestamp.now(), // Salva a data atual
+        };
+
+        // Atualiza o saldo e insere no array de investimentos
+        transaction.update(userRef, {
+          'saldo': novoSaldo,
+          'investimentos': FieldValue.arrayUnion([novoInvestimento]),
+        });
+      });
+
+      if (mounted) {
+        Navigator.pop(context); // Fecha o modal de confirmação
+        _showSuccessMessage(context);
+        _amountController.clear();
+      }
+    } catch (e) {
+      if (mounted) {
+        Navigator.pop(context); // Fecha o modal
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(e.toString().replaceAll("Exception: ", "")),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isProcessing = false);
+      }
+    }
+  }
 
   @override
   void dispose() {
@@ -303,20 +376,25 @@ class _InvestPageState extends State<InvestPage> {
               ),
             ),
             ElevatedButton(
-              onPressed: () {
-                Navigator.pop(context);
-                _showSuccessMessage(context);
-              },
+              onPressed: _isProcessing 
+                  ? null 
+                  : () => _processInvestment(context),
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 77, 51, 142),
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
-              child: Text(
-                'Confirmar',
-                style: GoogleFonts.poppins(color: Colors.white),
-              ),
+              child: _isProcessing
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                    )
+                  : Text(
+                      'Confirmar',
+                      style: GoogleFonts.poppins(color: Colors.white),
+                    ),
             ),
           ],
         );

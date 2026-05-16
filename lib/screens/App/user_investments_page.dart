@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart'; // <-- Ajuste o caminho se necessário
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
 
 class UserInvestmentsPage extends StatefulWidget {
   const UserInvestmentsPage({super.key});
@@ -11,28 +13,7 @@ class UserInvestmentsPage extends StatefulWidget {
 
 class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
   final TextEditingController _searchController = TextEditingController();
-
-  // Lista mockada mockando os investimentos reais que o usuário JÁ possui
-  final List<UserInvestment> _myInvestments = [
-    UserInvestment(
-      id: 1,
-      startupName: 'AgroTech',
-      tokenQuantity: 150,
-      totalValue: 'R\$ 1.500,00',
-    ),
-    UserInvestment(
-      id: 2,
-      startupName: 'EcoEnergy',
-      tokenQuantity: 80,
-      totalValue: 'R\$ 800,00',
-    ),
-    UserInvestment(
-      id: 3,
-      startupName: 'BioFuture',
-      tokenQuantity: 210,
-      totalValue: 'R\$ 2.100,00',
-    ),
-  ];
+  String _searchQuery = "";
 
   @override
   void dispose() {
@@ -42,213 +23,233 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return MainLayout(
       selectedIndex: 3,
-      body: Stack(
-        children: [
-          Positioned(
-            bottom: -80,
-            right: -80,
-            child: Container(
-              width: 250,
-              height: 250,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.pink.shade200.withValues(alpha: 0.5),
-                    Colors.purple.shade200.withValues(alpha: 0.5),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: -30,
-            right: 40,
-            child: Container(
-              width: 180,
-              height: 180,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    Colors.purple.shade300.withValues(alpha: 0.6),
-                    Colors.purple.shade400.withValues(alpha: 0.6),
-                  ],
-                ),
-              ),
-            ),
-          ),
+      body: user == null
+          ? const Center(child: Text("Usuário não autenticado"))
+          : StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Usuários')
+                  .doc(user.uid)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-          // Conteúdo Principal da Página
-          Column(
-            children: [
-              // Card de Patrimônio Total do Usuário em Tokens
-              Container(
-                margin: const EdgeInsets.all(16),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(16),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.shade200,
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+                if (!snapshot.hasData || !snapshot.data!.exists) {
+                  return const Center(child: Text("Dados não encontrados."));
+                }
+
+                final userData = snapshot.data!.data() as Map<String, dynamic>;
+                final List<dynamic> rawInvestments = userData['investimentos'] ?? [];
+
+                // Filtra os investimentos com base no texto digitado na barra de pesquisa
+                final filteredInvestments = rawInvestments.where((inv) {
+                  final name = (inv['startupName'] ?? '').toString().toLowerCase();
+                  return name.contains(_searchQuery.toLowerCase());
+                }).toList();
+
+                // Calcula o patrimônio total somando o valor gasto em cada investimento
+                double totalInvested = 0;
+                for (var inv in rawInvestments) {
+                  totalInvested += (inv['amountSpent'] ?? 0).toDouble();
+                }
+
+                return Stack(
                   children: [
-                    Row(
+                    // Círculos decorativos de fundo
+                    Positioned(
+                      top: -50,
+                      right: -50,
+                      child: Container(
+                        width: 200,
+                        height: 200,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color.fromARGB(255, 77, 51, 142).withValues(alpha:0.05),
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      bottom: -80,
+                      left: -80,
+                      child: Container(
+                        width: 250,
+                        height: 250,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: const Color.fromARGB(255, 182, 38, 111).withValues(alpha:0.05),
+                        ),
+                      ),
+                    ),
+
+                    Column(
                       children: [
+                        // Card de Patrimônio Total
                         Container(
-                          padding: const EdgeInsets.all(8),
+                          margin: const EdgeInsets.all(16),
+                          padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: Colors.grey.shade100,
-                            borderRadius: BorderRadius.circular(8),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.grey.withValues(alpha:0.1),
+                                spreadRadius: 2,
+                                blurRadius: 8,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
                           ),
-                          child: Icon(
-                            Icons.account_balance_wallet_outlined,
-                            color: Colors.grey.shade700,
-                            size: 20,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Text(
+                                    'Patrimônio Total Investido',
+                                    style: GoogleFonts.poppins(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade600,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                  const Icon(
+                                    Icons.account_balance_wallet,
+                                    color: Color.fromARGB(255, 77, 51, 142),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                'R\$ ${totalInvested.toStringAsFixed(2).replaceAll('.', ',')}',
+                                style: GoogleFonts.poppins(
+                                  fontSize: 28,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black87,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(width: 12),
-                        Text(
-                          'Total Investido em Tokens',
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey.shade600,
+
+                        // Barra de Pesquisa
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 12),
+                            decoration: BoxDecoration(
+                              color: Colors.grey.shade100,
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(Icons.search, color: Colors.grey.shade500),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: TextField(
+                                    controller: _searchController,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _searchQuery = value;
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      hintText: 'Pesquisar startup...',
+                                      hintStyle: GoogleFonts.poppins(color: Colors.grey.shade500),
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
                           ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        // Lista de Investimentos Ativos
+                        Expanded(
+                          child: filteredInvestments.isEmpty
+                              ? Center(
+                                  child: Text(
+                                    'Nenhum investimento encontrado.',
+                                    style: GoogleFonts.poppins(color: Colors.grey),
+                                  ),
+                                )
+                              : ListView.builder(
+                                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                                  itemCount: filteredInvestments.length,
+                                  itemBuilder: (context, index) {
+                                    final inv = filteredInvestments[index];
+                                    return _buildInvestmentCard(inv);
+                                  },
+                                ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 12),
-                    Text(
-                      'R\$ 4.400,00', // Soma mockada do patrimônio
-                      style: GoogleFonts.poppins(
-                        fontSize: 28,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black87,
-                      ),
-                    ),
                   ],
-                ),
-              ),
-
-              // Barra de Pesquisa de investimentos do portfólio
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.grey.shade300,
-                    ),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.search,
-                        color: Colors.grey.shade500,
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: TextField(
-                          controller: _searchController,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                          ),
-                          decoration: InputDecoration(
-                            hintText: 'Buscar nos meus investimentos...',
-                            hintStyle: GoogleFonts.poppins(
-                              color: Colors.grey.shade400,
-                            ),
-                            border: InputBorder.none,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              // Lista de Investimentos Ativos
-              Expanded(
-                child: ListView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  itemCount: _myInvestments.length,
-                  itemBuilder: (context, index) {
-                    final investment = _myInvestments[index];
-                    return _buildInvestmentCard(investment);
-                  },
-                ),
-              ),
-            ],
-          ),
-        ],
-      ),
+                );
+              },
+            ),
     );
   }
 
-  // Componente visual do card de investimento formatado
-  Widget _buildInvestmentCard(UserInvestment investment) {
+  Widget _buildInvestmentCard(Map<String, dynamic> investment) {
+    final String startupName = investment['startupName'] ?? 'Desconhecida';
+    final int tokenQuantity = investment['tokenQuantity'] ?? 0;
+    final double amountSpent = (investment['amountSpent'] ?? 0).toDouble();
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.grey.shade50,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Colors.grey.shade200,
-        ),
+        border: Border.all(color: Colors.grey.shade200),
       ),
       child: Row(
         children: [
-          // Inicial da Startup decorativa
+          // Ícone redondo com a inicial da startup
           Container(
-            width: 50,
-            height: 50,
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(255, 237, 233, 247),
-              borderRadius: BorderRadius.circular(10),
+            width: 45,
+            height: 45,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color.fromARGB(255, 240, 235, 255),
             ),
-            child: Center(
-              child: Text(
-                investment.startupName[0],
-                style: GoogleFonts.poppins(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: const Color.fromARGB(255, 77, 51, 142),
-                ),
+            alignment: Alignment.center,
+            child: Text(
+              startupName.isNotEmpty ? startupName[0].toUpperCase() : 'S',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: const Color.fromARGB(255, 77, 51, 142),
               ),
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: 12),
 
-          // Informações do Investimento (Nome e Quantidade de Tokens)
+          // Informações de Nome e Tokens
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  investment.startupName,
+                  startupName,
                   style: GoogleFonts.poppins(
-                    fontSize: 16,
+                    fontSize: 15,
                     fontWeight: FontWeight.w600,
                     color: Colors.black87,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '${investment.tokenQuantity} tokens',
+                  '$tokenQuantity tokens',
                   style: GoogleFonts.poppins(
                     fontSize: 13,
                     color: Colors.grey.shade600,
@@ -258,12 +259,12 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
             ),
           ),
 
-          // Valor Financeiro Total e Ação lateral
+          // Valor Financeiro Total
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(
-                investment.totalValue,
+                'R\$ ${amountSpent.toStringAsFixed(2).replaceAll('.', ',')}',
                 style: GoogleFonts.poppins(
                   fontSize: 15,
                   fontWeight: FontWeight.bold,
@@ -285,19 +286,4 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
       ),
     );
   }
-}
-
-// Modelo de Dados adaptado para a carteira de investimentos do Usuário
-class UserInvestment {
-  final int id;
-  final String startupName;
-  final int tokenQuantity;
-  final String totalValue;
-
-  UserInvestment({
-    required this.id,
-    required this.startupName,
-    required this.tokenQuantity,
-    required this.totalValue,
-  });
 }
