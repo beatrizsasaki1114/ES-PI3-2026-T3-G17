@@ -5,8 +5,9 @@ import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
-import 'package:projeto_integrador_3_grupo_17/screens/App/user_investments_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/User/user_investments_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/App/tradecenter_page.dart';
 
 class MainLayout extends StatelessWidget {
   final Widget body;
@@ -190,6 +191,7 @@ class MainLayout extends StatelessWidget {
               (route) => false,
             );
           } else if (index == 1) {
+            Navigator.push(context, MaterialPageRoute(builder: (_) => const OffersPage()));
           } else if (index == 3) {
             Navigator.push(context, MaterialPageRoute(builder: (_) => const UserInvestmentsPage()));
           } else if (index == 4) {

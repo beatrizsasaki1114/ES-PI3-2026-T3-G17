@@ -7,7 +7,9 @@ import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
 
 class UserProfilePage extends StatefulWidget {
-  const UserProfilePage({super.key});
+  final String? userId; 
+
+  const UserProfilePage({super.key, this.userId});
 
   @override
   State<UserProfilePage> createState() => _UserProfilePageState();
@@ -28,11 +30,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
 
   Future<void> _fetchUserData() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
-      if (user != null) {
+      final String? targetUid = widget.userId ?? FirebaseAuth.instance.currentUser?.uid;
+      if (targetUid != null) {
         final doc = await FirebaseFirestore.instance
             .collection('Usuários')
-            .doc(user.uid)
+            .doc(targetUid) 
             .get();
 
         if (doc.exists) {
