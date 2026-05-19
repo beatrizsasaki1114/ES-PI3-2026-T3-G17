@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
-import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
 
 class UserProfilePage extends StatefulWidget {
@@ -18,7 +17,8 @@ class _UserProfilePageState extends State<UserProfilePage> {
   String userName = "Carregando...";
   String userBio = "Buscando informações do perfil...";
   bool _isLoading = true;
-  final List<Startup> userInvestments = [];
+  
+  List<Map<String, dynamic>> userInvestments = [];
 
   @override
   void initState() {
@@ -36,9 +36,13 @@ class _UserProfilePageState extends State<UserProfilePage> {
             .get();
 
         if (doc.exists) {
+          final data = doc.data();
+          final List<dynamic> rawInvestments = data?['investimentos'] ?? [];
+          
           setState(() {
-            userName = doc.data()?['nome'] ?? "Usuário Sem Nome";
-            userBio = doc.data()?['descricao'] ?? "Clique aqui para adicionar uma descrição.";
+            userName = data?['nome'] ?? "Usuário Sem Nome";
+            userBio = data?['descricao'] ?? "Clique aqui para adicionar uma descrição.";
+            userInvestments = rawInvestments.map((e) => e as Map<String, dynamic>).toList();
             _isLoading = false;
           });
         }
@@ -118,6 +122,77 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return const Color(0xFF0D47A1);
   }
 
+  Widget _buildInvestmentCard(Map<String, dynamic> investment) {
+    final String startupName = investment['startupName'] ?? 'Desconhecida';
+    
+    String dateStr = "Data não informada";
+    dynamic rawDate = investment['data'] ?? investment['date'];
+    
+    if (rawDate != null) {
+      if (rawDate is Timestamp) {
+        final DateTime dt = rawDate.toDate();
+        dateStr = "${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}";
+      } else {
+        dateStr = rawDate.toString();
+      }
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12, left: 30, right: 30),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 45,
+            height: 45,
+            decoration: const BoxDecoration(
+              shape: BoxShape.circle,
+              color: Color.fromARGB(255, 240, 235, 255),
+            ),
+            alignment: Alignment.center,
+            child: Text(
+              startupName.isNotEmpty ? startupName[0].toUpperCase() : 'S',
+              style: GoogleFonts.poppins(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                color: const Color.fromARGB(255, 77, 51, 142),
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  startupName,
+                  style: GoogleFonts.poppins(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w600,
+                    color: Colors.black87,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  "Investido em: $dateStr",
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.grey.shade600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MainLayout(
@@ -125,7 +200,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
       appBarActions: [
         IconButton(
           icon: Image.asset('assets/images/userIcon.png', height: 40, width: 40),
-          onPressed: () {}, // Já está na página de perfil
+          onPressed: () {}, 
         ),
         IconButton(
           icon: Image.asset('assets/images/configIcon.png', height: 40, width: 40),
@@ -205,6 +280,18 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     ),
                   ),
                   const SizedBox(height: 15),
+
+                  if (userInvestments.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                      child: Text(
+                        "Nenhum investimento encontrado.",
+                        style: GoogleFonts.poppins(color: Colors.grey),
+                      ),
+                    )
+                  else
+                    ...userInvestments.map((inv) => _buildInvestmentCard(inv)),
+                    
                   const SizedBox(height: 30),
                 ],
               ),
