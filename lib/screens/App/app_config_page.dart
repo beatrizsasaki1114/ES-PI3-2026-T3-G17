@@ -29,6 +29,53 @@ class _AppConfigPageState extends State<AppConfigPage> {
     _checkMFAStatus();
   }
 
+  void _iniciar2FA(BuildContext context){
+    try {
+      AuthService().setupTwoFactor(
+        onSmsSent: (vId) async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => TwoFactorAuthPage(
+                verificationId: vId,
+              ),
+            ),
+          );
+
+          if (result == true) {
+            _checkMFAStatus();
+          }
+        },
+        onError: (erro) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Erro: $erro'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        },
+      );
+  
+      } catch (e) {
+        if (e.toString().contains('requires-recent-login')) {
+          if (!context.mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Por segurança, faça login novamente para alterar esta configuração.',
+              ),
+            ),
+          );
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const LoginPage(),
+            ),
+          );
+        }
+      }
+                        
+  }
   void _checkMFAStatus() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null) {
@@ -99,60 +146,41 @@ class _AppConfigPageState extends State<AppConfigPage> {
                           if (user != null && !user.emailVerified) {
                             await AuthService().sendEmailVerification();
                             if (!context.mounted) return;
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text(
-                                  'Verifique seu e-mail antes de ativar o 2FA. Link enviado!',
-                                ),
-                                backgroundColor: Color.fromARGB(255, 0, 255, 21),
+
+                            showDialog(
+                              context: context,
+                              builder: (dialogContext) => AlertDialog(
+                                title: const Text('Verificação Necessária'),
+                                content: const Text('Enviamos um link para o seu e-mail. Clique no link e depois aperte em "Já verifiquei".'),
+                                actions: [
+                                  TextButton(
+                                    onPressed: () => Navigator.pop(dialogContext),
+                                    child: const Text('Cancelar'),
+                                  ),
+                                  ElevatedButton(
+                                    onPressed: () async {
+                                      final user = FirebaseAuth.instance.currentUser;
+                                      await user?.reload(); 
+                                      final usuarioAtualizado = FirebaseAuth.instance.currentUser;
+                                      if (usuarioAtualizado != null && usuarioAtualizado.emailVerified) {
+                                        Navigator.pop(dialogContext); 
+                                        _iniciar2FA(context); 
+                                      } else {
+                                        ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text('E-mail ainda não verificado!')),
+                                        );
+                                      }
+                                    },
+                                    child: const Text('Já verifiquei'),
+                                  ),
+                                ],
                               ),
                             );
                             return;
                           }
-                          try {
-                            AuthService().setupTwoFactor(
-                              onSmsSent: (vId) async {
-                                final result = await Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TwoFactorAuthPage(
-                                      verificationId: vId,
-                                    ),
-                                  ),
-                                );
-
-                                if (result == true) {
-                                  _checkMFAStatus();
-                                }
-                              },
-                              onError: (erro) {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: Text('Erro: $erro'),
-                                    backgroundColor: Colors.red,
-                                  ),
-                                );
-                              },
-                            );
-                          } catch (e) {
-                            if (e.toString().contains('requires-recent-login')) {
-                              if (!context.mounted) return;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text(
-                                    'Por segurança, faça login novamente para alterar esta configuração.',
-                                  ),
-                                ),
-                              );
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => const LoginPage(),
-                                ),
-                              );
-                            }
-                          }
-                        } else {
+                          _iniciar2FA(context);
+                        } else{
+                           
                           try {
                             await AuthService().unenrollMFA();
                             _checkMFAStatus();
