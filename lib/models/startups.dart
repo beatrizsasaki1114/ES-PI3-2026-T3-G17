@@ -86,8 +86,8 @@ class Startup {
     required this.founders,
     required this.externalMembers,
     required this.videoUrl,
-    required this.publicDocuments, 
-    required this.perguntas, 
+    required this.publicDocuments,
+    required this.perguntas,
     required this.respostas,
     required this.precoAtualToken,
     required this.capitalCaptadoCent,
@@ -95,21 +95,14 @@ class Startup {
   });
 
   factory Startup.fromJson(Map<String, dynamic> json) {
+    var foundersJson = json['Fundadores'] as List? ?? [];
+    List<Founder> parsedFounders = foundersJson.map((e) => Founder.fromJson(Map<String, dynamic>.from(e))).toList();
 
-    var foundersList = json['Fundadores'] as List? ?? [];
-    List<Founder> parsedFounders = foundersList
-        .map((f) => Founder.fromJson(Map<String, dynamic>.from(f)))
-        .toList();
+    var externalJson = json['MembrosExterno'] as List? ?? [];
+    List<ExternalMember> parsedMembros = externalJson.map((e) => ExternalMember.fromJson(Map<String, dynamic>.from(e))).toList();
 
-    var membrosList = json['MembrosExterno'] as List? ?? [];
-    List<ExternalMember> parsedMembros = membrosList
-        .map((m) => ExternalMember.fromJson(Map<String, dynamic>.from(m)))
-        .toList();
-
-    var docsList = json['DocumentosPublicos'] as List? ?? [];
-    List<StartupDocument> parsedDocs = docsList
-        .map((d) => StartupDocument.fromJson(Map<String, dynamic>.from(d)))
-        .toList();
+    var docsJson = json['DocumentosPublicos'] as List? ?? [];
+    List<StartupDocument> parsedDocs = docsJson.map((e) => StartupDocument.fromJson(Map<String, dynamic>.from(e))).toList();
 
     var perguntasJson = json['Perguntas'] as List? ?? [];
     List<String> parsedPerguntas = perguntasJson.map((e) => e.toString()).toList();
@@ -118,10 +111,10 @@ class Startup {
     List<String> parsedRespostas = respostasJson.map((e) => e.toString()).toList();
 
     return Startup(
-      id: json['ID']?.toString() ?? '',
+      id: json['ID']?.toString() ?? json['id']?.toString() ?? '',
       name: json['NomeStartup']?.toString() ?? '',
       description: json['DescricaoCurta']?.toString() ?? '',
-      longDescription: json['DescricaoLonga']?.toString() ?? '',
+      longDescription: json['DescricaoLonga'] ?? '',
       videoUrl: json['DemoVideo']?.toString() ?? '',
       stage: _mapStage(json['Estagio']?.toString()),
       tokenType: _mapTokenType(json['tags'] is List ? List<dynamic>.from(json['tags']) : null),
@@ -141,13 +134,14 @@ class Startup {
       case 'nova': return 'Nova';
       case 'operacao': return 'Operação';
       case 'expansao': return 'Expansão';
-      case 'validacao': return 'Validação';
       default: return 'Desconhecido';
     }
   }
 
   static String _mapTokenType(List<dynamic>? tags) {
-    if (tags == null || tags.isEmpty) return 'N/A';
-    return tags.first.toString().toUpperCase();
-  }
+  if (tags == null || tags.isEmpty) return 'Geral';
+  String firstTag = tags.first.toString();
+  // Capitaliza a primeira letra:
+  return "${firstTag[0].toUpperCase()}${firstTag.substring(1)}";
+}
 }

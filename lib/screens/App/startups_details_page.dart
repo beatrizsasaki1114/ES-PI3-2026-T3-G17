@@ -198,7 +198,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
           }
 
           double capitalReais = fullStartup.capitalCaptadoCent;
-          double maxTokens = capitalReais * 3;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -276,8 +275,8 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     Expanded(
                       flex: 3,
                       child: _buildPriceInfo(
-                        'Tokens Máximos', 
-                        maxTokens.toInt().toString(), 
+                        'Tokens Disponíveis', 
+                        fullStartup.totalTokensEmitidos.toString(),
                       ),
                     ),
                   ],

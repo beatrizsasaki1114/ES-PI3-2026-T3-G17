@@ -22,7 +22,6 @@ function toListItem(id: string, startup: StartupDocument): StartupListItem {
 export async function listStartupItems(): Promise<StartupListItem[]> {
   const snapshot = await startupsCollection.limit(100).get();
 
-  // CORREÇÃO DEFINITIVA: Força a leitura segura da lista de documentos como um array genérico
   const docs = (snapshot.docs as any[]) || [];
 
   return docs.map((doc) => toListItem(doc.id, doc.data() as StartupDocument));
@@ -30,7 +29,16 @@ export async function listStartupItems(): Promise<StartupListItem[]> {
 
 export async function getStartupById(startupId: string): Promise<StartupDocument | undefined> {
   const startupSnapshot = await startupsCollection.doc(startupId).get();
-  return startupSnapshot.exists ? (startupSnapshot.data() as StartupDocument) : undefined;
+
+  if (!startupSnapshot.exists) {
+    return undefined;
+  }
+
+  const data = startupSnapshot.data() as StartupDocument;
+
+  data.ID = startupSnapshot.id; 
+
+  return data;
 }
 
 export async function userIsInvestor(startupId: string, uid: string): Promise<boolean> {

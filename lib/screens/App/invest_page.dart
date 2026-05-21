@@ -1,3 +1,4 @@
+//Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
@@ -15,10 +16,24 @@ class InvestPage extends StatefulWidget {
 }
 
 class _InvestPageState extends State<InvestPage> {
+    
   final TextEditingController _amountController = TextEditingController();
   bool _isProcessing = false;
 
   Future<void> _processInvestment(BuildContext context) async {
+    if (_amountController.text.isEmpty) return;
+
+    // Adicione esta validação:
+    if (widget.startup.id.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Erro: ID da startup não encontrado.'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      setState(() => _isProcessing = false);
+      return;
+    }
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
@@ -31,22 +46,29 @@ class _InvestPageState extends State<InvestPage> {
 
     try {
       final userRef = FirebaseFirestore.instance.collection('Usuários').doc(user.uid);
+      final startupRef = FirebaseFirestore.instance.collection('startups').doc(widget.startup.id);
 
       await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final snapshot = await transaction.get(userRef);
-        
-        if (!snapshot.exists) {
+        final userSnapshot = await transaction.get(userRef);
+        if (!userSnapshot.exists) {
           throw Exception("Usuário não encontrado.");
         }
 
-        final double saldoAtual = (snapshot.data()?['saldo'] ?? 0).toDouble();
+        final startupSnapshot = await transaction.get(startupRef);
+        if (!startupSnapshot.exists) {
+          throw Exception("Startup não encontrada.");
+        }
 
+        final double saldoAtual = (userSnapshot.data()?['saldo'] ?? 0).toDouble();
         if (saldoAtual < estimatedValue) {
           throw Exception("Saldo insuficiente para esta compra.");
         }
+        final int tokensDisponiveis = (startupSnapshot.data()?['TotalTokensEmitidos'] ?? 0).toInt();
+        if (tokensDisponiveis < tokenQuantity) {
+          throw Exception("A startup não possui tokens suficientes para essa compra.");
+        }
 
         final novoSaldo = saldoAtual - estimatedValue;
-
         final novoInvestimento = {
           'startupId': widget.startup.id,
           'startupName': widget.startup.name,
@@ -58,6 +80,10 @@ class _InvestPageState extends State<InvestPage> {
         transaction.update(userRef, {
           'saldo': novoSaldo,
           'investimentos': FieldValue.arrayUnion([novoInvestimento]),
+        });
+
+        transaction.update(startupRef, {
+          'TotalTokensEmitidos': FieldValue.increment(-tokenQuantity),
         });
       });
 
@@ -208,7 +234,7 @@ class _InvestPageState extends State<InvestPage> {
                   child: TextField(
                     controller: _amountController,
                     keyboardType: TextInputType.number,
-                    onChanged: (value) => setState(() {}), // Atualiza o valor estimado dinamicamente
+                    onChanged: (value) => setState(() {}), 
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.black87,
