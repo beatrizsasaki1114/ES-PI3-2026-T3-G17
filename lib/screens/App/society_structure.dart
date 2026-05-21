@@ -1,6 +1,7 @@
 //Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:fl_chart/fl_chart.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart'; 
 
 class SocietyStructurePage extends StatelessWidget {
@@ -13,6 +14,54 @@ class SocietyStructurePage extends StatelessWidget {
   Widget build(BuildContext context) {
 
     final founders = startup.founders;
+    final externalMembers = startup.externalMembers;
+
+    // Paleta de cores para o gráfico
+    final List<Color> sectionColors = [
+      const Color(0xFFE91E63),
+      const Color(0xFF3F51B5),
+      const Color(0xFF4CAF50),
+      const Color(0xFFFF9800),
+      const Color(0xFF00BCD4),
+      const Color(0xFF9C27B0),
+    ];
+
+    List<PieChartSectionData> pieSections = [];
+    List<Widget> founderCards = [];
+    List<Widget> externalCards = [];
+    int colorIndex = 0;
+
+    // Montando dados para o gráfico e os Cards dos Fundadores
+    for (var f in founders) {
+      Color color = sectionColors[colorIndex % sectionColors.length];
+      pieSections.add(
+        PieChartSectionData(
+          color: color,
+          value: f.porcentagem,
+          title: '${f.porcentagem}%',
+          radius: 50,
+          titleStyle: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      );
+      founderCards.add(FounderCard(founder: f, badgeColor: color));
+      colorIndex++;
+    }
+
+    // Montando dados para o gráfico e os Cards dos Membros Externos
+    for (var m in externalMembers) {
+      Color color = sectionColors[colorIndex % sectionColors.length];
+      pieSections.add(
+        PieChartSectionData(
+          color: color,
+          value: m.porcentagem,
+          title: '${m.porcentagem}%',
+          radius: 50,
+          titleStyle: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white),
+        ),
+      );
+      externalCards.add(ExternalMemberCard(member: m, badgeColor: color));
+      colorIndex++;
+    }
 
     return Scaffold(
       body: Container(
@@ -65,23 +114,65 @@ class SocietyStructurePage extends StatelessWidget {
                       topRight: Radius.circular(30),
                     ),
                   ),
-                  child: founders.isEmpty
-                      ? Center(
-                          child: Text(
-                            'Nenhum fundador encontrado',
-                            style: GoogleFonts.poppins(
-                              fontSize: 16,
-                              color: Colors.black54,
+                  child: SingleChildScrollView(
+                    padding: const EdgeInsets.all(24),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Se não houver nenhum sócio nem membro
+                        if (pieSections.isEmpty)
+                           Center(
+                            child: Text(
+                              'Nenhum dado societário encontrado',
+                              style: GoogleFonts.poppins(fontSize: 16, color: Colors.black54),
+                            ),
+                          )
+                        else ...[
+                          // GRÁFICO
+                          SizedBox(
+                            height: 220,
+                            child: PieChart(
+                              PieChartData(
+                                sections: pieSections,
+                                centerSpaceRadius: 40,
+                                sectionsSpace: 2,
+                              ),
                             ),
                           ),
-                        )
-                      : ListView.builder(
-                          padding: const EdgeInsets.all(24),
-                          itemCount: founders.length,
-                          itemBuilder: (context, index) {
-                            return FounderCard(founder: founders[index]);
-                          },
-                        ),
+                          const SizedBox(height: 32),
+
+                          // SÓCIOS (FUNDADORES)
+                          if (founderCards.isNotEmpty) ...[
+                            Text(
+                              'Sócios Fundadores',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ...founderCards,
+                          ],
+
+                          // MEMBROS EXTERNOS
+                          if (externalCards.isNotEmpty) ...[
+                            const SizedBox(height: 16),
+                            Text(
+                              'Membros Externos',
+                              style: GoogleFonts.poppins(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black87,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            ...externalCards,
+                          ],
+                        ]
+                      ],
+                    ),
+                  ),
                 ),
               ),
             ],
@@ -94,8 +185,9 @@ class SocietyStructurePage extends StatelessWidget {
 
 class FounderCard extends StatelessWidget {
   final Founder founder;
+  final Color badgeColor;
 
-  const FounderCard({super.key, required this.founder});
+  const FounderCard({super.key, required this.founder, required this.badgeColor});
 
   @override
   Widget build(BuildContext context) {
@@ -123,14 +215,28 @@ class FounderCard extends StatelessWidget {
             child: _buildPlaceholderAvatar(), 
           ),
           const SizedBox(height: 16),
-          Text(
-            founder.name,
-            style: GoogleFonts.poppins(
-              fontSize: 18,
-              fontWeight: FontWeight.bold,
-              color: Colors.black87,
-            ),
-            textAlign: TextAlign.center,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 14,
+                height: 14,
+                decoration: BoxDecoration(
+                  color: badgeColor,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Text(
+                '${founder.name} (${founder.porcentagem}%)',
+                style: GoogleFonts.poppins(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
           ),
           const SizedBox(height: 12),
           Text(
@@ -152,6 +258,77 @@ class FounderCard extends StatelessWidget {
       Icons.person,
       size: 60,
       color: Colors.black38,
+    );
+  }
+}
+
+class ExternalMemberCard extends StatelessWidget {
+  final ExternalMember member;
+  final Color badgeColor;
+
+  const ExternalMemberCard({super.key, required this.member, required this.badgeColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade300,
+              shape: BoxShape.circle,
+            ),
+            child: const Icon(Icons.person, size: 24, color: Colors.black38),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: badgeColor,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Expanded(
+                      child: Text(
+                        '${member.name} (${member.porcentagem}%)',
+                        style: GoogleFonts.poppins(
+                          fontSize: 15,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.black87,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                Text(
+                  member.role,
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.black54,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

@@ -163,7 +163,11 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(label, style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54)),
-        Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+        FittedBox(
+          fit: BoxFit.scaleDown,
+          alignment: Alignment.centerLeft,
+          child: Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+        ),
       ],
     );
   }
@@ -192,6 +196,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
           if (fullStartup.videoUrl.isNotEmpty) {
             _initializeVideo(fullStartup.videoUrl);
           }
+
+          double capitalReais = fullStartup.capitalCaptadoCent;
+          double maxTokens = capitalReais * 3;
 
           return SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
@@ -252,10 +259,27 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                 const SizedBox(height: 24),
                 Row(
                   children: [
-                    _buildPriceInfo(
-                      'Preço/Token', 
+                    Expanded(
+                      flex: 2,
+                      child: _buildPriceInfo(
+                        'Preço/Token', 
                         'R\$ ${fullStartup.precoAtualToken.toStringAsFixed(2).replaceAll('.', ',')}',
                       ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: _buildPriceInfo(
+                        'Capital Aportado', 
+                        'R\$ ${capitalReais.toStringAsFixed(2).replaceAll('.', ',')}',
+                      ),
+                    ),
+                    Expanded(
+                      flex: 3,
+                      child: _buildPriceInfo(
+                        'Tokens Máximos', 
+                        maxTokens.toInt().toString(), 
+                      ),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 24),

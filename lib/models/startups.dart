@@ -4,11 +4,13 @@ class Founder {
   final String name;
   final String role;
   final String shortDescription;
+  final double porcentagem;
 
   Founder({
     required this.name,
     required this.role,
     required this.shortDescription,
+    required this.porcentagem,
   });
 
   factory Founder.fromJson(Map<String, dynamic> json) {
@@ -16,6 +18,27 @@ class Founder {
       name: json['Nome']?.toString() ?? '',
       role: json['Funcao']?.toString() ?? '',
       shortDescription: json['DescricaoCurta']?.toString() ?? '',
+      porcentagem: (json['Porcentagem'] ?? 0).toDouble(),
+    );
+  }
+}
+
+class ExternalMember {
+  final String name;
+  final String role;
+  final double porcentagem;
+
+  ExternalMember({
+    required this.name,
+    required this.role,
+    required this.porcentagem,
+  });
+
+  factory ExternalMember.fromJson(Map<String, dynamic> json) {
+    return ExternalMember(
+      name: json['Nome']?.toString() ?? '',
+      role: json['Funcao']?.toString() ?? '',
+      porcentagem: (json['Porcentagem'] ?? 0).toDouble(),
     );
   }
 }
@@ -44,11 +67,14 @@ class Startup {
   final String tokenType;
   final String longDescription;
   final List<Founder> founders;
+  final List<ExternalMember> externalMembers;
   final String videoUrl;
   final List<StartupDocument> publicDocuments;
   final List<String> perguntas;
   final List<String> respostas;
   final double precoAtualToken;
+  final double capitalCaptadoCent;
+  final int totalTokensEmitidos;
 
   Startup({
     required this.id,
@@ -58,11 +84,14 @@ class Startup {
     required this.tokenType,
     required this.longDescription,
     required this.founders,
+    required this.externalMembers,
     required this.videoUrl,
     required this.publicDocuments, 
     required this.perguntas, 
     required this.respostas,
     required this.precoAtualToken,
+    required this.capitalCaptadoCent,
+    required this.totalTokensEmitidos,
   });
 
   factory Startup.fromJson(Map<String, dynamic> json) {
@@ -70,6 +99,11 @@ class Startup {
     var foundersList = json['Fundadores'] as List? ?? [];
     List<Founder> parsedFounders = foundersList
         .map((f) => Founder.fromJson(Map<String, dynamic>.from(f)))
+        .toList();
+
+    var membrosList = json['MembrosExterno'] as List? ?? [];
+    List<ExternalMember> parsedMembros = membrosList
+        .map((m) => ExternalMember.fromJson(Map<String, dynamic>.from(m)))
         .toList();
 
     var docsList = json['DocumentosPublicos'] as List? ?? [];
@@ -92,10 +126,13 @@ class Startup {
       stage: _mapStage(json['Estagio']?.toString()),
       tokenType: _mapTokenType(json['tags'] is List ? List<dynamic>.from(json['tags']) : null),
       founders: parsedFounders,
+      externalMembers: parsedMembros,
       publicDocuments: parsedDocs, 
       perguntas: parsedPerguntas, 
       respostas: parsedRespostas, 
       precoAtualToken: (json['PrecoAtualToken'] ?? 0).toDouble(),
+      capitalCaptadoCent: (json['CapitalCaptadoCent'] ?? 0).toDouble(),
+      totalTokensEmitidos: (json['TotalTokensEmitidos'] ?? 0).toInt(),
     );
   }
 

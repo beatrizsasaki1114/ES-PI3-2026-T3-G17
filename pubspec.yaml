@@ -44,6 +44,7 @@ dependencies:
   firebase_functions: ^0.0.1-dev
   youtube_player_flutter: ^9.1.3
   url_launcher: ^6.3.2
+  fl_chart: ^1.2.0
 
 dev_dependencies:
   flutter_test:

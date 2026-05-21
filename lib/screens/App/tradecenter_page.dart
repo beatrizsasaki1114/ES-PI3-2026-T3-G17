@@ -225,7 +225,7 @@ class _OffersPageState extends State<OffersPage> {
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color.fromARGB(255, 77, 51, 142).withOpacity(0.05),
+                color: const Color.fromARGB(255, 77, 51, 142).withValues(alpha:0.05),
               ),
             ),
           ),
@@ -311,7 +311,7 @@ class _OffersPageState extends State<OffersPage> {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.grey.withOpacity(0.1),
+            color: Colors.grey.withValues(alpha:0.1),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
