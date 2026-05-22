@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/User/detailed_investment_page.dart';
 
 class UserInvestmentsPage extends StatefulWidget {
   const UserInvestmentsPage({super.key});
@@ -264,12 +265,25 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text(
-                'Ver detalhes',
-                style: GoogleFonts.poppins(
-                  fontSize: 12,
-                  color: const Color(0xFFE91E63),
-                  fontWeight: FontWeight.w500,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => DetailedInvestmentPage(
+                        investment: investment, // Passamos o investimento clicado aqui
+                      ),
+                    ),
+                  );
+                },
+                child: Text(
+                  'Ver detalhes',
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    color: const Color(0xFFE91E63),
+                    fontWeight: FontWeight.w500,
+                    decoration: TextDecoration.underline, // Opcional: Adiciona sublinhado para mostrar que é clicável
+                  ),
                 ),
               ),
             ],
