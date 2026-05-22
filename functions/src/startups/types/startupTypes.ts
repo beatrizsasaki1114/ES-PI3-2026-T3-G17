@@ -45,6 +45,7 @@ export interface StartupDocument {
     updatedAt?: Timestamp | FieldValue;
     Perguntas?: String[];
     Respostas?: String[];
+    Eventos?: Record<string, any[]>;
 }
 
 export interface StartupListItem {

@@ -61,6 +61,7 @@ export const getStartupDetails = onCall(
             tags: startup.tags,
             Perguntas: startup.Perguntas ?? [],
             Respostas: startup.Respostas ?? [],
+            Eventos: startup.Eventos ?? {},
             createdAt: startup.createdAt,
             updatedAt: startup.updatedAt,
             access: {

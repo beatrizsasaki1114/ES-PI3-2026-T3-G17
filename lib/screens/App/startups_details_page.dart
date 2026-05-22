@@ -172,6 +172,83 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     );
   }
 
+  // --- WIDGET DE EVENTOS ADICIONADO AQUI ---
+  Widget _buildEventItem(StartupEvent evento) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        border: Border.all(color: Colors.grey.shade200),
+        borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 6,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            evento.titulo,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+              color: const Color.fromARGB(255, 77, 51, 142),
+            ),
+          ),
+          const SizedBox(height: 6),
+          Text(
+            evento.descricao,
+            style: GoogleFonts.poppins(
+              fontSize: 13,
+              color: Colors.black87,
+              height: 1.4,
+            ),
+          ),
+          const SizedBox(height: 12),
+          Row(
+            children: [
+              const Icon(Icons.calendar_month, size: 16, color: Color(0xFFE91E63)),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  evento.data,
+                  style: GoogleFonts.poppins(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                    color: const Color(0xFFE91E63),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (evento.local.isNotEmpty) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                const Icon(Icons.location_on, size: 16, color: Colors.black54),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Text(
+                    evento.local,
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.black54,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ]
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return MainLayout(
@@ -386,6 +463,30 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     ),
                   ),
                 const SizedBox(height: 32),
+                
+                // --- SEÇÃO DE EVENTOS INSERIDA AQUI ---
+                Text(
+                  'Eventos e Atualizações',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 77, 51, 142),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                if (fullStartup.eventos.isNotEmpty)
+                  ...fullStartup.eventos.map((evento) => _buildEventItem(evento))
+                else
+                  Text(
+                    'Nenhum evento programado no momento.',
+                    style: GoogleFonts.poppins(
+                      fontSize: 13,
+                      color: Colors.black54,
+                    ),
+                  ),
+                const SizedBox(height: 32),
+                // ----------------------------------------
+
                 Text(
                   'Documentos Oficiais',
                   style: GoogleFonts.poppins(

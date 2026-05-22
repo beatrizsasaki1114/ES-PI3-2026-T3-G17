@@ -48,7 +48,11 @@ class StartupDocument {
   final String url;
   final String type;
 
-  StartupDocument({required this.title, required this.url, required this.type});
+  StartupDocument({
+    required this.title,
+    required this.url,
+    required this.type,
+  });
 
   factory StartupDocument.fromJson(Map<String, dynamic> json) {
     return StartupDocument(
@@ -59,56 +63,99 @@ class StartupDocument {
   }
 }
 
+// Nova classe para mapear cada Evento vindo da lista [Título, Descrição, Data, Local]
+class StartupEvent {
+  final String titulo;
+  final String descricao;
+  final String data;
+  final String local;
+
+  StartupEvent({
+    required this.titulo,
+    required this.descricao,
+    required this.data,
+    required this.local,
+  });
+
+  factory StartupEvent.fromList(List<dynamic> list) {
+    return StartupEvent(
+      titulo: list.isNotEmpty ? list[0].toString() : '',
+      descricao: list.length > 1 ? list[1].toString() : '',
+      data: list.length > 2 ? list[2].toString() : '',
+      local: list.length > 3 ? list[3].toString() : '',
+    );
+  }
+}
+
 class Startup {
   final String id;
   final String name;
   final String description;
+  final String longDescription;
+  final String videoUrl;
   final String stage;
   final String tokenType;
-  final String longDescription;
-  final List<Founder> founders;
-  final List<ExternalMember> externalMembers;
-  final String videoUrl;
-  final List<StartupDocument> publicDocuments;
-  final List<String> perguntas;
-  final List<String> respostas;
   final double precoAtualToken;
   final double capitalCaptadoCent;
   final int totalTokensEmitidos;
+  final List<Founder> founders;
+  final List<ExternalMember> externalMembers;
+  final List<StartupDocument> publicDocuments;
+  final List<String> perguntas;
+  final List<String> respostas;
+  final List<StartupEvent> eventos; // Novo atributo inserido
 
   Startup({
     required this.id,
     required this.name,
     required this.description,
+    required this.longDescription,
+    required this.videoUrl,
     required this.stage,
     required this.tokenType,
-    required this.longDescription,
-    required this.founders,
-    required this.externalMembers,
-    required this.videoUrl,
-    required this.publicDocuments,
-    required this.perguntas,
-    required this.respostas,
     required this.precoAtualToken,
     required this.capitalCaptadoCent,
     required this.totalTokensEmitidos,
+    required this.founders,
+    required this.externalMembers,
+    required this.publicDocuments,
+    required this.perguntas,
+    required this.respostas,
+    required this.eventos, // Requerido no construtor
   });
 
   factory Startup.fromJson(Map<String, dynamic> json) {
     var foundersJson = json['Fundadores'] as List? ?? [];
-    List<Founder> parsedFounders = foundersJson.map((e) => Founder.fromJson(Map<String, dynamic>.from(e))).toList();
+    List<Founder> parsedFounders = foundersJson
+        .map((e) => Founder.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
 
-    var externalJson = json['MembrosExterno'] as List? ?? [];
-    List<ExternalMember> parsedMembros = externalJson.map((e) => ExternalMember.fromJson(Map<String, dynamic>.from(e))).toList();
+    var membrosJson = json['MembrosExterno'] as List? ?? [];
+    List<ExternalMember> parsedMembros = membrosJson
+        .map((e) => ExternalMember.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
 
     var docsJson = json['DocumentosPublicos'] as List? ?? [];
-    List<StartupDocument> parsedDocs = docsJson.map((e) => StartupDocument.fromJson(Map<String, dynamic>.from(e))).toList();
+    List<StartupDocument> parsedDocs = docsJson
+        .map((e) => StartupDocument.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
 
     var perguntasJson = json['Perguntas'] as List? ?? [];
     List<String> parsedPerguntas = perguntasJson.map((e) => e.toString()).toList();
 
     var respostasJson = json['Respostas'] as List? ?? [];
     List<String> parsedRespostas = respostasJson.map((e) => e.toString()).toList();
+
+    // Mapeamento correto do seu Map de Eventos (Chave -> Array de 4 posições)
+    List<StartupEvent> parsedEventos = [];
+    var eventosMap = json['Eventos'];
+    if (eventosMap is Map) {
+      eventosMap.forEach((key, value) {
+        if (value is List) {
+          parsedEventos.add(StartupEvent.fromList(value));
+        }
+      });
+    }
 
     return Startup(
       id: json['ID']?.toString() ?? json['id']?.toString() ?? '',
@@ -120,9 +167,10 @@ class Startup {
       tokenType: _mapTokenType(json['tags'] is List ? List<dynamic>.from(json['tags']) : null),
       founders: parsedFounders,
       externalMembers: parsedMembros,
-      publicDocuments: parsedDocs, 
-      perguntas: parsedPerguntas, 
-      respostas: parsedRespostas, 
+      publicDocuments: parsedDocs,
+      perguntas: parsedPerguntas,
+      respostas: parsedRespostas,
+      eventos: parsedEventos, // Passando a lista processada para a instância
       precoAtualToken: (json['PrecoAtualToken'] ?? 0).toDouble(),
       capitalCaptadoCent: (json['CapitalCaptadoCent'] ?? 0).toDouble(),
       totalTokensEmitidos: (json['TotalTokensEmitidos'] ?? 0).toInt(),
@@ -139,9 +187,9 @@ class Startup {
   }
 
   static String _mapTokenType(List<dynamic>? tags) {
-  if (tags == null || tags.isEmpty) return 'Geral';
-  String firstTag = tags.first.toString();
-  // Capitaliza a primeira letra:
-  return "${firstTag[0].toUpperCase()}${firstTag.substring(1)}";
-}
+    if (tags != null && tags.isNotEmpty) {
+      return tags.first.toString();
+    }
+    return 'Geral';
+  }
 }

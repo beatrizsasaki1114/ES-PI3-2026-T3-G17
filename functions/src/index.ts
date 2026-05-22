@@ -4,8 +4,6 @@ export { listStartups } from "./startups/handlers/listStartups";
 export { getStartupDetails } from "./startups/handlers/getStartupDetails";
 export { seedStartupCatalog } from "./startups/handlers/seedStartupCatalog";
 
-// Chamada das funções de exchange - Sofia de Sousa
-export * from "./exchange";
 
 /**
  * Import function triggers from their respective submodules:
