@@ -78,13 +78,37 @@ class StartupEvent {
   });
 
   factory StartupEvent.fromList(List<dynamic> list) {
-    return StartupEvent(
-      titulo: list.isNotEmpty ? list[0].toString() : '',
-      descricao: list.length > 1 ? list[1].toString() : '',
-      data: list.length > 2 ? list[2].toString() : '',
-      local: list.length > 3 ? list[3].toString() : '',
-    );
+  String dataFormatada = '';
+
+  if (list.length > 2) {
+    var dataRaw = list[2];
+    
+    // Verifica se veio como o Map de Timestamp do Firebase Functions {_seconds: ..., _nanoseconds: ...}
+    if (dataRaw is Map && dataRaw.containsKey('_seconds')) {
+      int segundos = dataRaw['_seconds'] ?? 0;
+      DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(segundos * 1000).toLocal();
+      
+      // Formata manualmente para o padrão brasileiro (DD/MM/AAAA às HH:MM)
+      String dia = dateTime.day.toString().padLeft(2, '0');
+      String mes = dateTime.month.toString().padLeft(2, '0');
+      String ano = dateTime.year.toString();
+      String hora = dateTime.hour.toString().padLeft(2, '0');
+      String minuto = dateTime.minute.toString().padLeft(2, '0');
+      
+      dataFormatada = "$dia/$mes/$ano às $hora:$minuto";
+    } else {
+      // Caso já seja uma String comum (como na segunda imagem)
+      dataFormatada = dataRaw.toString();
+    }
   }
+
+  return StartupEvent(
+    titulo: list.isNotEmpty ? list[0].toString() : '',
+    descricao: list.length > 1 ? list[1].toString() : '',
+    data: dataFormatada,
+    local: list.length > 3 ? list[3].toString() : '',
+  );
+}
 }
 
 class Startup {
