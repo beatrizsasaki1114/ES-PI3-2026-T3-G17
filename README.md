@@ -1,15 +1,6 @@
-# ES-PI3-2026-T3-G17
-
-#Link do protótipo do projeto no Figma https://www.figma.com/design/UJAGXiWKgH9jd0VAFeKRth/Wireframe-Mescla-Invest?node-id=0-1&t=q3cdW5JEvCyItxGf-1
-
-
-## Time 17
-
-* [Beatriz Naomi Ferreira Sasaki](https://github.com/beatrizsasaki1114) : 25016735
-* [Bruno Lenitta Machado](https://github.com/BrunoM2422) : 25008041
-* [Heloisa Lacerda Marinho](https://github.com/loisaaz) : 25893868
-* [Luca Francesco Filippi](https://github.com/LucaFilippi) : 25022556
-* [Sofia de Sousa](https://github.com/1SofiaSousa) : 25005435
+<p align="center">
+  <img src="/assets/images/logoMesclaInvest.png" width=450>
+</p>
 
 ## Sobre o Projeto
 
@@ -22,3 +13,15 @@ O desenvolvimento do MesclaInvest utiliza um conjunto de tecnologias modernas vo
 O backend da aplicação é construído com Node.js, utilizando JavaScript/TypeScript para implementação das regras de negócio e disponibilização de APIs responsáveis pela comunicação com o aplicativo mobile. Para armazenamento e gerenciamento dos dados da aplicação, é utilizado o Firebase Firestore, um banco de dados NoSQL em nuvem que permite armazenamento flexível e escalável das informações do sistema.
 
 Além disso, o projeto utiliza Git para controle de versão do código e GitHub como plataforma de hospedagem do repositório, possibilitando o trabalho colaborativo da equipe, gerenciamento de branches e acompanhamento do progresso do desenvolvimento.
+
+## Integrantes do Time 17
+
+* [Beatriz Naomi Ferreira Sasaki](https://github.com/beatrizsasaki1114) : 25016735
+* [Bruno Lenitta Machado](https://github.com/BrunoM2422) : 25008041
+* [Heloisa Lacerda Marinho](https://github.com/loisaaz) : 25893868
+* [Luca Francesco Filippi](https://github.com/LucaFilippi) : 25022556
+* [Sofia de Sousa](https://github.com/1SofiaSousa) : 25005435
+
+## Tecnologias Utilizadas
+
+
