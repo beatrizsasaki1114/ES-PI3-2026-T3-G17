@@ -1,5 +1,4 @@
 // Beatriz Naomi
-
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_functions/cloud_functions.dart';
 
@@ -18,11 +17,13 @@ class AuthService {
     required String cpf,
     required String password,
   }) async {
-    UserCredential result = await firebaseAuth.createUserWithEmailAndPassword(
-      email: email,
-      password: password,
-    );
     try {
+      // Correção estrutural: o método que gera o erro agora está devidamente protegido dentro do try
+      UserCredential result = await firebaseAuth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+
       await FirebaseFunctions.instanceFor(region: 'southamerica-east1')
           // Nome da função na Cloud Function
           .httpsCallable('createUser')
@@ -38,7 +39,7 @@ class AuthService {
       return result.user;
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        throw ' A senha escolhida é muito fraca. Tente uma mais longa';
+        throw 'A senha escolhida é muito fraca. Tente uma mais longa';
       } else if (e.code == 'email-already-in-use') {
         throw 'Este e-mail já está em uso';
       } else {
@@ -68,7 +69,7 @@ class AuthService {
     required Function(String error) onError,
   }) async {
     try {
-      // verificando se o usuário esta autenticado
+      // verificado se o usuário esta autenticado
       if (currentUser == null) throw 'Usuário não autenticado';
 
       final session = await currentUser!.multiFactor.getSession();
@@ -120,23 +121,24 @@ class AuthService {
     } catch (e) {
       onError(e.toString());
     }
-}
+  }
+
   Future<void> validateCode({
     required String verificationId,
     required String smsCode,
   }) async {
-    try{
+    try {
       final credential = PhoneAuthProvider.credential(
-      verificationId: verificationId,
-      smsCode: smsCode,
-    );
-    final assertion = PhoneMultiFactorGenerator.getAssertion(credential);
-    await firebaseAuth.currentUser?.reload();
-    await currentUser!.multiFactor.enroll(assertion);
-    } on FirebaseAuthException catch (e) {
-        rethrow;
+        verificationId: verificationId,
+        smsCode: smsCode,
+      );
+      final assertion = PhoneMultiFactorGenerator.getAssertion(credential);
+      await firebaseAuth.currentUser?.reload();
+      await currentUser!.multiFactor.enroll(assertion);
+    } on FirebaseAuthException {
+      // Correção do Linter: Removida a variável 'e' que não estava sendo usada
+      rethrow;
     }
-
   }
 
   Future<void> unenrollMFA() async {

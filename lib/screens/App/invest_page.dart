@@ -20,11 +20,11 @@ class _InvestPageState extends State<InvestPage> {
   final TextEditingController _amountController = TextEditingController();
   bool _isProcessing = false;
 
-  Future<void> _processInvestment(BuildContext context) async {
+  Future<void> _processInvestment() async {
     if (_amountController.text.isEmpty) return;
 
-    // Adicione esta validação:
     if (widget.startup.id.isEmpty) {
+      if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('Erro: ID da startup não encontrado.'),
@@ -36,8 +36,6 @@ class _InvestPageState extends State<InvestPage> {
     }
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
-
-    if (_amountController.text.isEmpty) return;
 
     final tokenQuantity = int.parse(_amountController.text);
     final estimatedValue = tokenQuantity * widget.startup.precoAtualToken;
@@ -87,21 +85,18 @@ class _InvestPageState extends State<InvestPage> {
         });
       });
 
-      if (mounted) {
-        Navigator.pop(context); 
-        _showSuccessMessage(context);
-        _amountController.clear();
-      }
+      if (!mounted) return;
+      _showSuccessMessage(context);
+      _amountController.clear();
+      
     } catch (e) {
-      if (mounted) {
-        Navigator.pop(context); 
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString().replaceAll("Exception: ", "")),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(e.toString().replaceAll("Exception: ", "")),
+          backgroundColor: Colors.red,
+        ),
+      );
     } finally {
       if (mounted) {
         setState(() => _isProcessing = false);
@@ -361,7 +356,7 @@ class _InvestPageState extends State<InvestPage> {
   void _showInvestmentConfirmation(BuildContext context) {
     showDialog(
       context: context,
-      builder: (BuildContext context) {
+      builder: (BuildContext dialogContext) {
         return AlertDialog(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(20),
@@ -379,7 +374,7 @@ class _InvestPageState extends State<InvestPage> {
           ),
           actions: [
             TextButton(
-              onPressed: () => Navigator.pop(context),
+              onPressed: () => Navigator.pop(dialogContext),
               child: Text(
                 'Cancelar',
                 style: GoogleFonts.poppins(color: Colors.grey),
@@ -388,7 +383,11 @@ class _InvestPageState extends State<InvestPage> {
             ElevatedButton(
               onPressed: _isProcessing 
                   ? null 
-                  : () => _processInvestment(context),
+                  : () {
+                      // Fecha o diálogo de confirmação antes de iniciar o processo
+                      Navigator.pop(dialogContext);
+                      _processInvestment();
+                    },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 77, 51, 142),
                 shape: RoundedRectangleBorder(

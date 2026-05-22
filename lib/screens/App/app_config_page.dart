@@ -145,6 +145,8 @@ class _AppConfigPageState extends State<AppConfigPage> {
                           await user?.reload();
                           if (user != null && !user.emailVerified) {
                             await AuthService().sendEmailVerification();
+                            
+                            // Correção 1: Garantia após o envio do e-mail de verificação
                             if (!context.mounted) return;
 
                             showDialog(
@@ -162,6 +164,10 @@ class _AppConfigPageState extends State<AppConfigPage> {
                                       final user = FirebaseAuth.instance.currentUser;
                                       await user?.reload(); 
                                       final usuarioAtualizado = FirebaseAuth.instance.currentUser;
+                                      
+                                      // Correção 2 & 3: Garantias antes de fechar o diálogo e iniciar o fluxo 2FA
+                                      if (!context.mounted) return;
+                                      
                                       if (usuarioAtualizado != null && usuarioAtualizado.emailVerified) {
                                         Navigator.pop(dialogContext); 
                                         _iniciar2FA(context); 
@@ -184,6 +190,8 @@ class _AppConfigPageState extends State<AppConfigPage> {
                           try {
                             await AuthService().unenrollMFA();
                             _checkMFAStatus();
+                            
+                            // Correção 4: Garantia após o desvinculo do MFA
                             if (!context.mounted) return;
 
                             ScaffoldMessenger.of(context).showSnackBar(
@@ -194,6 +202,8 @@ class _AppConfigPageState extends State<AppConfigPage> {
                           } catch (e) {
                             if (e.toString().contains('requires-recent-login')) {
                               setState(() => isMultiFactorSession = true);
+                              
+                              if (!context.mounted) return;
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
                                   content: Text(
