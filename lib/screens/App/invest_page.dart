@@ -384,7 +384,6 @@ class _InvestPageState extends State<InvestPage> {
               onPressed: _isProcessing 
                   ? null 
                   : () {
-                      // Fecha o diálogo de confirmação antes de iniciar o processo
                       Navigator.pop(dialogContext);
                       _processInvestment();
                     },

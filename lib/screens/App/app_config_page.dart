@@ -146,7 +146,6 @@ class _AppConfigPageState extends State<AppConfigPage> {
                           if (user != null && !user.emailVerified) {
                             await AuthService().sendEmailVerification();
                             
-                            // Correção 1: Garantia após o envio do e-mail de verificação
                             if (!context.mounted) return;
 
                             showDialog(
@@ -165,7 +164,6 @@ class _AppConfigPageState extends State<AppConfigPage> {
                                       await user?.reload(); 
                                       final usuarioAtualizado = FirebaseAuth.instance.currentUser;
                                       
-                                      // Correção 2 & 3: Garantias antes de fechar o diálogo e iniciar o fluxo 2FA
                                       if (!context.mounted) return;
                                       
                                       if (usuarioAtualizado != null && usuarioAtualizado.emailVerified) {
@@ -191,7 +189,6 @@ class _AppConfigPageState extends State<AppConfigPage> {
                             await AuthService().unenrollMFA();
                             _checkMFAStatus();
                             
-                            // Correção 4: Garantia após o desvinculo do MFA
                             if (!context.mounted) return;
 
                             ScaffoldMessenger.of(context).showSnackBar(

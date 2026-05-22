@@ -16,7 +16,6 @@ class SocietyStructurePage extends StatelessWidget {
     final founders = startup.founders;
     final externalMembers = startup.externalMembers;
 
-    // Paleta de cores para o gráfico
     final List<Color> sectionColors = [
       const Color(0xFFE91E63),
       const Color(0xFF3F51B5),
@@ -31,7 +30,6 @@ class SocietyStructurePage extends StatelessWidget {
     List<Widget> externalCards = [];
     int colorIndex = 0;
 
-    // Montando dados para o gráfico e os Cards dos Fundadores
     for (var f in founders) {
       Color color = sectionColors[colorIndex % sectionColors.length];
       pieSections.add(
@@ -47,7 +45,6 @@ class SocietyStructurePage extends StatelessWidget {
       colorIndex++;
     }
 
-    // Montando dados para o gráfico e os Cards dos Membros Externos
     for (var m in externalMembers) {
       Color color = sectionColors[colorIndex % sectionColors.length];
       pieSections.add(
@@ -119,7 +116,6 @@ class SocietyStructurePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Se não houver nenhum sócio nem membro
                         if (pieSections.isEmpty)
                            Center(
                             child: Text(
@@ -128,7 +124,6 @@ class SocietyStructurePage extends StatelessWidget {
                             ),
                           )
                         else ...[
-                          // GRÁFICO
                           SizedBox(
                             height: 220,
                             child: PieChart(
@@ -141,7 +136,6 @@ class SocietyStructurePage extends StatelessWidget {
                           ),
                           const SizedBox(height: 32),
 
-                          // SÓCIOS (FUNDADORES)
                           if (founderCards.isNotEmpty) ...[
                             Text(
                               'Sócios Fundadores',
@@ -155,7 +149,6 @@ class SocietyStructurePage extends StatelessWidget {
                             ...founderCards,
                           ],
 
-                          // MEMBROS EXTERNOS
                           if (externalCards.isNotEmpty) ...[
                             const SizedBox(height: 16),
                             Text(

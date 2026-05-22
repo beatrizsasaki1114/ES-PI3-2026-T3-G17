@@ -271,7 +271,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                     context,
                     MaterialPageRoute(
                       builder: (context) => DetailedInvestmentPage(
-                        investment: investment, // Passamos o investimento clicado aqui
+                        investment: investment, 
                       ),
                     ),
                   );
@@ -282,7 +282,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                     fontSize: 12,
                     color: const Color(0xFFE91E63),
                     fontWeight: FontWeight.w500,
-                    decoration: TextDecoration.underline, // Opcional: Adiciona sublinhado para mostrar que é clicável
+                    decoration: TextDecoration.underline,
                   ),
                 ),
               ),

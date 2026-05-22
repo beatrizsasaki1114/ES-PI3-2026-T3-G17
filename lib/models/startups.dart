@@ -63,7 +63,6 @@ class StartupDocument {
   }
 }
 
-// Nova classe para mapear cada Evento vindo da lista [Título, Descrição, Data, Local]
 class StartupEvent {
   final String titulo;
   final String descricao;
@@ -82,13 +81,11 @@ class StartupEvent {
 
   if (list.length > 2) {
     var dataRaw = list[2];
-    
-    // Verifica se veio como o Map de Timestamp do Firebase Functions {_seconds: ..., _nanoseconds: ...}
+  
     if (dataRaw is Map && dataRaw.containsKey('_seconds')) {
       int segundos = dataRaw['_seconds'] ?? 0;
       DateTime dateTime = DateTime.fromMillisecondsSinceEpoch(segundos * 1000).toLocal();
       
-      // Formata manualmente para o padrão brasileiro (DD/MM/AAAA às HH:MM)
       String dia = dateTime.day.toString().padLeft(2, '0');
       String mes = dateTime.month.toString().padLeft(2, '0');
       String ano = dateTime.year.toString();
@@ -97,7 +94,6 @@ class StartupEvent {
       
       dataFormatada = "$dia/$mes/$ano às $hora:$minuto";
     } else {
-      // Caso já seja uma String comum (como na segunda imagem)
       dataFormatada = dataRaw.toString();
     }
   }
@@ -127,7 +123,7 @@ class Startup {
   final List<StartupDocument> publicDocuments;
   final List<String> perguntas;
   final List<String> respostas;
-  final List<StartupEvent> eventos; // Novo atributo inserido
+  final List<StartupEvent> eventos;
 
   Startup({
     required this.id,
@@ -145,7 +141,7 @@ class Startup {
     required this.publicDocuments,
     required this.perguntas,
     required this.respostas,
-    required this.eventos, // Requerido no construtor
+    required this.eventos,
   });
 
   factory Startup.fromJson(Map<String, dynamic> json) {
@@ -170,7 +166,6 @@ class Startup {
     var respostasJson = json['Respostas'] as List? ?? [];
     List<String> parsedRespostas = respostasJson.map((e) => e.toString()).toList();
 
-    // Mapeamento correto do seu Map de Eventos (Chave -> Array de 4 posições)
     List<StartupEvent> parsedEventos = [];
     var eventosMap = json['Eventos'];
     if (eventosMap is Map) {
@@ -194,7 +189,7 @@ class Startup {
       publicDocuments: parsedDocs,
       perguntas: parsedPerguntas,
       respostas: parsedRespostas,
-      eventos: parsedEventos, // Passando a lista processada para a instância
+      eventos: parsedEventos,
       precoAtualToken: (json['PrecoAtualToken'] ?? 0).toDouble(),
       capitalCaptadoCent: (json['CapitalCaptadoCent'] ?? 0).toDouble(),
       totalTokensEmitidos: (json['TotalTokensEmitidos'] ?? 0).toInt(),

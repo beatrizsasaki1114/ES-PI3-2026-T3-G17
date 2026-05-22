@@ -172,7 +172,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     );
   }
 
-  // --- WIDGET DE EVENTOS ADICIONADO AQUI ---
   Widget _buildEventItem(StartupEvent evento) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -464,7 +463,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 const SizedBox(height: 32),
                 
-                // --- SEÇÃO DE EVENTOS INSERIDA AQUI ---
                 Text(
                   'Eventos e Atualizações',
                   style: GoogleFonts.poppins(
@@ -485,7 +483,6 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     ),
                   ),
                 const SizedBox(height: 32),
-                // ----------------------------------------
 
                 Text(
                   'Documentos Oficiais',

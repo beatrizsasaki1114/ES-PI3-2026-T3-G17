@@ -16,25 +16,21 @@ class DetailedInvestmentPage extends StatefulWidget {
 class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
   @override
   Widget build(BuildContext context) {
-    // Extraindo dados do mapa de investimento passado
     final String startupName = widget.investment['startupName'] ?? 'Desconhecida';
     final int tokenQuantity = widget.investment['tokenQuantity'] ?? 0;
     final double amountSpent = (widget.investment['amountSpent'] ?? 0).toDouble();
     
-    // O valor atual será o mesmo do valor investido até que a lógica seja criada
     final double currentAmount = amountSpent; 
 
-    // Extraindo e formatando a data
     final Timestamp? timestamp = widget.investment['date'] as Timestamp?;
     final DateTime date = timestamp != null ? timestamp.toDate() : DateTime.now();
     final String formattedDate = 
         "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} às ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
 
     return MainLayout(
-      selectedIndex: 3, // Mantém a seleção na aba de investimentos
+      selectedIndex: 3, 
       body: Stack(
         children: [
-          // Background Decorativo
           Positioned(
             top: -50,
             right: -50,
@@ -64,7 +60,6 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header com Botão de Voltar
                 Padding(
                   padding: const EdgeInsets.only(top: 16.0, left: 16.0, right: 16.0),
                   child: Row(
@@ -85,7 +80,6 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                   ),
                 ),
                 
-                // Card Principal da Startup
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Center(
@@ -138,7 +132,6 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                   ),
                 ),
 
-                // Seção de Detalhes Financeiros
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Container(
@@ -174,7 +167,7 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                           icon: Icons.trending_up,
                           label: 'Valor Atual Estimado',
                           value: 'R\$ ${currentAmount.toStringAsFixed(2).replaceAll('.', ',')}',
-                          valueColor: const Color(0xFF4CAF50), // Cor verde indicando valorização financeira
+                          valueColor: const Color(0xFF4CAF50), 
                         ),
                       ],
                     ),
@@ -183,7 +176,6 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                 
                 const SizedBox(height: 32),
 
-                // Espaço Reservado para o Gráfico
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Text(
