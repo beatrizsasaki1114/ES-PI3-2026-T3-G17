@@ -1,9 +1,10 @@
+# ES-PI3-2026-T3-G17
+
 <p align="center">
   <img src="/assets/images/logoMesclaInvest.png" width=450>
 </p>
 
 ## Sobre o Projeto
-
 O **MesclaInvest** é uma plataforma mobile desenvolvida no contexto da disciplina de Projeto Integrador 3 da PUC-Campinas. O objetivo do sistema é simular um ambiente digital de investimentos em startups vinculadas ao ecossistema de inovação Mescla, permitindo que usuários explorem projetos, acompanhem informações institucionais e interajam com os empreendedores. A aplicação busca aproximar a universidade da sociedade, promovendo maior visibilidade às iniciativas empreendedoras desenvolvidas por estudantes.
 
 A plataforma também simula a negociação de participações digitais representadas por tokens. Por meio do aplicativo, os usuários poderão visualizar startups cadastradas, acessar documentos e informações relevantes, enviar perguntas aos fundadores e participar de um ambiente de compra e venda simulada de tokens. O foco do projeto está na construção da arquitetura de software, integração entre backend e aplicativo mobile, e no desenvolvimento de funcionalidades que reproduzam, de forma acadêmica e simulada, a dinâmica de plataformas de investimento.
@@ -15,7 +16,6 @@ O backend da aplicação é construído com Node.js, utilizando JavaScript/TypeS
 Além disso, o projeto utiliza Git para controle de versão do código e GitHub como plataforma de hospedagem do repositório, possibilitando o trabalho colaborativo da equipe, gerenciamento de branches e acompanhamento do progresso do desenvolvimento.
 
 ## Integrantes do Time 17
-
 * [Beatriz Naomi Ferreira Sasaki](https://github.com/beatrizsasaki1114) : 25016735
 * [Bruno Lenitta Machado](https://github.com/BrunoM2422) : 25008041
 * [Heloisa Lacerda Marinho](https://github.com/loisaaz) : 25893868
@@ -23,5 +23,46 @@ Além disso, o projeto utiliza Git para controle de versão do código e GitHub 
 * [Sofia de Sousa](https://github.com/1SofiaSousa) : 25005435
 
 ## Tecnologias Utilizadas
+- Flutter
+- Linguagem Dart
+-  TypeScript
+-  Cloud Firestore
+  
+## Pré-requisitos
+Antes de executar o projeto, certifique-se ter instalado:
+- **Node.js** 
+  [Baixar aqui](https://nodejs.org/)
+- **Java JDK**
+  [Baixar aqui](https://adoptium.net/pt-BR/temurin/releases?version=21&os=any&arch=any)
+- **Flutter SDK**
+  [Baixar aqui](https://docs.flutter.dev/install)
 
+## Como executar o projeto
+Para executar e testar o ecossistema completo localmente, siga em ordem as intruções abaixo:
 
+No terminal
+
+Verifique se as dependências do Flutter estão ok
+```bash
+flutter doctor
+```
+Acesse a pasta ES-PI3-2026-T3-G17
+```bash
+cd ES-PI3-2026-T3-G17
+```
+Acesse a pasta das funções para ativar o servidor
+```bash
+cd functions
+```
+Instale as dependências do projeto
+```bash
+npm install
+```
+Compile o código TypeScript para JavaScript:
+```bash
+npm run build
+```
+Inicie o firebase
+```bash
+firebase emulators:start
+```
