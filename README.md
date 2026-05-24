@@ -41,36 +41,39 @@ Antes de executar o projeto, certifique-se ter instalado:
 Para executar e testar o ecossistema completo localmente, siga em ordem as intruções abaixo:
 
 No terminal
-
-1. Verifique se as dependências do Flutter estão ok
-```bash
-flutter doctor
-```
-2. Acesse a pasta **ES-PI3-2026-T3-G17**
-```bash
-cd ES-PI3-2026-T3-G17
-```
-3. Acesse a diretório das funções
-```bash
-cd functions
-```
-4. Instale as dependências do projeto
-```bash
-npm install
-```
-5. Compile o código TypeScript para JavaScript:
-```bash
-npm run build
-```
-6. Inicie o servidor
-```bash
-firebase emulators:start
-```
-7. Download de dependências e configurações do projeto.
+1. Download de dependências e configurações do projeto.
 ```bash
 flutter pub get
 ```
-8. Iniciar a depuração da aplicação
+2. Verifique se as dependências do Flutter estão ok
+```bash
+flutter doctor
+```
+3. Acesse a pasta **ES-PI3-2026-T3-G17**
+```bash
+cd ES-PI3-2026-T3-G17
+```
+4. Acesse a diretório das funções
+```bash
+cd functions
+```
+5. Instale as dependências do projeto
+```bash
+npm install
+```
+6. Compile o código TypeScript para JavaScript:
+```bash
+npm run build
+```
+7. Inicie o servidor
+```bash
+firebase emulators:start
+```
+8. Download de dependências e configurações do projeto.
+```bash
+flutter pub get
+```
+9. Iniciar a depuração da aplicação
 ```bash
 flutter run
 ```
