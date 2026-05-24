@@ -1,7 +1,7 @@
 # ES-PI3-2026-T3-G17
 
 <p align="center">
-  <img src="/assets/images/logoMesclaInvest.png" width=450>
+  <img src="/assets/images/logoMesclaInvest.png" alt="Logo MesclaInvest" width=450>
 </p>
 
 ## Sobre o Projeto
@@ -42,27 +42,35 @@ Para executar e testar o ecossistema completo localmente, siga em ordem as intru
 
 No terminal
 
-Verifique se as dependências do Flutter estão ok
+1. Verifique se as dependências do Flutter estão ok
 ```bash
 flutter doctor
 ```
-Acesse a pasta ES-PI3-2026-T3-G17
+2. Acesse a pasta **ES-PI3-2026-T3-G17**
 ```bash
 cd ES-PI3-2026-T3-G17
 ```
-Acesse a pasta das funções para ativar o servidor
+3. Acesse a diretório das funções
 ```bash
 cd functions
 ```
-Instale as dependências do projeto
+4. Instale as dependências do projeto
 ```bash
 npm install
 ```
-Compile o código TypeScript para JavaScript:
+5. Compile o código TypeScript para JavaScript:
 ```bash
 npm run build
 ```
-Inicie o firebase
+6. Inicie o servidor
 ```bash
 firebase emulators:start
+```
+7. Download de dependências e configurações do projeto.
+```bash
+flutter pub get
+```
+8. Iniciar a depuração da aplicação
+```bash
+flutter run
 ```
