@@ -10,5 +10,3 @@ export type Users = {
     saldo: number;   
     descricao: string;
 }
-
-

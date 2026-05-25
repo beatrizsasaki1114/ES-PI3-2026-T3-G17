@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:projeto_integrador_3_grupo_17/models/startups.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class PrivateChatPage extends StatefulWidget {
-  final Startup startup;
+  final String startupName;
 
-  const PrivateChatPage({super.key, required this.startup});
+  const PrivateChatPage({super.key, required this.startupName});
 
   @override
   State<PrivateChatPage> createState() => _PrivateChatPageState();
@@ -13,55 +14,46 @@ class PrivateChatPage extends StatefulWidget {
 
 class _PrivateChatPageState extends State<PrivateChatPage> {
   final TextEditingController _messageController = TextEditingController();
-  final List<ChatMessage> _messages = [];
-
-  @override
-  void initState() {
-    super.initState();
-    _messages.addAll([
-      ChatMessage(
-        text: 'Seja bem-vindo ao chat com Agrotech!',
-        isFromStartup: true,
-        timestamp: DateTime.now().subtract(const Duration(minutes: 5)),
-      ),
-      ChatMessage(
-        text: 'Olá! O que você precisa em relação aos nosso negócio? Estou aqui!',
-        isFromStartup: true,
-        timestamp: DateTime.now().subtract(const Duration(minutes: 4)),
-      ),
-    ]);
-  }
+  final ScrollController _scrollController = ScrollController();
+  final user = FirebaseAuth.instance.currentUser;
 
   @override
   void dispose() {
     _messageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
-  void _sendMessage() {
-    if (_messageController.text.trim().isEmpty) return;
+  void _sendMessage() async {
+    if (_messageController.text.trim().isEmpty || user == null) return;
 
-    setState(() {
-      _messages.add(ChatMessage(
-        text: _messageController.text.trim(),
-        isFromStartup: false,
-        timestamp: DateTime.now(),
-      ));
+    final text = _messageController.text.trim();
+    _messageController.clear(); 
+
+    final chatRef = FirebaseFirestore.instance
+        .collection('Usuários')
+        .doc(user!.uid)
+        .collection('chats')
+        .doc(widget.startupName)
+        .collection('mensagens');
+
+    await chatRef.add({
+      'text': text,
+      'is_from_startup': false,
+      'timestamp': FieldValue.serverTimestamp(),
     });
 
-    _messageController.clear();
+    _scrollToBottom();
+  }
 
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted) {
-        setState(() {
-          _messages.add(ChatMessage(
-            text: 'Obrigado pela sua mensagem! Em breve retornaremos.',
-            isFromStartup: true,
-            timestamp: DateTime.now(),
-          ));
-        });
-      }
-    });
+  void _scrollToBottom() {
+    if (_scrollController.hasClients) {
+      _scrollController.animateTo(
+        _scrollController.position.maxScrollExtent + 100,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 
   @override
@@ -86,7 +78,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
               ),
               child: Center(
                 child: Text(
-                  widget.startup.name[0].toUpperCase(),
+                  widget.startupName.isNotEmpty ? widget.startupName[0].toUpperCase() : 'S',
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -96,12 +88,15 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              widget.startup.name,
-              style: GoogleFonts.poppins(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-                color: Colors.black87,
+            Expanded(
+              child: Text(
+                widget.startupName,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  color: Colors.black87,
+                ),
               ),
             ),
           ],
@@ -110,59 +105,78 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
       body: Stack(
         children: [
           Positioned(
-            bottom: -50,
-            left: -50,
+            top: -50,
+            right: -50,
             child: Container(
               width: 200,
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFFE91E63).withValues(alpha:0.2),
-                    const Color(0xFFE91E63).withValues(alpha:0.1),
-                  ],
-                ),
+                color: const Color(0xFFE91E63).withValues(alpha:0.05),
               ),
             ),
           ),
           Positioned(
-            bottom: -30,
-            right: -80,
+            bottom: -80,
+            left: -80,
             child: Container(
               width: 250,
               height: 250,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                gradient: LinearGradient(
-                  colors: [
-                    const Color(0xFF9C27B0).withValues(alpha:0.25),
-                    const Color(0xFF9C27B0).withValues(alpha:0.15),
-                  ],
-                ),
+                color: const Color(0xFF9C27B0).withValues(alpha:0.05),
               ),
             ),
           ),
+          
           Column(
             children: [
               Expanded(
-                child: _messages.isEmpty
-                    ? Center(
-                  child: Text(
-                    'Nenhuma mensagem ainda',
-                    style: GoogleFonts.poppins(
-                      fontSize: 14,
-                      color: Colors.black38,
-                    ),
-                  ),
-                )
-                    : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: _messages.length,
-                  itemBuilder: (context, index) {
-                    return MessageBubble(message: _messages[index]);
-                  },
-                ),
+                child: user == null
+                    ? const Center(child: Text("Usuário não autenticado"))
+                    : StreamBuilder<QuerySnapshot>(
+                        stream: FirebaseFirestore.instance
+                            .collection('Usuários')
+                            .doc(user!.uid)
+                            .collection('chats')
+                            .doc(widget.startupName)
+                            .collection('mensagens')
+                            .orderBy('timestamp', descending: false)
+                            .snapshots(),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return const Center(child: CircularProgressIndicator());
+                          }
+
+                          if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                            return Center(
+                              child: Text(
+                                'Nenhuma mensagem ainda.\nEnvie a primeira mensagem!',
+                                textAlign: TextAlign.center,
+                                style: GoogleFonts.poppins(
+                                  fontSize: 14,
+                                  color: Colors.black38,
+                                ),
+                              ),
+                            );
+                          }
+
+                          final docs = snapshot.data!.docs;
+
+                          WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
+
+                          return ListView.builder(
+                            controller: _scrollController,
+                            padding: const EdgeInsets.all(16),
+                            itemCount: docs.length,
+                            itemBuilder: (context, index) {
+                              final data = docs[index].data() as Map<String, dynamic>;
+                              final message = ChatMessage.fromFirestore(data);
+                              return MessageBubble(message: message);
+                            },
+                          );
+                        },
+                      ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -203,8 +217,8 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        decoration: BoxDecoration(
-                          gradient: const LinearGradient(
+                        decoration: const BoxDecoration(
+                          gradient: LinearGradient(
                             colors: [Color(0xFFE91E63), Color(0xFF9C27B0)],
                           ),
                           shape: BoxShape.circle,
@@ -234,25 +248,25 @@ class MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
-        mainAxisAlignment: message.isFromStartup
-            ? MainAxisAlignment.start
-            : MainAxisAlignment.end,
+        mainAxisAlignment:
+            message.isFromStartup ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: [
           if (message.isFromStartup) ...[
             Container(
+  
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.75,
               ),
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
               decoration: BoxDecoration(
-                color: const Color(0xFFE91E63).withValues(alpha:0.15),
+                color: Colors.grey.shade200,
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
-                  bottomRight: Radius.circular(20),
                   bottomLeft: Radius.circular(4),
+                  bottomRight: Radius.circular(20),
                 ),
               ),
               child: Text(
@@ -308,19 +322,13 @@ class ChatMessage {
     required this.timestamp,
   });
 
-  factory ChatMessage.fromJson(Map<String, dynamic> json) {
+  factory ChatMessage.fromFirestore(Map<String, dynamic> data) {
     return ChatMessage(
-      text: json['text'] as String,
-      isFromStartup: json['is_from_startup'] as bool,
-      timestamp: DateTime.parse(json['timestamp'] as String),
+      text: data['text'] ?? '',
+      isFromStartup: data['is_from_startup'] ?? false,
+      timestamp: data['timestamp'] != null
+          ? (data['timestamp'] as Timestamp).toDate()
+          : DateTime.now(),
     );
-  }
-
-  Map<String, dynamic> toJson() {
-    return {
-      'text': text,
-      'is_from_startup': isFromStartup,
-      'timestamp': timestamp.toIso8601String(),
-    };
   }
 }

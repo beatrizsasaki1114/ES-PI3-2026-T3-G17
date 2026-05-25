@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
+import 'package:projeto_integrador_3_grupo_17/screens/User/private_chat.dart';
 
 class DetailedInvestmentPage extends StatefulWidget {
   final Map<String, dynamic> investment;
@@ -221,8 +222,31 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                   ),
                 ),
                 
-                const SizedBox(height: 40),
+                const SizedBox(height: 100),
               ],
+            ),
+          ),
+
+          Positioned(
+            bottom: 24,
+            right: 24,
+            child: FloatingActionButton.extended(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PrivateChatPage(
+                      startupName: startupName, 
+                    ),
+                  ),
+                );
+              },
+              backgroundColor: const Color(0xFFE91E63),
+              icon: const Icon(Icons.chat_bubble_outline, color: Colors.white),
+              label: Text(
+                'Falar com a Startup', 
+                style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600)
+              ),
             ),
           ),
         ],
