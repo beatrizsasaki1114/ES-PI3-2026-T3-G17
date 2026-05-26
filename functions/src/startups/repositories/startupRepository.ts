@@ -55,7 +55,7 @@ export async function seedDemoStartups(): Promise<string[]> {
   const ids: string[] = [];
 
   demoStartup.forEach((startup) => {
-    const docRef = startupsCollection.doc();
+    const docRef = startupsCollection.doc(startup.ID);
     batch.set(docRef, startup);
     ids.push(docRef.id);
   });

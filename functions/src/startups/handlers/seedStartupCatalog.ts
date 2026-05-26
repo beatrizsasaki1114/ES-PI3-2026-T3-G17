@@ -2,8 +2,9 @@
 
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { seedDemoStartups } from "../repositories/startupRepository";
-import { normalizeString } from "../shared/validation";
+import { normalizeString } from "../../shared/validation";
 
+// seed_key: mesclainvest123
 export const seedStartupCatalog = onCall(
     { region: "southamerica-east1" ,
     secrets: ["SEED_STARTUP_CATALOG_KEY"]
