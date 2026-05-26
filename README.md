@@ -65,15 +65,7 @@ npm install
 ```bash
 npm run build
 ```
-7. Inicie o servidor
-```bash
-firebase emulators:start
-```
-8. Download de dependências e configurações do projeto.
-```bash
-flutter pub get
-```
-9. Iniciar a depuração da aplicação
+7. Iniciar a depuração da aplicação
 ```bash
 flutter run
 ```
