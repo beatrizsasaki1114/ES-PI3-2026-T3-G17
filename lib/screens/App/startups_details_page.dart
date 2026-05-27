@@ -8,6 +8,7 @@ import 'package:projeto_integrador_3_grupo_17/services/startups/startups_service
 import 'package:projeto_integrador_3_grupo_17/screens/App/invest_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/society_structure.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
+import 'package:projeto_integrador_3_grupo_17/widgets/token_price_chart.dart';
 
 class StartupDetailsPage extends StatefulWidget {
   final Startup startup;

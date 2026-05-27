@@ -15,7 +15,7 @@ export const seedHistory = onCall(
             
             const startupId = startupDoc.id;
             // Busca todas as ofertas vendidas dessa startup
-            const ofertasSnapshot = await db.collection("Ofertas")
+            const ofertasSnapshot = await db.collection("ofertas_demo")
                 .where("startupId", "==", startupId)
                 .where("status", "==", "vendida")
                 .get();
@@ -31,7 +31,9 @@ export const seedHistory = onCall(
             ofertasSnapshot.forEach((ofertaDoc)=>{
                 const {precoUnitario, quantidadeTokens, dataVenda} = ofertaDoc.data();
                 // Extrai apenas o YYYY-MM-DD da string data
-                 const data: string = (dataVenda as Timestamp).toDate().toISOString().split("T")[0];
+                const data: string = typeof dataVenda === "string"
+                    ? dataVenda.split("T")[0]
+                    : (dataVenda as Timestamp).toDate().toISOString().split("T")[0];
                 
                  // Inicializa o histórico das transações se ainda não tiver sido feito
                 if (!porData[data]) {
