@@ -38,7 +38,7 @@ export const calculateDailyHistory = onSchedule(
                 totalTokens += quantidadeTokens;
             }
             // Buscamos todas as ofertas que foram negociadas e vendidas hoje
-            const ofertasSnapshot = await db.collection("ofertas_demo")
+            const ofertasSnapshot = await db.collection("Ofertas")
             .where("startupId","==", startupId)
             .where("status", "==", "vendida",)
             .where("dataVenda", ">=", inicioDoDia)

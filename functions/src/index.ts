@@ -5,6 +5,7 @@ export { getStartupDetails } from "./startups/handlers/getStartupDetails";
 export { seedStartupCatalog } from "./startups/handlers/seedStartupCatalog";
 export {seedOfertas} from "./ofertasDemo/handlers/seedOfertas";
 export {calculateDailyHistory} from "./historico/handlers/calculateDailyHistory";
+export {seedHistory} from "./historico/handlers/seedHistory";
 
 /**
  * Import function triggers from their respective submodules:
