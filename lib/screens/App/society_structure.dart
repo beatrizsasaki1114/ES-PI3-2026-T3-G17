@@ -13,7 +13,7 @@ class SocietyStructurePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    // Separa os sócios nas duas categorias pré-definidas no modelo
+    // Separa os sócios nas duas categorias de fundador e membros secundários
     final founders = startup.founders;
     final externalMembers = startup.externalMembers;
 
@@ -33,7 +33,7 @@ class SocietyStructurePage extends StatelessWidget {
     int colorIndex = 0;
 
     // Prepara os dados visuais percorrendo primeiro os fundadores.
-    // É gerada uma seção de pizza (PieChartSectionData) e um Card UI sincronizados na mesma cor.
+    // É gerada uma seção de pizza e um Card UI sincronizados na mesma cor.
     for (var f in founders) {
       Color color = sectionColors[colorIndex % sectionColors.length];
       pieSections.add(
