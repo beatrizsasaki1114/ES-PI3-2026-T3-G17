@@ -25,6 +25,19 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
   YoutubePlayerController? _controller;
   late Future<Startup> _startupDetailsFuture;
 
+  // Horário de abertura do mercado
+   bool get _mercadoAberto {
+    final hora = DateTime.now().hour * 60 + DateTime.now().minute;
+    return hora >= 8 * 60 && hora < 18 * 60;
+  }
+ 
+  String get _motivoMercadoFechado {
+    final hora = DateTime.now().hour * 60 + DateTime.now().minute;
+    if (hora < 8 * 60)   return 'Mercado fechado. Abre às 08:00';
+    if (hora >= 18 * 60) return 'Mercado encerrado. Reabre amanhã às 08:00';
+    return '';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -172,6 +185,51 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
       ],
     );
   }
+ Widget _buildPrecoToken(double precoAtual, double? precoAnterior) {
+    // Calcula variação se tiver preço anterior
+    double? variacao;
+    if (precoAnterior != null && precoAnterior > 0) {
+      variacao = ((precoAtual - precoAnterior) / precoAnterior) * 100;
+    }
+ 
+    final valorFormatado =
+        'R\$ ${precoAtual.toStringAsFixed(2).replaceAll('.', ',')}';
+ 
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Preço/Token',
+          style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54),
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                valorFormatado,
+                style: GoogleFonts.poppins(
+                    fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+            ),
+            if (variacao != null) ...[
+              const SizedBox(width: 2),
+              Icon(
+                variacao >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                size: 14,
+                color: variacao >= 0
+                    ? const Color(0xFF2E7D32)
+                    : const Color(0xFFC62828),
+              ),
+            ],
+          ],
+        ),
+      ],
+    );
+  }
+  
 
   Widget _buildEventItem(StartupEvent evento) {
     return Container(
@@ -337,9 +395,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   children: [
                     Expanded(
                       flex: 2,
-                      child: _buildPriceInfo(
-                        'Preço/Token', 
-                        'R\$ ${fullStartup.precoAtualToken.toStringAsFixed(2).replaceAll('.', ',')}',
+                      child:_buildPrecoToken(
+                        fullStartup.precoAtualToken,
+                        fullStartup.precoAnteriorToken,
                       ),
                     ),
                     Expanded(
@@ -359,36 +417,62 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ],
                 ),
                 const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => InvestPage(startup: fullStartup),
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed:  _mercadoAberto
+                            ?  () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => InvestPage(startup: fullStartup),
+                            ),
+                          );
+                        }: null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor:_mercadoAberto 
+                          ? const Color(0xFFE91E63)
+                          : Colors.grey.shade400,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE91E63),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        child: Text(
+                          "Investir em ${fullStartup.name}",
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                    child: Text(
-                      "Investir em ${fullStartup.name}",
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                     if (!_mercadoAberto) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.access_time,
+                              size: 13, color: Colors.grey.shade500),
+                          const SizedBox(width: 4),
+                          Text(
+                            _motivoMercadoFechado,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
+                    ],
+
+                  ],
                 ),
                 const SizedBox(height: 24),
-                Container(
+               Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
@@ -398,25 +482,11 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                   child: Column(
                     children: [
-                      Container(
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Gráfico de Valorização',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              color: Colors.black38,
-                            ),
-                          ),
-                        ),
-                      ),
+                      TokenPriceChart(startupId: widget.startup.id),
                     ],
                   ),
                 ),
+           
                 const SizedBox(height: 32),
                 Text(
                   "Sobre a Startup",

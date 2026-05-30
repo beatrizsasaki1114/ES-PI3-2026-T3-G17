@@ -2,17 +2,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'token_price_chart.dart';
- 
+
 class TokenChartPeriodButtons extends StatelessWidget {
   final PeriodoGrafico periodoSelecionado;
   final ValueChanged<PeriodoGrafico> onPeriodoChanged;
- 
+
   const TokenChartPeriodButtons({
     super.key,
     required this.periodoSelecionado,
     required this.onPeriodoChanged,
   });
- 
+
   @override
   Widget build(BuildContext context) {
     return Row(

@@ -29,7 +29,7 @@ export const getStartupDetails = onCall(
     }
 
     const startup = await getStartupById(startupId);
-
+    console.log('PrecoAnteriorToken do banco:', startup?.PrecoAnteriorToken);
    
     if (!startup) {
         throw new HttpsError(
@@ -53,7 +53,8 @@ export const getStartupDetails = onCall(
             SumarioExecutivo: startup.SumarioExecutivo,
             CapitalCaptadoCent: startup.CapitalCaptadoCent,
             TotalTokensEmitidos: startup.TotalTokensEmitidos,
-            PrecoAtualToken: startup.PrecoAtualToken,
+            PrecoAtualToken:  (startup as any).PrecoAtualToken ?? startup.PrecoAtualToken,
+            PrecoAnteriorToken: (startup as any).PrecoAnteriorToken  ?? null,
             Fundadores: startup.Fundadores,
             MembrosExterno: startup.MembrosExterno,
             DemoVideo: startup.DemoVideo,

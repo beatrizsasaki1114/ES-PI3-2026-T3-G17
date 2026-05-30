@@ -3,10 +3,14 @@ export {signInUser} from "./Users/handlers/signIn";
 export { listStartups } from "./startups/handlers/listStartups";
 export { getStartupDetails } from "./startups/handlers/getStartupDetails";
 export { seedStartupCatalog } from "./startups/handlers/seedStartupCatalog";
-export {seedOfertas} from "./ofertasDemo/handlers/seedOfertas";
+export {seedOfertas} from "./seedOfertas/handlers/seedOfertas";
 export {calculateDailyHistory} from "./historico/handlers/calculateDailyHistory";
 export {seedHistory} from "./historico/handlers/seedHistory";
-
+export {listOfertas} from "./historico/handlers/listOfertas";
+export {listComprasDiretas} from "./historico/handlers/listComprasDiretas";
+export {listHistorico} from "./historico/handlers/listHistorico";
+export {calculateTokenPrice} from "./historico/handlers/calculateTokenPrice";
+export {sincronizeTokenPrice} from "./historico/handlers/sincronizeTokenPrice";
 /**
  * Import function triggers from their respective submodules:
  *
