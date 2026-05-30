@@ -33,6 +33,8 @@ class _InvestPageState extends State<InvestPage> {
       setState(() => _isProcessing = false);
       return;
     }
+    
+    // Valida se o usuário está logado antes de processar valores financeiros
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
 
@@ -45,6 +47,7 @@ class _InvestPageState extends State<InvestPage> {
       final userRef = FirebaseFirestore.instance.collection('Usuários').doc(user.uid);
       final startupRef = FirebaseFirestore.instance.collection('startups').doc(widget.startup.id);
 
+      // Usar runTransaction é importante pois evita erros comuns como por exemplo multiplos compradores simultâneos, queda de rede e problemas com o dispositivo
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final userSnapshot = await transaction.get(userRef);
         if (!userSnapshot.exists) {
@@ -56,16 +59,21 @@ class _InvestPageState extends State<InvestPage> {
           throw Exception("Startup não encontrada.");
         }
 
+        // Validação 1: O usuário tem saldo suficiente?
         final double saldoAtual = (userSnapshot.data()?['saldo'] ?? 0).toDouble();
         if (saldoAtual < estimatedValue) {
           throw Exception("Saldo insuficiente para esta compra.");
         }
+        
+        // Validação 2: A startup ainda tem tokens disponíveis?
         final int tokensDisponiveis = (startupSnapshot.data()?['TotalTokensEmitidos'] ?? 0).toInt();
         if (tokensDisponiveis < tokenQuantity) {
           throw Exception("A startup não possui tokens suficientes para essa compra.");
         }
 
         final novoSaldo = saldoAtual - estimatedValue;
+        
+        // Estrutura do novo investimento a ser salva no array do usuário
         final novoInvestimento = {
           'startupId': widget.startup.id,
           'startupName': widget.startup.name,
@@ -74,16 +82,19 @@ class _InvestPageState extends State<InvestPage> {
           'date': Timestamp.now(), 
         };
 
+        // Escrita 1: Atualiza o saldo do usuário e adiciona o histórico de investimento
         transaction.update(userRef, {
           'saldo': novoSaldo,
-          'investimentos': FieldValue.arrayUnion([novoInvestimento]),
+          'investimentos': FieldValue.arrayUnion([novoInvestimento]), 
         });
 
+        // Escrita 2: Deduz a quantidade de tokens disponíveis da startup
         transaction.update(startupRef, {
-          'TotalTokensEmitidos': FieldValue.increment(-tokenQuantity),
+          'TotalTokensEmitidos': FieldValue.increment(-tokenQuantity), 
         });
       });
 
+      // Checa se o widget ainda está montado antes de usar o BuildContext
       if (!mounted) return;
       _showSuccessMessage(context);
       _amountController.clear();
@@ -130,6 +141,7 @@ class _InvestPageState extends State<InvestPage> {
       ),
       body: Stack(
         children: [
+          // Backgrounds decorativos
           Positioned(
             bottom: -100,
             right: -100,
@@ -228,7 +240,7 @@ class _InvestPageState extends State<InvestPage> {
                   child: TextField(
                     controller: _amountController,
                     keyboardType: TextInputType.number,
-                    onChanged: (value) => setState(() {}), 
+                    onChanged: (value) => setState(() {}), // Dispara rebuild para recalcular valor estimado sempre que for digitado um numero novo
                     style: GoogleFonts.poppins(
                       fontSize: 16,
                       color: Colors.black87,
@@ -273,6 +285,7 @@ class _InvestPageState extends State<InvestPage> {
                   height: 55,
                   child: ElevatedButton(
                     onPressed: () {
+                      // Abre o pop-up de confirmação antes de processar a compra de fato
                       _showInvestmentConfirmation(context);
                     },
                     style: ElevatedButton.styleFrom(
@@ -300,6 +313,7 @@ class _InvestPageState extends State<InvestPage> {
     );
   }
 
+  // Calcula o custo em tempo real de acordo com a digitação do usuário
   String _calculateEstimatedValue() {
     if (_amountController.text.isEmpty) {
       return '0,00';
@@ -344,8 +358,8 @@ class _InvestPageState extends State<InvestPage> {
               onPressed: _isProcessing 
                   ? null 
                   : () {
-                      Navigator.pop(dialogContext);
-                      _processInvestment();
+                      Navigator.pop(dialogContext); // Fecha o dialog
+                      _processInvestment(); // Dispara o backend
                     },
               style: ElevatedButton.styleFrom(
                 backgroundColor: const Color.fromARGB(255, 77, 51, 142),

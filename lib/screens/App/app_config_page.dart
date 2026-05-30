@@ -1,4 +1,4 @@
-//Bruno Machado
+//Bruno Machado e Beatriz Naomi
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/forgotten_password_page.dart';
@@ -7,6 +7,9 @@ import 'package:projeto_integrador_3_grupo_17/screens/Authentication/two_factor_
 import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart'; 
+
+//A página de configurações do App é puramente ilustrativa, tirando pela ativação da função do 2FA, ela foi usada como um treino de frontend para treinar uso
+//de diferentes tipos de botões e opções de menu como dropdown e seletor binário, além de servir para simular um aplicativo real
 
 class AppConfigPage extends StatefulWidget {
   const AppConfigPage({super.key});
@@ -87,6 +90,10 @@ class _AppConfigPageState extends State<AppConfigPage> {
     }
   }
 
+//Aqui está o design principal da página com algumas opções (não funcionais), como alteração de idioma, modo escuro, moeda do aplicativo e informações técnicas
+//como a versão do aplicativo, alteração de senha e configuração biométrica, além de termos e privacidade
+//Aqui também se encontra o botão para a ativação do 2FA configurado logo acima
+//Como essa página é quase que 100% puramente ilustrativa, o código abaixo é 95% apenas design
   @override
   Widget build(BuildContext context) {
     return MainLayout(

@@ -15,6 +15,9 @@ class CataloguePage extends StatefulWidget {
 
 class _CataloguePageState extends State<CataloguePage> {
   final int _selectedIndex = 2;
+  
+  // Armazena a requisição no estado para evitar que a chamada 
+  // à API/banco seja refeita toda vez que a tela for reconstruída.
   final _minhaRequisicao = StartupService().fetchStartups();
   String _categoriaSelecionada = 'Todos';
 
@@ -26,6 +29,7 @@ class _CataloguePageState extends State<CataloguePage> {
         IconButton(
           icon: const Icon(Icons.search, size: 30.0),
           onPressed: () {
+            // Invoca a barra de pesquisa nativa do Flutter delegando a lógica para MySearchDelegate
             showSearch(
               context: context,
               delegate: MySearchDelegate(minhaRequisicao: _minhaRequisicao),
@@ -49,24 +53,31 @@ class _CataloguePageState extends State<CataloguePage> {
             const SizedBox(height: 10),
             
             Expanded(
+              // FutureBuilder gerencia a exibição da interface com base no estado da requisição assíncrona
               child: FutureBuilder<List<Startup>>(
                 future: _minhaRequisicao,
                 builder: (context, snapshot) {
+                  // Estado 1: Aguardando os dados
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return const Center(child: CircularProgressIndicator());
                   }
+                  // Estado 2: Falha na requisição
                   if (snapshot.hasError) {
                     return Center(
                       child: Text('Erro ao carregar dados: ${snapshot.error}'),
                     );
                   }
 
+                  // Estado 3: Sucesso. Extrai os dados ou retorna lista vazia por segurança
                   final startups = snapshot.data ?? [];
+                  
+                  // Cria uma lista de categorias únicas baseadas no 'stage' das startups
                   final categorias = [
                     'Todos',
                     ...startups.map((s) => s.stage).toSet() 
                   ];
 
+                  // Filtra a lista de startups exibidas com base no chip de categoria selecionado
                   final startupsExibidas = _categoriaSelecionada == 'Todos'
                       ? startups.toList()
                       : startups.where((s) => s.stage.toLowerCase() == _categoriaSelecionada.toLowerCase()).toList();
@@ -74,6 +85,7 @@ class _CataloguePageState extends State<CataloguePage> {
                   return Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      // Carrossel de filtros
                       SizedBox(
                         height: 30,
                         child: ListView.builder(
@@ -88,6 +100,7 @@ class _CataloguePageState extends State<CataloguePage> {
                                 label: cat,
                                 color: isSelected ? const Color.fromARGB(255, 77, 51, 142) : Colors.grey[300]!,
                                 onTap: () {
+                                  // Atualiza a tela para refletir o novo filtro
                                   setState(() {
                                     _categoriaSelecionada = cat;
                                   });
@@ -99,6 +112,8 @@ class _CataloguePageState extends State<CataloguePage> {
                       ),
                   
                       const SizedBox(height: 20),
+                      
+                      // Lista com os cards das startups já filtradas
                       Expanded(
                         child: startupsExibidas.isEmpty 
                             ? const Center(child: Text('Nenhuma startup encontrada.'))
@@ -131,6 +146,7 @@ class _CataloguePageState extends State<CataloguePage> {
   }
 }
 
+// Widget customizado para padronizar o visual das startups na lista
 class StartupCard extends StatelessWidget {
   final Startup startup;
   final VoidCallback onTap;
@@ -158,6 +174,7 @@ class StartupCard extends StatelessWidget {
         ),
         child: Row(
           children: [
+            // Ícone/Avatar da startup (usa a primeira letra do nome)
             Container(
               width: 56,
               height: 56,
@@ -224,6 +241,7 @@ class StartupCard extends StatelessWidget {
   }
 }
 
+// Widget reutilizável para as pílulas/tags visuais (ex: categorias, estágios)
 class InfoChip extends StatelessWidget {
   final String label;
   final Color color;
@@ -260,27 +278,29 @@ class InfoChip extends StatelessWidget {
   }
 }
 
-
+// Lógica para a tela de pesquisa
 class MySearchDelegate extends SearchDelegate {
   final Future<List<Startup>> minhaRequisicao;
   MySearchDelegate({required this.minhaRequisicao});
 
+  // Botão de limpar a barra de pesquisa
   @override
   List<Widget>? buildActions(BuildContext context) => [
     IconButton(icon: const Icon(Icons.clear), onPressed: () => query = ""),
   ];
 
-
+  // Botão de voltar
   @override
   Widget? buildLeading(BuildContext context) => IconButton(
     icon: const Icon(Icons.arrow_back),
     onPressed: () => close(context, null),
   );
 
-
+  // Exibição após submeter a busca
   @override
   Widget buildResults(BuildContext context) => buildSuggestions(context);
 
+  // Resultados que aparecem em tempo real enquanto o usuário digita
   @override
   Widget buildSuggestions(BuildContext context) {
     return FutureBuilder<List<Startup>>(
@@ -291,6 +311,7 @@ class MySearchDelegate extends SearchDelegate {
         }
         final startups = snapshot.data!;
 
+        // Filtra comparando o texto digitado (query) com o nome da startup
         final filtradas = startups
             .where((s) => s.name.toLowerCase().contains(query.toLowerCase()))
             .toList();

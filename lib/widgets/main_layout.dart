@@ -1,6 +1,9 @@
+//Bruno Machado
+
+//Imports usados no layout do projeto, incluindo appbar, bottombar e sidebar/drawer
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:firebase_auth/firebase_auth.dart'; // <-- IMPORTADO O FIREBASE AQUI
+import 'package:firebase_auth/firebase_auth.dart'; 
 import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/wallet_page.dart';
@@ -9,6 +12,12 @@ import 'package:projeto_integrador_3_grupo_17/screens/User/user_investments_page
 import 'package:projeto_integrador_3_grupo_17/screens/Authentication/login_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/tradecenter_page.dart';
 
+//O MainLayout é uma estrutura geral do aplicativo, por isso está num arquivo separado para ser encorporado na maioria das outras páginas mais facilmente, 
+//o que ele faz é basicamente encapsular o scaffold principal da página com esse layout
+
+//Cria um widget de molde para indicar a parte da tela que será alterada
+//O selectedIndex mostra na bottom bar qual página o usuário está, ou caso ele não esteja em nenhum das indicadas, mostra o botão central
+//O appBarActions permite a adição e remoção de botões em algumas páginas caso necessitado
 class MainLayout extends StatelessWidget {
   final Widget body;
   final int selectedIndex;
@@ -21,6 +30,7 @@ class MainLayout extends StatelessWidget {
     this.appBarActions,
   });
 
+//Função para construir os itens do drawer/sidebar, você passa apenas o ícone e o nome do botão, além de sua ação no OnTap
   Widget _buildDrawerItem({
     required BuildContext context,
     required IconData icon,
@@ -45,6 +55,9 @@ class MainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
+      //A AppBar é o menu superior do aplicativo, ele dá ao usuário algumas opções de navegação para o catálogo, 
+      //sua página de perfil, a abertura do drawer e as configurações
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 2,
@@ -111,6 +124,9 @@ class MainLayout extends StatelessWidget {
                 ],
               ),
             ),
+
+            //Aqui são construídos os itens do drawer, eles incluem os botões de navegação para o catálogo, carteira, investimentos do usuário,
+            //configurações, perfil do usuário e a opção de sair da conta
             _buildDrawerItem(
               context: context,
               icon: Icons.business_center,
@@ -176,6 +192,9 @@ class MainLayout extends StatelessWidget {
           ],
         ),
       ),
+
+      //Aqui fica a barra de navegação inferior, ela dá ao usuário uma forma dinâmica de navegar pelo aplicativo nas telas principais dele, 
+      //ela apresenta os botões de catálogo de startups, carteira, investimentos do usuário, perfil do usuário e o balcão de venda de tokens.
       body: SafeArea(child: body),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: selectedIndex,

@@ -13,9 +13,11 @@ class SocietyStructurePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    // Separa os sócios nas duas categorias pré-definidas no modelo
     final founders = startup.founders;
     final externalMembers = startup.externalMembers;
 
+    // Paleta de cores para garantir contraste no gráfico de pizza
     final List<Color> sectionColors = [
       const Color(0xFFE91E63),
       const Color(0xFF3F51B5),
@@ -30,6 +32,8 @@ class SocietyStructurePage extends StatelessWidget {
     List<Widget> externalCards = [];
     int colorIndex = 0;
 
+    // Prepara os dados visuais percorrendo primeiro os fundadores.
+    // É gerada uma seção de pizza (PieChartSectionData) e um Card UI sincronizados na mesma cor.
     for (var f in founders) {
       Color color = sectionColors[colorIndex % sectionColors.length];
       pieSections.add(
@@ -45,6 +49,7 @@ class SocietyStructurePage extends StatelessWidget {
       colorIndex++;
     }
 
+    // Faz o mesmo para os membros externos, continuando o sequenciamento de cores
     for (var m in externalMembers) {
       Color color = sectionColors[colorIndex % sectionColors.length];
       pieSections.add(
@@ -116,6 +121,7 @@ class SocietyStructurePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // Proteção caso os arrays de fundadores/membros venham vazios
                         if (pieSections.isEmpty)
                            Center(
                             child: Text(
@@ -126,6 +132,7 @@ class SocietyStructurePage extends StatelessWidget {
                         else ...[
                           SizedBox(
                             height: 220,
+                            // O gráfico da fl_chart só é renderizado se existirem dados
                             child: PieChart(
                               PieChartData(
                                 sections: pieSections,
@@ -146,6 +153,7 @@ class SocietyStructurePage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 16),
+                            // Renderiza a lista de cards processada anteriormente usando "spread operator"
                             ...founderCards,
                           ],
 
@@ -211,6 +219,7 @@ class FounderCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              // Badge colorido indicando qual fatia do gráfico pertence a essa pessoa
               Container(
                 width: 14,
                 height: 14,

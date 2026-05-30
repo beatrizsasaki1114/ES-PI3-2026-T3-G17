@@ -1,4 +1,4 @@
-//Bruno Machado, Beatriz Naomi
+//Bruno Machado, Beatriz Naomi e Heloisa Marinho
 
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/authentication/create_account_page.dart';

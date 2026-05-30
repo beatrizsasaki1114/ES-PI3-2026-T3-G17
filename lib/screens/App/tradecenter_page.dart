@@ -1,4 +1,4 @@
-//Bruno Machado
+//Bruno Machado e Luca Filippi
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,7 +19,7 @@ class _OffersPageState extends State<OffersPage> {
   void _showCreateOfferSheet(BuildContext context) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
+      isScrollControlled: true, 
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -28,6 +28,7 @@ class _OffersPageState extends State<OffersPage> {
     );
   }
 
+  // Deleta o registro da oferta atrelada ao usuário criador
   Future<void> _deleteOffer(String ofertaId) async {
     bool? confirmar = await showDialog<bool>(
       context: context,
@@ -66,6 +67,7 @@ class _OffersPageState extends State<OffersPage> {
     }
   }
 
+  // Lógica de transferência de tokens 
   Future<void> _buyTokens(Map<String, dynamic> oferta, String ofertaId) async {
     final buyerUid = currentUser?.uid;
     if (buyerUid == null) return;
@@ -76,6 +78,7 @@ class _OffersPageState extends State<OffersPage> {
     final startupId = oferta['startupId'];
     final startupNome = oferta['startupNome'];
 
+    // Etapa 1: Confirmação na UI
     bool? confirmar = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -97,6 +100,7 @@ class _OffersPageState extends State<OffersPage> {
 
     if (confirmar != true) return;
 
+    // Loading enquanto processa a transação
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -108,11 +112,13 @@ class _OffersPageState extends State<OffersPage> {
       final sellerRef = FirebaseFirestore.instance.collection('Usuários').doc(sellerUid);
       final offerRef = FirebaseFirestore.instance.collection('Ofertas').doc(ofertaId);
 
+      // Etapa 2: Executa a transação englobando comprador, vendedor e o registro da oferta
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final offerSnap = await transaction.get(offerRef);
         final buyerSnap = await transaction.get(buyerRef);
         final sellerSnap = await transaction.get(sellerRef);
 
+        // Previne dupla compra
         if (!offerSnap.exists || offerSnap.data()?['status'] != 'ativa') {
           throw Exception("Esta oferta já foi vendida ou cancelada.");
         }
@@ -125,6 +131,7 @@ class _OffersPageState extends State<OffersPage> {
           throw Exception("Saldo insuficiente na carteira para esta compra.");
         }
 
+        // --- MANIPULAÇÃO DA CARTEIRA DO COMPRADOR ---
         List<dynamic> buyerInvestments = List.from(buyerData['investimentos'] ?? []);
         
         buyerInvestments.add({
@@ -135,10 +142,12 @@ class _OffersPageState extends State<OffersPage> {
           'date': Timestamp.now(), 
         });
 
+        // --- MANIPULAÇÃO DA CARTEIRA DO VENDEDOR ---
         List<dynamic> sellerInvestments = List.from(sellerData['investimentos'] ?? []);
         final dynamic offerInvDate = oferta['investmentDate'];
 
         int sellerIdx = -1;
+        // Tenta encontrar o lote exato de investimento que está sendo vendido
         if (offerInvDate != null) {
           sellerIdx = sellerInvestments.indexWhere((inv) {
             final invDate = inv['date'] ?? inv['data'];
@@ -146,6 +155,7 @@ class _OffersPageState extends State<OffersPage> {
           });
         }
         
+        // se não achar por data, acha qualquer investimento dessa startup que tenha saldo suficiente
         if (sellerIdx == -1) {
           sellerIdx = sellerInvestments.indexWhere((inv) => 
               inv['startupId'] == startupId && (inv['tokenQuantity'] ?? 0) >= quantidadeTokens);
@@ -162,10 +172,12 @@ class _OffersPageState extends State<OffersPage> {
           throw Exception("O vendedor não possui tokens suficientes neste lote.");
         }
 
+        // Recalcula as cotas para o vendedor
         int newSellerQtd = oldSellerQtd - quantidadeTokens;
         double oldSellerAmount = (updatedSellerInv['amountSpent'] ?? 0).toDouble();
         double newSellerAmount = oldSellerQtd > 0 ? oldSellerAmount * (newSellerQtd / oldSellerQtd) : 0;
 
+        // Se ele vender TUDO do lote, o investimento é removido do array dele
         if (newSellerQtd == 0) {
           sellerInvestments.removeAt(sellerIdx); 
         } else {
@@ -174,6 +186,7 @@ class _OffersPageState extends State<OffersPage> {
           sellerInvestments[sellerIdx] = updatedSellerInv;
         }
 
+        // --- ATUALIZAÇÕES FINAIS ---
         transaction.update(buyerRef, {
           'saldo': buyerSaldo - valorTotal,
           'investimentos': buyerInvestments,
@@ -244,6 +257,8 @@ class _OffersPageState extends State<OffersPage> {
                 ),
               ),
               Expanded(
+                // StreamBuilder mantém o balcão atualizado em tempo real para todos os usuários logados.
+                // Filtra por status 'ativa' para não mostrar negócios já fechados
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection('Ofertas')
@@ -279,6 +294,8 @@ class _OffersPageState extends State<OffersPage> {
                       itemBuilder: (context, index) {
                         final oferta = ofertas[index].data() as Map<String, dynamic>;
                         final ofertaId = ofertas[index].id;
+                        
+                        // Verifica se a oferta que está sendo gerada na lista pertence a quem está logado
                         final isMyOffer = oferta['vendedorId'] == currentUser?.uid;
 
                         return _buildOfferCard(oferta, ofertaId, isMyOffer);
@@ -301,6 +318,8 @@ class _OffersPageState extends State<OffersPage> {
     );
   }
 
+  // Constrói o card da oferta. Se a oferta for do usuário, o botão é de excluir.
+  // Caso contrário, é o botão de comprar.
   Widget _buildOfferCard(Map<String, dynamic> oferta, String ofertaId, bool isMyOffer) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -340,6 +359,7 @@ class _OffersPageState extends State<OffersPage> {
                     ),
                     GestureDetector(
                       onTap: () {
+                        // Navegação para ver o perfil do anunciante
                         Navigator.push(
                           context,
                           MaterialPageRoute(
@@ -407,6 +427,7 @@ class _OffersPageState extends State<OffersPage> {
   }
 }
 
+// O componente interno que abre dentro do BottomSheet para criação de oferta
 class CreateOfferSheet extends StatefulWidget {
   const CreateOfferSheet({super.key});
 
@@ -426,6 +447,7 @@ class _CreateOfferSheetState extends State<CreateOfferSheet> {
   @override
   void initState() {
     super.initState();
+    // Busca os dados da carteira do usuário ao abrir a tela
     _fetchMyInvestments();
   }
 
@@ -435,6 +457,7 @@ class _CreateOfferSheetState extends State<CreateOfferSheet> {
       final doc = await FirebaseFirestore.instance.collection('Usuários').doc(user.uid).get();
       if (doc.exists) {
         setState(() {
+          // Preenche o Dropdown apenas com os investimentos do usuário
           myInvestments = doc.data()?['investimentos'] ?? [];
           _isLoading = false;
         });
@@ -442,13 +465,16 @@ class _CreateOfferSheetState extends State<CreateOfferSheet> {
     }
   }
 
+  // Cria e envia a oferta para a Collection 'Ofertas' no Firebase
   Future<void> _publishOffer() async {
     if (selectedInvestment == null || _qtdController.text.isEmpty || _precoController.text.isEmpty) return;
 
     final qtdDesejada = int.tryParse(_qtdController.text) ?? 0;
+    // Permite que o usuário digite com vírgula
     final precoUnitario = double.tryParse(_precoController.text.replaceAll(',', '.')) ?? 0.0;
     final maxTokens = selectedInvestment!['tokenQuantity'];
 
+    // Validações locais da regra de negócio
     if (qtdDesejada <= 0 || qtdDesejada > maxTokens) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Quantidade inválida ou acima do que você possui.")));
       return;
@@ -470,12 +496,12 @@ class _CreateOfferSheetState extends State<CreateOfferSheet> {
         'precoUnitario': precoUnitario,
         'valorTotal': qtdDesejada * precoUnitario,
         'dataCriacao': Timestamp.now(),
-        'status': 'ativa',
+        'status': 'ativa', // O status diz se ela renderiza na StreamBuilder ou não
         'investmentDate': selectedInvestment!['date'] ?? selectedInvestment!['data'], 
       });
 
       if (mounted) {
-        Navigator.pop(context);
+        Navigator.pop(context); 
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text("Oferta publicada com sucesso!"), backgroundColor: Colors.green),
         );
@@ -543,7 +569,7 @@ class _CreateOfferSheetState extends State<CreateOfferSheet> {
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(backgroundColor: const Color.fromARGB(255, 77, 51, 142)),
-                    onPressed: _isPublishing ? null : _publishOffer,
+                    onPressed: _isPublishing ? null : _publishOffer, 
                     child: _isPublishing 
                       ? const CircularProgressIndicator(color: Colors.white)
                       : Text("Publicar Oferta", style: GoogleFonts.poppins(color: Colors.white, fontSize: 16)),

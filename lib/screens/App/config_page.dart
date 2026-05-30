@@ -8,6 +8,9 @@ import 'package:projeto_integrador_3_grupo_17/screens/User/user_data_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/user_profile_page.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart'; 
 
+//Essa é uma página intermediária de navegação do usuário para escolher qual menu de configurações ele quer acessar ou sair do aplicativo, 
+//aqui ele pode selecionar entre os menus de configuração do App ou dele mesmo
+
 class ConfigPage extends StatefulWidget {
   const ConfigPage({super.key});
 
@@ -22,6 +25,7 @@ class _ConfigPageState extends State<ConfigPage> {
   @override
   Widget build(BuildContext context) {
 
+    //Adição de botões extras no menu superior
     final List<Widget> configAppBarActions = [
       IconButton(
         icon: Image.asset(
@@ -67,6 +71,7 @@ class _ConfigPageState extends State<ConfigPage> {
               ),
               const SizedBox(height: 40),
 
+              //Botão para redirecionar o usuário até as configurações do usuário
               _buildSettingsButton(
                 label: "Configurações de Usuário",
                 icon: Icons.person_outline,
@@ -82,6 +87,7 @@ class _ConfigPageState extends State<ConfigPage> {
 
               const SizedBox(height: 20),
 
+              //Botão para redirecionar o usuário até as configurações do App
               _buildSettingsButton(
                 label: "Configurações do App",
                 icon: Icons.settings_applications_outlined,
@@ -97,11 +103,13 @@ class _ConfigPageState extends State<ConfigPage> {
 
               const SizedBox(height: 20),
 
+              //Botão para sair da conta do usuário e ser redirecionado para o login
               _buildSettingsButton(
                 label: "Sair",
                 icon: Icons.logout,
                 color: Colors.redAccent,
                 onTap: () async {
+                  //função de sign out do firebase
                   await FirebaseAuth.instance.signOut();
                   
                   if (context.mounted) {
