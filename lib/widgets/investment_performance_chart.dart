@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/token_price_chart.dart';
 import 'package:projeto_integrador_3_grupo_17/services/dashboards/dashboard_services.dart';
 
@@ -47,18 +46,7 @@ class _InvestmentPerformanceChartState
     return variacao.clamp(-0.05, 0.05);
   }
 
-   // Taxa de variação ajustada por período
-  // Quanto maior o prazo, menor a taxa — evita extrapolação
-  double get _taxaParaPeriodo {
-    final base = _variacaoDiaria;
-    switch (_periodo) {
-      case PeriodoGrafico.dia:       return base;
-      case PeriodoGrafico.semana:    return base * 0.7;
-      case PeriodoGrafico.mes:       return base * 0.4;
-      case PeriodoGrafico.seisMeses: return base * 0.1;
-      case PeriodoGrafico.ano:       return base * 0.05;
-    }
-  }
+  
 
   // Calcula o valor atual do investimento distribuindo a variação pro rata pelo pregão
   // Valor_{hora} = inicial × (1 + taxaDiaria)^(fracao_do_dia)
@@ -150,14 +138,26 @@ class _InvestmentPerformanceChartState
     }
   }
 
-  // Variação total no período selecionado
- double? get _variacaoPercent {
-    if (_precoAnteriorToken <= 0) return null;
-    final taxa = _taxaParaPeriodo;
-    final dias = _periodo == PeriodoGrafico.dia ? 1 : _diasDoPeriodo();
-    final valorFinal = _valorAtualHoje * pow(1 + taxa, dias.toDouble());
-    return ((valorFinal - _valorAtualHoje) / _valorAtualHoje) * 100;
+    // Último valor projetado do período selecionado
+  // Usado no header e no badge — muda conforme o período escolhido
+  double get _valorUltimoPonto {
+    final spots = _gerarPontos();
+    if (spots.isEmpty) return widget.amountSpent;
+    return spots.last.y;
   }
+
+
+   // Variação total no período: do primeiro ao último ponto gerado
+  double? get _variacaoPercent {
+    if (_precoAnteriorToken <= 0) return null;
+    final spots = _gerarPontos();
+    if (spots.isEmpty) return null;
+    final inicio = spots.first.y;
+    final fim    = spots.last.y;
+    if (inicio == 0) return null;
+    return ((fim - inicio) / inicio) * 100;
+  }
+ 
 
   LineChartData _mainData() {
     final spots  = _gerarPontos();
@@ -308,7 +308,7 @@ class _InvestmentPerformanceChartState
   @override
   Widget build(BuildContext context) {
     final variacao   = _variacaoPercent;
-    final valorAtual = _valorAtualHoje;
+    final valorAtual =  _valorUltimoPonto;
 
     return Container(
       padding: const EdgeInsets.all(16),

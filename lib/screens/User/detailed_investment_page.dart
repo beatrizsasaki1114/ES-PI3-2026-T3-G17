@@ -22,8 +22,7 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
     final double amountSpent = (widget.investment['amountSpent'] ?? 0).toDouble();
     final double? precoNaCompra = widget.investment['precoNaCompra'] != null
         ? (widget.investment['precoNaCompra'] as num).toDouble()
-        : null; 
-    final double currentAmount = amountSpent; 
+        : null;  
 
     final Timestamp? timestamp = widget.investment['date'] as Timestamp?;
     final DateTime date = timestamp != null ? timestamp.toDate() : DateTime.now();
@@ -165,13 +164,7 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                           value: 'R\$ ${amountSpent.toStringAsFixed(2).replaceAll('.', ',')}',
                           valueColor: Colors.black87,
                         ),
-                        const Divider(height: 32, thickness: 1),
-                        _buildDetailRow(
-                          icon: Icons.trending_up,
-                          label: 'Valor Atual Estimado',
-                          value: 'R\$ ${currentAmount.toStringAsFixed(2).replaceAll('.', ',')}',
-                          valueColor: const Color(0xFF4CAF50), 
-                        ),
+                    
                       ],
                     ),
                   ),
