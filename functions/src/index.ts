@@ -11,6 +11,9 @@ export {listComprasDiretas} from "./historico/handlers/listComprasDiretas";
 export {listHistorico} from "./historico/handlers/listHistorico";
 export {calculateTokenPrice} from "./historico/handlers/calculateTokenPrice";
 export {sincronizeTokenPrice} from "./historico/handlers/sincronizeTokenPrice";
+export { calcularPrecoTokenManual } from "./historico/handlers/calcularPrecoTokenManual";
+export {seedTransacoesHoje} from "./historico/handlers/Seedtransacoeshoje";
+export {getStartupPrices} from "./startups/handlers/getStartupsPrices";
 /**
  * Import function triggers from their respective submodules:
  *

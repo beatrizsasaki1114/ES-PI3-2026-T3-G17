@@ -21,12 +21,12 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
-  }
+  } 
 
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
-
+    
     return MainLayout(
       selectedIndex: 3,
       body: user == null

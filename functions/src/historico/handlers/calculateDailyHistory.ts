@@ -4,7 +4,8 @@ import {Timestamp} from "firebase-admin/firestore";
 import { onSchedule } from "firebase-functions/v2/scheduler";
 import { processarHistoricoDiarioNoBanco } from "../repositories/historicoRepository";
 
-
+// Função que calcula diariamente o histórico das transações realizadas no dia atual
+// Assim conseguimos tirar o valor médio do token em cada dia 
 export const calculateDailyHistory = onSchedule(
     // atribuindo algumas informações para a função 
     {   
@@ -22,7 +23,7 @@ export const calculateDailyHistory = onSchedule(
 
         const inicioDoDia = Timestamp.fromDate(new Date(dataId + "T00:00:00.000Z"));
         const fimDoDia = Timestamp.fromDate(new Date(dataId + "T23:59:59.999Z"));
-        
+        // Processa todas as transações do dia e salva o resumo no HistoricoDiario
         await processarHistoricoDiarioNoBanco(dataId, inicioDoDia, fimDoDia);
     }
 )

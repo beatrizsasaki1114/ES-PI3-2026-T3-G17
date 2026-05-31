@@ -19,12 +19,13 @@ export const listOfertas = onCall(
 
         const abertura    = Timestamp.fromDate(new Date(dataId + "T12:00:00.000Z")); // 09:00 BRT
         const fechamento  = Timestamp.fromDate(new Date(dataId + "T21:00:00.000Z")); // 18:00 BRT
-
+         // Busca todas as ofertas da startup dentro do horário de mercado de hoje
         const snapshot = await getOfertas(startupId, abertura, fechamento);
 
         // Agrupa por hora e calcula preço médio ponderado
         const porHora: Record<number, { somaValor: number; somaTokens: number; dataHora: Date }> = {};
 
+         // Itera sobre cada oferta encontrada
         snapshot.forEach((doc) => {
             const { precoUnitario, quantidadeTokens, dataVenda } = doc.data();
             const dataHora = (dataVenda as Timestamp).toDate();
@@ -34,15 +35,16 @@ export const listOfertas = onCall(
                         + (dataHora.getUTCMonth() + 1) * 10000
                         + dataHora.getUTCDate() * 100
                         + dataHora.getUTCHours();
-
+               // Se ainda não tem entrada para essa hora, cria uma nova
             if (!porHora[chave]) {
                 porHora[chave] = { somaValor: 0, somaTokens: 0, dataHora };
             }
-
+               // Acumula o valor total (preço × quantidade) e o total de tokens da hora
             porHora[chave].somaValor  += precoUnitario * quantidadeTokens;
             porHora[chave].somaTokens += quantidadeTokens;
         });
 
+         // Converte o objeto agrupado em array, ordena por hora e calcula o preço médio
         const data = Object.entries(porHora)
             .sort(([a], [b]) => parseInt(a) - parseInt(b))
             .map(([, { somaValor, somaTokens, dataHora }]) => ({
@@ -50,7 +52,8 @@ export const listOfertas = onCall(
                 precoMedio: parseFloat((somaValor / somaTokens).toFixed(2)),
                 volume:     somaTokens,
             }));
-
+        
+        //Retorna a contagem e os dados para o Flutter
         return { count: data.length, data };
     }
 );

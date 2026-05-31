@@ -5,10 +5,14 @@ import 'package:cloud_functions/cloud_functions.dart';
 class AuthService {
   // instancia do firebaseAuth
   final FirebaseAuth firebaseAuth = FirebaseAuth.instance;
-  // pegando o usuário principal
+  
+  // Retorna o usuário atualmente logado — null se não há usuário autenticado
   User? get currentUser => firebaseAuth.currentUser;
+  // Stream que emite eventos quando o estado de autenticação muda
+  // Ex: usuário faz login, logout ou o token expira
   Stream<User?> get authStateChanges => firebaseAuth.authStateChanges();
 
+  // Cria uma nova conta com email e senha e salva dados extras junto
   Future<User?> createAccount({
     required String nome,
     required String sobrenome,
@@ -18,7 +22,7 @@ class AuthService {
     required String password,
   }) async {
     try {
-      // Correção estrutural: o método que gera o erro agora está devidamente protegido dentro do try
+       // Retorna um UserCredential com os dados do usuário criado
       UserCredential result = await firebaseAuth.createUserWithEmailAndPassword(
         email: email,
         password: password,
@@ -48,6 +52,7 @@ class AuthService {
     }
   }
 
+  // Faz login com email e senha
   Future<User?> signIn({
     required String email,
     required String password,
@@ -56,9 +61,13 @@ class AuthService {
       email: email,
       password: password,
     );
+    
+    // Retorna o usuário logado
     return credential.user;
   }
 
+  
+  // Envia email de redefinição de senha para o endereço informado
   Future<void> resetPassword({required String email}) async {
     await firebaseAuth.sendPasswordResetEmail(email: email);
   }
@@ -71,29 +80,34 @@ class AuthService {
     try {
       // verificado se o usuário esta autenticado
       if (currentUser == null) throw 'Usuário não autenticado';
-
+      // Pega a sessão multifator do usuário atual 
+      // necessária para vincular o telefone
       final session = await currentUser!.multiFactor.getSession();
+      //  Chama a Cloud Function signInUser para buscar o telefone do usuário no Firestore
       final result = await FirebaseFunctions.instanceFor(
         region: 'southamerica-east1',
       ).httpsCallable('signInUser').call({'email': currentUser!.email});
 
+       // Verifica se o telefone foi retornado pela Cloud Function
       if (result.data != null && result.data['telefone'] != null) {
         String telefone = result.data['telefone'].trim();
 
+         // Garante que o número está no formato internacional (+55)
         if (!telefone.startsWith('+')) {
           telefone = '+55$telefone';
         }
 
+         // Dispara o envio do SMS de verificação
         await firebaseAuth.verifyPhoneNumber(
-          multiFactorSession: session,
-          phoneNumber: telefone,
+          multiFactorSession: session,// Sessão multifator do usuário
+          phoneNumber: telefone, // Número que vai receber o SMS
           verificationCompleted: (_) {},
           // acionado se algo der errado antes mesmo do SMS ser processado
           verificationFailed: (e) =>
               onError(e.message ?? 'Falha na verificação'),
           // acionado um aviso assim que o google envia o sms para o dispositivo
           codeSent: (vId, _) => onSmsSent(vId),
-
+          // Chamado quando o tempo limite de verificação automática expira
           codeAutoRetrievalTimeout: (_) {},
         );
       }
@@ -102,6 +116,11 @@ class AuthService {
     }
   }
 
+  // Envia SMS de login para o número já cadastrado no 2FA
+  // Quando o usuário tenta fazer login com email/senha e tem 2FA ativo,
+  // o Firebase não deixa entrar direto — ele lança FirebaseAuthMultiFactorException.
+  // Dentro da exceção vem o MultiFactorResolver com:
+  //  resolver.session → prova que a senha estava correta (vincula o SMS ao login)
   Future<void> sendLoginSms({
     required MultiFactorResolver resolver,
     required Function(String vId) onSmsSent,
@@ -123,32 +142,38 @@ class AuthService {
     }
   }
 
+  // Valida o código SMS digitado pelo usuário e completa o 2FA
   Future<void> validateCode({
     required String verificationId,
     required String smsCode,
   }) async {
     try {
+      // Cria a credencial de autenticação por telefone com o código recebido
       final credential = PhoneAuthProvider.credential(
         verificationId: verificationId,
         smsCode: smsCode,
       );
+      // Converte a credencial em asserção multifator
       final assertion = PhoneMultiFactorGenerator.getAssertion(credential);
+       // Recarrega o usuário para garantir estado atualizado
       await firebaseAuth.currentUser?.reload();
+      // Registra o fator de autenticação no perfil do usuário
       await currentUser!.multiFactor.enroll(assertion);
     } on FirebaseAuthException {
-      // Correção do Linter: Removida a variável 'e' que não estava sendo usada
       rethrow;
     }
   }
 
+  // Remove o 2FA do usuário — desativa a autenticação de dois fatores
   Future<void> unenrollMFA() async {
     try {
       if (currentUser != null) {
+        // Acessa o objeto multifator do usuário atual
         final mfaUser = currentUser!.multiFactor;
-        // pega a lista de todos os fatores de autenticação ativos
+         // Busca todos os fatores de autenticação ativos
         final enrolledFactors = await mfaUser.getEnrolledFactors();
         if (enrolledFactors.isNotEmpty) {
-          // remove o primeiro fator encontrado
+          // remove o primeiro fator encontrado (telefone cadastrado)
           await mfaUser.unenroll(factorUid: enrolledFactors.first.uid);
         }
       }
@@ -157,6 +182,8 @@ class AuthService {
     }
   }
 
+  
+  // Envia email de verificação para o usuário atual
   Future<void> sendEmailVerification() async {
     final user = FirebaseAuth.instance.currentUser;
     if (user != null && !user.emailVerified) {

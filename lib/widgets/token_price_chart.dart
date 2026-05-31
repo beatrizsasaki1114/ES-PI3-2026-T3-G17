@@ -17,6 +17,7 @@ class HistoricoPoint {
 enum PeriodoGrafico { dia, semana, mes, seisMeses, ano }
 
 extension PeriodoLabel on PeriodoGrafico {
+   // Label exibido no botão (ex: "1D", "1S", "1M", "6M", "1A")
   String get label {
     switch (this) {
       case PeriodoGrafico.dia:
@@ -31,7 +32,7 @@ extension PeriodoLabel on PeriodoGrafico {
         return '1A';
     }
   }
-
+ // String enviada para a Cloud Function listHistorico como parâmetro de período
   String get periodoString {
     switch (this) {
       case PeriodoGrafico.semana:
@@ -46,21 +47,6 @@ extension PeriodoLabel on PeriodoGrafico {
         return 'ano';
     }
   }
-
-  int get janelaMediaMovel {
-    switch (this) {
-      case PeriodoGrafico.dia:
-        return 1;
-      case PeriodoGrafico.semana:
-        return 2;
-      case PeriodoGrafico.mes:
-        return 3;
-      case PeriodoGrafico.seisMeses:
-        return 7;
-      case PeriodoGrafico.ano:
-        return 14;
-    }
-  }
 }
 
 class TokenPriceChart extends StatefulWidget {
@@ -72,43 +58,23 @@ class TokenPriceChart extends StatefulWidget {
 }
  
 class _TokenPriceChartState extends State<TokenPriceChart> {
+   // Período padrão ao abrir a telas de investimento é 1A
   PeriodoGrafico _periodo = PeriodoGrafico.ano;
  
-  // 1D  → pontos por hora vindos das Cloud Functions (tempo real)
+  // Para o período 1D, pegamos os pontos por hora vindos das Cloud Functions (tempo real)
   List<HistoricoPoint> _dadoDiario = [];
-  // 1S/1M/6M/1A → histórico salvo no Firestore via listHistorico
+  // Dados dos outros período 1S/1M/6M/1A, pegamos do histórico salvo no Firestore via listHistorico
   List<HistoricoPoint> _historicoSalvo = [];
- 
+ // Controla o indicador de carregamento
   bool _carregando = true;
+  // Mensagem de erro se a busca falhar
   String? _erro;
  
-  // Único ponto de contato com Firebase
+
   final _service = DashboardServices();
- 
+
   final Color _corLinha  = const Color(0xFFE91E63);
   final Color _corSombra = const Color(0xFFE91E63);
- 
-  // Horário de funcionamento: seg-sex 09:00 às 18:00 (horário de Brasília)
-  bool get _mercadoAberto {
-    final agora    = DateTime.now();
-    final diaSemana = agora.weekday; // 1=seg, 7=dom
-    if (diaSemana == DateTime.saturday || diaSemana == DateTime.sunday) return false;
-    final hora = agora.hour * 60 + agora.minute;
-    return hora >= 9 * 60 && hora < 18 * 60; // 09:00 a 18:00
-  }
- 
-  String get _statusMercado {
-    final agora     = DateTime.now();
-    final diaSemana = agora.weekday;
-    final hora      = agora.hour * 60 + agora.minute;
-    final fimDeSemana = diaSemana == DateTime.saturday || diaSemana == DateTime.sunday;
-    final aberturaHoje = fimDeSemana ? 8 * 60 : 9 * 60;
-    if (hora < aberturaHoje) {
-      return 'Mercado fechado. Abre às ${fimDeSemana ? '08' : '09'}:00';
-    }
-    if (hora >= 18 * 60) return 'Mercado encerrado. Reabre amanhã às ${diaSemana == DateTime.friday ? '08' : diaSemana == DateTime.saturday ? '08' : '09'}:00';
-    return '';
-  }
  
   @override
   void initState() {
@@ -116,48 +82,45 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
     _carregarTudo();
   }
  
- 
+  // Busca os dados do período atual 
   Future<void> _carregarTudo() async {
+      // Ativa o indicador de carregamento e limpa erros anteriores
     setState(() { _carregando = true; _erro = null; });
     try {
-      // Para o 1D só busca dados em tempo real se o mercado estiver aberto
-      final diario = (_periodo == PeriodoGrafico.dia && _mercadoAberto)
+      // Para o 1D:  busca dados em tempo real 
+      final diario = _periodo == PeriodoGrafico.dia
           ? await _service.fetchHistoricoDiario(widget.startupId)
-          : <HistoricoPoint>[];
- 
+          : <HistoricoPoint>[];// outros períodos não usam dados diário
+
+       // 1S/1M/6M/1A: busca histórico salvo no HistoricoDiario do Firestore
       final historico = await _service.fetchHistoricoSalvo(
           widget.startupId, _periodo.periodoString);
  
+       // Atualiza o estado com os dados recebidos
       setState(() {
         _dadoDiario     = diario;
         _historicoSalvo = historico;
         _carregando     = false;
       });
     } catch (_) {
+       // Em caso de erro, exibe mensagem e para o carregamento
       setState(() {
         _erro       = 'Não foi possível carregar o histórico.';
         _carregando = false;
       });
     }
   }
- 
-  
+
+  // Retorna os dados corretos para o período selecionado
   List<HistoricoPoint> get _dadosDoPeriodo {
     switch (_periodo) {
- 
-      // 1D: janela deslizante de 24h vindas das Cloud Functions
-      // Sempre tem dados (últimas 24h), então não precisa de fallback complexo
       case PeriodoGrafico.dia:
         return _dadoDiario;
  
-            // 1S/1M/6M/1A: histórico já filtrado pelo servidor
       default:
         return _historicoSalvo;
     }
   }
- 
-  bool _mesmoDia(DateTime a, DateTime b) =>
-      a.year == b.year && a.month == b.month && a.day == b.day;
  
   // Aviso de dados insuficientes (só para 1M/6M/1A)
   bool get _dadosInsuficientes {
@@ -167,30 +130,21 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
       PeriodoGrafico.seisMeses: 180,
       PeriodoGrafico.ano:       365,
     }[_periodo]!;
+      // Considera insuficiente se tem menos de 70% dos dias esperados
     return _dadosDoPeriodo.length < (esperado * 0.7).round();
   }
- 
+
+     // Retorna true se não há dados para exibir no gráfico
     bool get _semDados =>
       _periodo == PeriodoGrafico.dia ? _dadoDiario.isEmpty : _historicoSalvo.isEmpty;
- 
-  // ─── Média móvel ───────────────────────────────────────────────────────────
-  List<HistoricoPoint> _mediaMovel(List<HistoricoPoint> dados) {
-    final janela = _periodo.janelaMediaMovel;
-    if (janela <= 1 || dados.length < janela) return dados;
-    return List.generate(dados.length, (i) {
-      final inicio = (i - janela + 1).clamp(0, dados.length - 1).toInt();
-      final slice  = dados.sublist(inicio, i + 1);
-      final media  = slice.map((p) => p.precoMedio).reduce((a, b) => a + b) / slice.length;
-      return HistoricoPoint(data: dados[i].data, precoMedio: media);
-    });
-  }
- 
+
   // Agrupa os pontos por mês calculando a média ponderada de cada mês
   // Usado para 6M e 1A: cada ponto no gráfico representa um mês inteiro
   List<HistoricoPoint> _agruparPorMes(List<HistoricoPoint> dados) {
     if (dados.isEmpty) return [];
- 
+    // Mapa de "YYYY-MM" → lista de preços do mês
     final porMes = <String, List<double>>{};
+    // Mapa de "YYYY-MM" → data representativa (dia 15 do mês)
     final dataPorMes = <String, DateTime>{};
  
     for (final p in dados) {
@@ -200,28 +154,35 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
       // Guarda o dia 15 do mês como data representativa do ponto
       dataPorMes[chave] = DateTime(p.data.year, p.data.month, 15);
     }
- 
+
+    // Converte o mapa em lista de HistoricoPoint com a média de cada mês
     return porMes.entries.map((e) {
       final media = e.value.reduce((a, b) => a + b) / e.value.length;
       return HistoricoPoint(data: dataPorMes[e.key]!, precoMedio: media);
     }).toList()
       ..sort((a, b) => a.data.compareTo(b.data));
   }
- 
+
+  //Calcula a variação % entre o primeiro e último ponto do período
+  // Retorna null se não há dados suficientes
   double? get _variacao {
     final d = _dadosDoPeriodo;
     if (d.length < 2 || d.first.precoMedio == 0) return null;
     return ((d.last.precoMedio - d.first.precoMedio) / d.first.precoMedio) * 100;
   }
  
- 
+  // Converte a lista de HistoricoPoint em lista de FlSpot para o gráfico
+  // x = índice do ponto, y = preço médio
   List<FlSpot> _gerarSpots(List<HistoricoPoint> dados) =>
       List.generate(dados.length, (i) => FlSpot(i.toDouble(), dados[i].precoMedio));
  
+ // Retorna o widget de label do eixo X para cada ponto
   Widget _bottomTitleWidget(double value, TitleMeta meta, List<HistoricoPoint> dados) {
     final i = value.toInt();
+     // Ignora índices fora do range
     if (i < 0 || i >= dados.length) return const SizedBox.shrink();
     final label = _labelParaIndice(i, dados);
+    // Retorna widget vazio se não há label para esse ponto
     if (label.isEmpty) return const SizedBox.shrink();
     return SideTitleWidget(
       meta: meta,
@@ -229,25 +190,25 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
     );
   }
  
+  // Define qual label mostrar no eixo X para cada índice
   String _labelParaIndice(int i, List<HistoricoPoint> dados) {
     final data  = dados[i].data;
     final total = dados.length;
     switch (_periodo) {
-      // 1D: HH:00 a cada 4 horas
+       // 1D: mostra hora a cada 4 horas (ex: "08:00", "12:00", "16:00")
       case PeriodoGrafico.dia:
-        // Mostra HH:00 a cada 4 horas
         if (data.hour % 4 == 0) return '${data.hour.toString().padLeft(2, '0')}:00';
         return '';
-      // 1S: nome do dia da semana
+       // 1S: mostra nome abreviado do dia da semana (ex: "Seg", "Ter")
       case PeriodoGrafico.semana:
         return _diaSemana(data.weekday);
-      // 1M: dias marcantes
+      // 1M: mostra dias marcantes (1, 5, 10, 15, 20, 25) e o último
       case PeriodoGrafico.mes:
         const marcas = {1, 5, 10, 15, 20, 25};
         return (marcas.contains(data.day) || i == total - 1)
             ? data.day.toString().padLeft(2, '0')
             : '';
-      // 6M e 1A: primeira ocorrência de cada mês
+       // 6M e 1A: mostra o nome do mês na primeira ocorrência de cada mês
       case PeriodoGrafico.seisMeses:
       case PeriodoGrafico.ano:
         if (i == 0) return _mesAbrev(data.month);
@@ -260,6 +221,7 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
   String _mesAbrev(int m)  => _meses[m - 1];
   String _diaSemana(int d) => _diasSem[d - 1];
  
+ // Configura e retorna os dados do gráfico de linha
   LineChartData _mainData(List<HistoricoPoint> dados) {
     final spots  = _gerarSpots(dados);
     final precos = dados.map((p) => p.precoMedio).toList();
@@ -303,7 +265,7 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
           getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
             final idx   = spot.x.toInt().clamp(0, dados.length - 1);
             final ponto = dados[idx];
-            // Tooltip: 1D → hora, 6M/1A → Mês/Ano, demais → data completa
+            
             final String label;
             if (_periodo == PeriodoGrafico.dia) {
               label = '${ponto.data.hour.toString().padLeft(2, '0')}:00';
@@ -354,7 +316,6 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
     );
   }
  
-  // ─── Build ─────────────────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -377,13 +338,11 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
             onPeriodoChanged: (novo) {
               setState(() => _periodo = novo);
               // Recarrega o histórico com o novo período (exceto 1D que já está carregado)
-              if (novo != PeriodoGrafico.dia) _carregarTudo();
+           _carregarTudo();
             },
           ),
           const SizedBox(height: 8),
-          // Banner de mercado fechado (só para o período 1D)
-          if (_periodo == PeriodoGrafico.dia && !_mercadoAberto)
-            _buildMercadoFechado(),
+
           if (_carregando)
             const SizedBox(
               height: 180,
@@ -403,7 +362,7 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
                 child: LineChart(_mainData(
                   (_periodo == PeriodoGrafico.seisMeses || _periodo == PeriodoGrafico.ano)
                       ? _agruparPorMes(_dadosDoPeriodo)
-                      : _mediaMovel(_dadosDoPeriodo),
+                      : _dadosDoPeriodo,
                 )),
               ),
             ),
@@ -412,7 +371,7 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
       ),
     );
   }
- 
+ // Cabeçalho com título "Valorização do Token" e badge de variação %
   Widget _buildCabecalho() {
     final v = _variacao;
     return Row(
@@ -440,30 +399,8 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
     );
   }
  
-  Widget _buildMercadoFechado() {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF5F5F5),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: Row(children: [
-        Icon(Icons.access_time, size: 16, color: Colors.grey.shade600),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            _statusMercado,
-            style: GoogleFonts.poppins(fontSize: 11, color: Colors.black54),
-          ),
-        ),
-      ]),
-    );
-  }
- 
+  // Banner amarelo de aviso quando os dados do período são insuficientes
   Widget _buildAviso() {
-    final n = _dadosDoPeriodo.length;
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -484,7 +421,8 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
       ]),
     );
   }
- 
+
+// Estado vazio — exibe ícone e mensagem quando não há transações 
   Widget _buildSemDados() => SizedBox(
     height: 160,
     child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
@@ -495,6 +433,7 @@ class _TokenPriceChartState extends State<TokenPriceChart> {
     ])),
   );
  
+ // Estado de erro — exibe mensagem e botão para tentar novamente
   Widget _buildErro() => SizedBox(
     height: 160,
     child: Center(child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [

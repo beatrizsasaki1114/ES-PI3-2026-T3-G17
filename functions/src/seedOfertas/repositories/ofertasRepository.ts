@@ -4,7 +4,6 @@ import{demoOfertas} from "../utils/ofertasSeedData";
 import {Timestamp} from "firebase-admin/firestore";
 
 // guardando as transações do documento na coleção de oferta
-
 const ofertasCollection = db.collection("Ofertas");
 
 export async function seedDemoOfertas(): Promise<string[]>{

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'token_price_chart.dart';
 
+// Widget reutilizável que exibe os botões de período do gráfico (1D, 1S, 1M, 6M, 1A)
 class TokenChartPeriodButtons extends StatelessWidget {
   final PeriodoGrafico periodoSelecionado;
   final ValueChanged<PeriodoGrafico> onPeriodoChanged;

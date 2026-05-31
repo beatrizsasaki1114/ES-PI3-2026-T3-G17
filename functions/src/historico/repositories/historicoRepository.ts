@@ -2,6 +2,7 @@
 import { db } from "../../shared/firebase";
 import { Timestamp } from "firebase-admin/firestore";
 
+// Busca todas as ofertas vendidas de uma startup em um intervalo de tempo
 export async function getOfertas(startupId: string, inicioDoDia: Timestamp, fimDoDia: Timestamp){
     return await db.collection("Ofertas")
             .where("startupId", "==", startupId)
@@ -11,6 +12,7 @@ export async function getOfertas(startupId: string, inicioDoDia: Timestamp, fimD
             .get();
 }
 
+// Busca todas as compras diretas concluídas de uma startup em um intervalo de tempo
 export async function getComprasDiretas(startupId: string, inicioDoDia: Timestamp, fimDoDia: Timestamp){
     return await db.collection("ComprasDiretas")
         .where("startupId", "==", startupId)
@@ -39,7 +41,7 @@ export async function processarHistoricoDiarioNoBanco(dataId: string, inicioDoDi
         }
 
         // Buscamos todas as ofertas que foram negociadas e vendidas hoje
-         const ofertasSnapshot = await getOfertas(startupId, inicioDoDia, fimDoDia);
+        const ofertasSnapshot = await getOfertas(startupId, inicioDoDia, fimDoDia);
         // Buscamos as compras de tokens que foram feitas diretas com a Startup hoje
         const comprasSnapshot = await getComprasDiretas(startupId, inicioDoDia, fimDoDia);
 
@@ -157,20 +159,22 @@ export async function seedHistoricoDiarioNoBanco() {
     }
 }
 
-
+// Busca o histórico diário de uma startup para um período específico
+// Retorna array ordenado por data com precoMedio e volumeNegociado de cada dia
 export async function getHistoricoPorPeriodo(
     startupId: string,
     periodo: "semana" | "mes" | "seisMeses" | "ano"
 ): Promise<{ data: string; precoMedio: number; volumeNegociado: number }[]> {
- 
+     // Mapa de período para quantidade de dias
     const diasPorPeriodo: Record<string, number> = {
         semana:     7,
         mes:        30,
         seisMeses:  180,
         ano:        365,
     };
- 
+    // Pega a quantidade de dias do período solicitado
     const dias = diasPorPeriodo[periodo];
+    // Período inválido — lança erro
     if (!dias) throw new Error(`Período inválido: ${periodo}`);
  
     // Calcula a data de corte (YYYY-MM-DD) para filtrar no Firestore
@@ -178,7 +182,7 @@ export async function getHistoricoPorPeriodo(
     const corte    = new Date(hoje);
     corte.setDate(hoje.getDate() - dias);
     const dataCorte = corte.toISOString().split("T")[0];
- 
+       // Busca os documentos do HistoricoDiario a partir da data de corte
     const snapshot = await db
         .collection("startups")
         .doc(startupId)
@@ -188,6 +192,7 @@ export async function getHistoricoPorPeriodo(
         .get();
  
     // Se não houver dados no período, retorna tudo disponível
+      // Isso garante que o gráfico sempre tenha dados para exibir
     if (snapshot.empty) {
         const tudo = await db
             .collection("startups")
@@ -196,6 +201,7 @@ export async function getHistoricoPorPeriodo(
             .orderBy("data", "asc")
             .get();
  
+          // Mapeia os documentos para o formato esperado pelo Flutter
         return tudo.docs.map(doc => {
             const d = doc.data();
             return {
@@ -221,7 +227,8 @@ export async function getStartups() {
     return await db.collection("startups").get();
 }
  
-// Busca o último dia do HistoricoDiario de uma startup
+// Busca o documento mais recente do HistoricoDiario de uma startup
+// Ordena por data decrescente e limita a 1 resultado
 export async function getUltimoDiaHistorico(startupId: string) {
     return await db
         .collection("startups")
@@ -233,6 +240,8 @@ export async function getUltimoDiaHistorico(startupId: string) {
 }
  
 // Atualiza o preço do token da startup
+// novoPreco passa a ser PrecoAtualToken
+// precoAnterior salvo como PrecoAnteriorToken para calcular variação amanhã
 export async function atualizarPrecoToken(
     startupId: string,
     novoPreco: number,

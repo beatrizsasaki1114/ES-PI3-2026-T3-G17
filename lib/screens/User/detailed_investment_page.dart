@@ -4,7 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/User/private_chat.dart';
-
+import 'package:projeto_integrador_3_grupo_17/widgets/investment_performance_chart.dart';
 class DetailedInvestmentPage extends StatefulWidget {
   final Map<String, dynamic> investment;
 
@@ -20,7 +20,9 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
     final String startupName = widget.investment['startupName'] ?? 'Desconhecida';
     final int tokenQuantity = widget.investment['tokenQuantity'] ?? 0;
     final double amountSpent = (widget.investment['amountSpent'] ?? 0).toDouble();
-    
+    final double? precoNaCompra = widget.investment['precoNaCompra'] != null
+        ? (widget.investment['precoNaCompra'] as num).toDouble()
+        : null; 
     final double currentAmount = amountSpent; 
 
     final Timestamp? timestamp = widget.investment['date'] as Timestamp?;
@@ -191,34 +193,11 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                 const SizedBox(height: 16),
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
-                  child: Container(
-                    height: 220,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(16),
-                      border: Border.all(color: Colors.grey.shade300, width: 1.5),
-                    ),
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(
-                          Icons.show_chart,
-                          size: 48,
-                          color: Colors.grey.shade400,
-                        ),
-                        const SizedBox(height: 12),
-                        Text(
-                          'Espaço reservado para o\ngráfico de desenvolvimento',
-                          textAlign: TextAlign.center,
-                          style: GoogleFonts.poppins(
-                            fontSize: 14,
-                            color: Colors.grey.shade500,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
+                  child: InvestmentPerformanceChart(
+                    startupName:   startupName,
+                    tokenQuantity: tokenQuantity,
+                    amountSpent:   amountSpent,
+                    precoNaCompra: precoNaCompra,
                   ),
                 ),
                 
