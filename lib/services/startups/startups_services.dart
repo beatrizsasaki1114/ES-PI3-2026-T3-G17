@@ -1,4 +1,4 @@
-// Beatriz Naomi e Sofia de Souza
+// Beatriz Naomi e Sofia de Sousa
 
 import 'package:cloud_functions/cloud_functions.dart';
 import 'package:projeto_integrador_3_grupo_17/models/startups.dart';

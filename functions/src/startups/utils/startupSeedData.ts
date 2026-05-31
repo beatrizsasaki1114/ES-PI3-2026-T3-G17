@@ -1,5 +1,6 @@
-//Bruno Machado
+//Sofia de Sousa e Bruno Machado
 
+//Backup das startups de demonstração para popular o banco de dados com informações reais e completas, facilitando os testes e a visualização das funcionalidades da plataforma.
 import { StartupDocument } from "../types/startupTypes";
 
 export const demoStartup: StartupDocument[] = [
