@@ -1,3 +1,5 @@
+// Sofia de Sousa
+
 // 1 - Cria uma função que pode ser chamada diretamente pelo Front (onCall)
 //     HttpsError - Usado para retornar erros padronizados
 // 2 - allowedStages - Lista de estágios permitidos para as startups (nova, operação, expansão)
