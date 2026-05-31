@@ -8,6 +8,7 @@ import 'package:projeto_integrador_3_grupo_17/services/startups/startups_service
 import 'package:projeto_integrador_3_grupo_17/screens/App/invest_page.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/society_structure.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
+import 'package:projeto_integrador_3_grupo_17/widgets/token_price_chart.dart';
 
 class StartupDetailsPage extends StatefulWidget {
   final Startup startup;
@@ -20,14 +21,31 @@ class StartupDetailsPage extends StatefulWidget {
 
 class _StartupDetailsPageState extends State<StartupDetailsPage> {
   int? _expandedFaqIndex;
-  final int _selectedIndex = 2; 
+  final int _selectedIndex = 2;
   YoutubePlayerController? _controller;
   late Future<Startup> _startupDetailsFuture;
+
+  // Horário de abertura do mercado
+  bool get _mercadoAberto {
+    final agora = DateTime.now().toUtc().subtract(const Duration(hours: 3));
+    final hora = agora.hour * 60 + agora.minute;
+    return hora >= 8 * 60 && hora < 18 * 60;
+  }
+
+  String get _motivoMercadoFechado {
+    final agora = DateTime.now().toUtc().subtract(const Duration(hours: 3));
+    final hora = agora.hour * 60 + agora.minute;
+    if (hora < 8 * 60) return 'Mercado fechado. Abre às 08:00';
+    if (hora >= 18 * 60) return 'Mercado encerrado. Reabre amanhã às 08:00';
+    return '';
+  }
 
   @override
   void initState() {
     super.initState();
-    _startupDetailsFuture = StartupService().fetchStartupDetails(widget.startup.id);
+    _startupDetailsFuture = StartupService().fetchStartupDetails(
+      widget.startup.id,
+    );
   }
 
   void _initializeVideo(String url) {
@@ -162,11 +180,67 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54)),
+        Text(
+          label,
+          style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54),
+        ),
         FittedBox(
           fit: BoxFit.scaleDown,
           alignment: Alignment.centerLeft,
-          child: Text(value, style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+          child: Text(
+            value,
+            style: GoogleFonts.poppins(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPrecoToken(double precoAtual, double? precoAnterior) {
+    // Calcula variação se tiver preço anterior
+    double? variacao;
+    if (precoAnterior != null && precoAnterior > 0) {
+      variacao = ((precoAtual - precoAnterior) / precoAnterior) * 100;
+    }
+
+    final valorFormatado =
+        'R\$ ${precoAtual.toStringAsFixed(2).replaceAll('.', ',')}';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Preço/Token',
+          style: GoogleFonts.poppins(fontSize: 12, color: Colors.black54),
+        ),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              alignment: Alignment.centerLeft,
+              child: Text(
+                valorFormatado,
+                style: GoogleFonts.poppins(
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            if (variacao != null) ...[
+              const SizedBox(width: 2),
+              Icon(
+                variacao >= 0 ? Icons.arrow_upward : Icons.arrow_downward,
+                size: 14,
+                color: variacao >= 0
+                    ? const Color(0xFF2E7D32)
+                    : const Color(0xFFC62828),
+              ),
+            ],
+          ],
         ),
       ],
     );
@@ -182,7 +256,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha:0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 6,
             offset: const Offset(0, 3),
           ),
@@ -211,7 +285,11 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
           const SizedBox(height: 12),
           Row(
             children: [
-              const Icon(Icons.calendar_month, size: 16, color: Color(0xFFE91E63)),
+              const Icon(
+                Icons.calendar_month,
+                size: 16,
+                color: Color(0xFFE91E63),
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -242,7 +320,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                 ),
               ],
             ),
-          ]
+          ],
         ],
       ),
     );
@@ -291,7 +369,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                       ),
                       child: Center(
                         child: Text(
-                          fullStartup.name.isNotEmpty ? fullStartup.name[0].toUpperCase() : 'S',
+                          fullStartup.name.isNotEmpty
+                              ? fullStartup.name[0].toUpperCase()
+                              : 'S',
                           style: GoogleFonts.poppins(
                             fontSize: 28,
                             fontWeight: FontWeight.bold,
@@ -336,55 +416,85 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   children: [
                     Expanded(
                       flex: 2,
-                      child: _buildPriceInfo(
-                        'Preço/Token', 
-                        'R\$ ${fullStartup.precoAtualToken.toStringAsFixed(2).replaceAll('.', ',')}',
+                      child: _buildPrecoToken(
+                        fullStartup.precoAtualToken,
+                        fullStartup.precoAnteriorToken,
                       ),
                     ),
                     Expanded(
                       flex: 3,
                       child: _buildPriceInfo(
-                        'Capital Aportado', 
+                        'Capital Aportado',
                         'R\$ ${capitalReais.toStringAsFixed(2).replaceAll('.', ',')}',
                       ),
                     ),
                     Expanded(
                       flex: 3,
                       child: _buildPriceInfo(
-                        'Tokens Disponíveis', 
+                        'Tokens Disponíveis',
                         fullStartup.totalTokensEmitidos.toString(),
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
-                SizedBox(
-                  width: double.infinity,
-                  height: 55,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => InvestPage(startup: fullStartup),
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      height: 55,
+                      child: ElevatedButton(
+                        onPressed: _mercadoAberto
+                            ? () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        InvestPage(startup: fullStartup),
+                                  ),
+                                );
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _mercadoAberto
+                              ? const Color(0xFFE91E63)
+                              : Colors.grey.shade400,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                      );
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xFFE91E63),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+                        child: Text(
+                          "Investir em ${fullStartup.name}",
+                          style: GoogleFonts.poppins(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.white,
+                          ),
+                        ),
                       ),
                     ),
-                    child: Text(
-                      "Investir em ${fullStartup.name}",
-                      style: GoogleFonts.poppins(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
+                    if (!_mercadoAberto) ...[
+                      const SizedBox(height: 6),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.access_time,
+                            size: 13,
+                            color: Colors.grey.shade500,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _motivoMercadoFechado,
+                            style: GoogleFonts.poppins(
+                              fontSize: 11,
+                              color: Colors.grey.shade500,
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ),
+                    ],
+                  ],
                 ),
                 const SizedBox(height: 24),
                 Container(
@@ -396,35 +506,25 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     border: Border.all(color: Colors.grey.shade200),
                   ),
                   child: Column(
-                    children: [
-                      Container(
-                        height: 120,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Center(
-                          child: Text(
-                            'Gráfico de Valorização',
-                            style: GoogleFonts.poppins(
-                              fontSize: 12,
-                              color: Colors.black38,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+                    children: [TokenPriceChart(startupId: widget.startup.id)],
                   ),
                 ),
+
                 const SizedBox(height: 32),
                 Text(
                   "Sobre a Startup",
-                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
                 const SizedBox(height: 8),
                 Text(
                   fullStartup.longDescription,
-                  style: GoogleFonts.poppins(fontSize: 14, color: Colors.black87),
+                  style: GoogleFonts.poppins(
+                    fontSize: 14,
+                    color: Colors.black87,
+                  ),
                 ),
                 const SizedBox(height: 24),
                 if (fullStartup.videoUrl.isNotEmpty && _controller != null)
@@ -462,7 +562,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     ),
                   ),
                 const SizedBox(height: 32),
-                
+
                 Text(
                   'Eventos e Atualizações',
                   style: GoogleFonts.poppins(
@@ -473,7 +573,9 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                 ),
                 const SizedBox(height: 12),
                 if (fullStartup.eventos.isNotEmpty)
-                  ...fullStartup.eventos.map((evento) => _buildEventItem(evento))
+                  ...fullStartup.eventos.map(
+                    (evento) => _buildEventItem(evento),
+                  )
                 else
                   Text(
                     'Nenhum evento programado no momento.',
@@ -493,16 +595,21 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 12),
-                ...fullStartup.publicDocuments.map((doc) => _buildDocumentButton(
-                      title: doc.title,
-                      size: 'PDF - Acessar arquivo',
-                      onTap: () async {
-                        final Uri url = Uri.parse(doc.url);
-                        if (await canLaunchUrl(url)) {
-                          await launchUrl(url, mode: LaunchMode.externalApplication);
-                        }
-                      },
-                    )),
+                ...fullStartup.publicDocuments.map(
+                  (doc) => _buildDocumentButton(
+                    title: doc.title,
+                    size: 'PDF - Acessar arquivo',
+                    onTap: () async {
+                      final Uri url = Uri.parse(doc.url);
+                      if (await canLaunchUrl(url)) {
+                        await launchUrl(
+                          url,
+                          mode: LaunchMode.externalApplication,
+                        );
+                      }
+                    },
+                  ),
+                ),
                 const SizedBox(height: 32),
                 Text(
                   'FAQ',
@@ -514,21 +621,18 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                 ),
                 const SizedBox(height: 12),
                 if (fullStartup.perguntas.isNotEmpty)
-                  ...List.generate(
-                    fullStartup.perguntas.length,
-                    (index) {
-                      String resposta = 'Resposta não encontrada.';
-                      if (index < fullStartup.respostas.length) {
-                        resposta = fullStartup.respostas[index];
-                      }
+                  ...List.generate(fullStartup.perguntas.length, (index) {
+                    String resposta = 'Resposta não encontrada.';
+                    if (index < fullStartup.respostas.length) {
+                      resposta = fullStartup.respostas[index];
+                    }
 
-                      return _buildFaqItem(
-                        question: fullStartup.perguntas[index],
-                        answer: resposta,
-                        index: index,
-                      );
-                    },
-                  )
+                    return _buildFaqItem(
+                      question: fullStartup.perguntas[index],
+                      answer: resposta,
+                      index: index,
+                    );
+                  })
                 else
                   Text(
                     'Nenhuma pergunta frequente cadastrada.',
@@ -554,7 +658,8 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (context) => SocietyStructurePage(startup: fullStartup),
+                          builder: (context) =>
+                              SocietyStructurePage(startup: fullStartup),
                         ),
                       );
                     },
@@ -563,11 +668,16 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                       foregroundColor: Colors.black87,
                       elevation: 0,
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
                     child: Text(
                       'Acessar Estrutura Societária',
-                      style: GoogleFonts.poppins(fontSize: 15, fontWeight: FontWeight.w600),
+                      style: GoogleFonts.poppins(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ),

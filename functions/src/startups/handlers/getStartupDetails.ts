@@ -2,7 +2,7 @@
 
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { requireAuthenticatedUser } from "../shared/auth";
-import { normalizeString } from "../shared/validation";
+import { normalizeString } from "../../shared/validation";
 
 //Importação das funções do repositório para acessar os dados das startups e verificar o status do usuário como investidor
 import {
@@ -31,7 +31,7 @@ export const getStartupDetails = onCall(
     //Busca startup no firestore usando o id fornecido, espera o banco responder
     const startup = await getStartupById(startupId);
 
-    // Se não encontrou a startup, lança erro
+   
     if (!startup) {
         throw new HttpsError(
             "not-found",
@@ -55,7 +55,8 @@ export const getStartupDetails = onCall(
             SumarioExecutivo: startup.SumarioExecutivo,
             CapitalCaptadoCent: startup.CapitalCaptadoCent,
             TotalTokensEmitidos: startup.TotalTokensEmitidos,
-            PrecoAtualToken: startup.PrecoAtualToken,
+            PrecoAtualToken:  (startup as any).PrecoAtualToken ?? startup.PrecoAtualToken,
+            PrecoAnteriorToken: (startup as any).PrecoAnteriorToken  ?? null,
             Fundadores: startup.Fundadores,
             MembrosExterno: startup.MembrosExterno,
             DemoVideo: startup.DemoVideo,

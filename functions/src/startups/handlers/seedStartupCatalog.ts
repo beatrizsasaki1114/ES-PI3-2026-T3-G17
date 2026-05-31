@@ -2,9 +2,9 @@
 
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { seedDemoStartups } from "../repositories/startupRepository";
-import { normalizeString } from "../shared/validation";
+import { normalizeString } from "../../shared/validation";
 
-//Cria a função de ver o catalago de startups
+// seed_key: mesclainvest123
 export const seedStartupCatalog = onCall(
 
     //Configuração da função, define a região onde ela será executa

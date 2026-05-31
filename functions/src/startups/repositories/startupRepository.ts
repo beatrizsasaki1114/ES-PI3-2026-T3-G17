@@ -83,3 +83,20 @@ export async function seedDemoStartups(): Promise<string[]> {
   //Retorna os IDs das srtatups criadas 
   return ids;
 }
+
+// Busca apenas os preços do token de uma startup, usado pelo getStartupPrices
+export async function getStartupPrices(startupName: string): Promise<{ precoAtual: number; precoAnterior: number } | undefined> {
+  const snap = await db.collection("startups")
+            .where("NomeStartup", "==", startupName)
+            .limit(1)
+            .get();
+ 
+  if (snap.empty) return undefined;
+ 
+   const data = snap.docs[0].data() as any;
+ 
+  return {
+    precoAtual:    (data.PrecoAtualToken    as number) ?? 0,
+    precoAnterior: (data.PrecoAnteriorToken as number) ?? 0,
+  };
+}

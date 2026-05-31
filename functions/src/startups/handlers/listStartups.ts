@@ -10,7 +10,7 @@
 
 import { HttpsError, onCall } from "firebase-functions/v2/https";
 import { requireAuthenticatedUser } from "../../shared/auth";
-import { normalizeString } from "../shared/validation";
+import { normalizeString } from "../../shared/validation";
 import { allowedStages } from "../shared/constants";
 import { listStartupItems } from "../repositories/startupRepository";
 import { StartupStage } from "../types/startupTypes";

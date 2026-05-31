@@ -116,6 +116,7 @@ class Startup {
   final String stage;
   final String tokenType;
   final double precoAtualToken;
+   final double? precoAnteriorToken;
   final double capitalCaptadoCent;
   final int totalTokensEmitidos;
   final List<Founder> founders;
@@ -134,6 +135,7 @@ class Startup {
     required this.stage,
     required this.tokenType,
     required this.precoAtualToken,
+    this.precoAnteriorToken,
     required this.capitalCaptadoCent,
     required this.totalTokensEmitidos,
     required this.founders,
@@ -191,6 +193,7 @@ class Startup {
       respostas: parsedRespostas,
       eventos: parsedEventos,
       precoAtualToken: (json['PrecoAtualToken'] ?? 0).toDouble(),
+      precoAnteriorToken: json['PrecoAnteriorToken'] != null ? (json['PrecoAnteriorToken'] as num).toDouble() : null,
       capitalCaptadoCent: (json['CapitalCaptadoCent'] ?? 0).toDouble(),
       totalTokensEmitidos: (json['TotalTokensEmitidos'] ?? 0).toInt(),
     );

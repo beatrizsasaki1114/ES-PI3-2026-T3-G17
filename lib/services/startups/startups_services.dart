@@ -24,7 +24,6 @@ class StartupService {
 
   final response = Map<String, dynamic>.from(result.data);
   final data = Map<String, dynamic>.from(response['data']);
-
   return Startup.fromJson(data);
 }
 }

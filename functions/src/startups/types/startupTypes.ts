@@ -37,6 +37,7 @@ export interface StartupDocument {
     CapitalCaptadoCent: number;
     TotalTokensEmitidos: number;
     PrecoAtualToken: number;
+    PrecoAnteriorToken?: number | null;
     DemoVideo: string;
     Fundadores: Fundador[];
     MembrosExterno: MembroExterno[];

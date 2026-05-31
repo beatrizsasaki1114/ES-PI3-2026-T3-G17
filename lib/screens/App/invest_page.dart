@@ -46,8 +46,7 @@ class _InvestPageState extends State<InvestPage> {
     try {
       final userRef = FirebaseFirestore.instance.collection('Usuários').doc(user.uid);
       final startupRef = FirebaseFirestore.instance.collection('startups').doc(widget.startup.id);
-
-      // Usar runTransaction é importante pois evita erros comuns como por exemplo multiplos compradores simultâneos, queda de rede e problemas com o dispositivo
+      final compraRef = FirebaseFirestore.instance.collection('ComprasDiretas').doc();
       await FirebaseFirestore.instance.runTransaction((transaction) async {
         final userSnapshot = await transaction.get(userRef);
         if (!userSnapshot.exists) {
@@ -91,6 +90,16 @@ class _InvestPageState extends State<InvestPage> {
         // Escrita 2: Deduz a quantidade de tokens disponíveis da startup
         transaction.update(startupRef, {
           'TotalTokensEmitidos': FieldValue.increment(-tokenQuantity), 
+        });
+
+          // Registra a compra direta para o cálculo do histórico de preço
+        transaction.set(compraRef, {
+          'startupId': widget.startup.id,
+          'compradorId': user.uid,
+          'precoUnitario': widget.startup.precoAtualToken,
+          'quantidadeTokens': tokenQuantity,
+          'dataCompra': Timestamp.now(),
+          'status': 'concluida',
         });
       });
 
