@@ -1,4 +1,4 @@
-//Bruno Machado
+// Bruno Machado
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -15,6 +15,7 @@ class UserConfigPage extends StatefulWidget {
 }
 
 class _UserConfigPageState extends State<UserConfigPage> {
+  // Guarda temporariamente os textos digitados em cada caixa do formulário
   final TextEditingController _firstNameController = TextEditingController();
   final TextEditingController _lastNameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
@@ -27,6 +28,7 @@ class _UserConfigPageState extends State<UserConfigPage> {
   @override
   void initState() {
     super.initState();
+    // Coloca as palavras antigas dentro das caixas antes de abrir a tela de fato
     _loadUserData();
   }
 
@@ -66,6 +68,7 @@ class _UserConfigPageState extends State<UserConfigPage> {
     }
   }
 
+  // Pega todos os novos textos preenchidos e envia para substituir os velhos
   Future<void> _updateUserData() async {
     setState(() => _isLoading = true);
     try {
@@ -142,6 +145,7 @@ class _UserConfigPageState extends State<UserConfigPage> {
                       ),
                       const SizedBox(height: 40),
 
+                      // Agrupamentos de títulos em cima de cada caixa de escrever
                       _buildFieldLabel("Nome"),
                       _buildCustomInput(controller: _firstNameController),
                       const SizedBox(height: 20),
@@ -164,6 +168,7 @@ class _UserConfigPageState extends State<UserConfigPage> {
                       ),
                       const SizedBox(height: 20),
 
+                      // Esta caixa fica mais escura para mostrar que não dá para apagar ou mudar
                       _buildFieldLabel("CPF"),
                       _buildCustomInput(initialValue: _cpf, isEditable: false),
 
@@ -219,6 +224,7 @@ class _UserConfigPageState extends State<UserConfigPage> {
     );
   }
 
+  // Molde flexível que constrói todas as caixas de entrada do formulário
   Widget _buildCustomInput({
     TextEditingController? controller,
     String? initialValue,

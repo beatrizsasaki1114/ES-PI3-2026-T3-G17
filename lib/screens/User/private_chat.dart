@@ -1,10 +1,11 @@
-//Bruno Machado, Luca Filippi e Heloisa Marinho
+// Bruno Machado, Luca Filippi e Heloisa Marinho
 
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+// Cria a página de conversa e exige que o nome da empresa seja informado para abrir
 class PrivateChatPage extends StatefulWidget {
   final String startupName;
 
@@ -15,10 +16,14 @@ class PrivateChatPage extends StatefulWidget {
 }
 
 class _PrivateChatPageState extends State<PrivateChatPage> {
+  // Ferramenta que guarda o que a pessoa está digitando na caixa de texto
   final TextEditingController _messageController = TextEditingController();
+  // Ferramenta que controla a barra de rolagem da tela
   final ScrollController _scrollController = ScrollController();
+  // Identifica quem é o usuário logado no aplicativo
   final user = FirebaseAuth.instance.currentUser;
 
+  // Limpa essas ferramentas da memória do celular quando o usuário sai da tela
   @override
   void dispose() {
     _messageController.dispose();
@@ -26,12 +31,16 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
     super.dispose();
   }
 
+  // Função ativada quando o botão de enviar é pressionado
   void _sendMessage() async {
+    // Se a caixa estiver vazia ou o usuário não estiver logado, não faz nada
     if (_messageController.text.trim().isEmpty || user == null) return;
 
+    // Guarda o texto escrito e apaga da caixinha de digitação na hora
     final text = _messageController.text.trim();
     _messageController.clear(); 
 
+    // Cria o caminho exato no banco de dados para guardar essa conversa específica
     final chatRef = FirebaseFirestore.instance
         .collection('Usuários')
         .doc(user!.uid)
@@ -39,14 +48,17 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
         .doc(widget.startupName)
         .collection('mensagens');
 
+    // Manda a mensagem para a internet avisando que foi o usuário quem enviou, junto com a hora exata
     await chatRef.add({
       'text': text,
       'is_from_startup': false,
       'timestamp': FieldValue.serverTimestamp(),
     });
 
+
     _scrollToBottom();
   }
+
 
   void _scrollToBottom() {
     if (_scrollController.hasClients) {
@@ -62,6 +74,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      // Barra superior com o nome da empresa e botão de voltar
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 1,
@@ -104,8 +117,10 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
           ],
         ),
       ),
+      // Corpo principal da tela empilhando o fundo colorido com as mensagens
       body: Stack(
         children: [
+          // Bolinhas coloridas decorativas no fundo da tela
           Positioned(
             top: -50,
             right: -50,
@@ -133,9 +148,11 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
           
           Column(
             children: [
+              // Área onde a lista de mensagens aparece
               Expanded(
                 child: user == null
                     ? const Center(child: Text("Usuário não autenticado"))
+                    // Espera as novas mensagens
                     : StreamBuilder<QuerySnapshot>(
                         stream: FirebaseFirestore.instance
                             .collection('Usuários')
@@ -146,10 +163,12 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                             .orderBy('timestamp', descending: false)
                             .snapshots(),
                         builder: (context, snapshot) {
+                          // Loading
                           if (snapshot.connectionState == ConnectionState.waiting) {
                             return const Center(child: CircularProgressIndicator());
                           }
 
+                          // Se a conversa estiver vazia, convida o usuário a mandar a primeira mensagem
                           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                             return Center(
                               child: Text(
@@ -163,10 +182,13 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                             );
                           }
 
+                          // Pega a lista de mensagens que chegou do banco de dados
                           final docs = snapshot.data!.docs;
 
+                          // Dá um pequeno empurrãozinho na tela para baixo sempre que a lista for desenhada
                           WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
+                          // Constrói visualmente a lista rolável com todos os balões de conversa
                           return ListView.builder(
                             controller: _scrollController,
                             padding: const EdgeInsets.all(16),
@@ -180,6 +202,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
                         },
                       ),
               ),
+              // Rodapé branco onde fica a caixa para digitar o texto e o botão de enviar
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
@@ -242,6 +265,7 @@ class _PrivateChatPageState extends State<PrivateChatPage> {
   }
 }
 
+// O molde visual que desenha cada balãozinho de conversa na tela
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
 
@@ -252,12 +276,13 @@ class MessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 6.0),
       child: Row(
+        // Joga o balão para a esquerda se for da empresa, e para a direita se for do usuário
         mainAxisAlignment:
             message.isFromStartup ? MainAxisAlignment.start : MainAxisAlignment.end,
         children: [
+          // Configuração do balão cinza 
           if (message.isFromStartup) ...[
             Container(
-  
               constraints: BoxConstraints(
                 maxWidth: MediaQuery.of(context).size.width * 0.75,
               ),
@@ -267,7 +292,7 @@ class MessageBubble extends StatelessWidget {
                 borderRadius: const BorderRadius.only(
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
-                  bottomLeft: Radius.circular(4),
+                  bottomLeft: Radius.circular(4), 
                   bottomRight: Radius.circular(20),
                 ),
               ),
@@ -294,7 +319,7 @@ class MessageBubble extends StatelessWidget {
                   topLeft: Radius.circular(20),
                   topRight: Radius.circular(20),
                   bottomLeft: Radius.circular(20),
-                  bottomRight: Radius.circular(4),
+                  bottomRight: Radius.circular(4), 
                 ),
               ),
               child: Text(
@@ -313,6 +338,7 @@ class MessageBubble extends StatelessWidget {
   }
 }
 
+//  organiza as informações cruas que chegam do banco
 class ChatMessage {
   final String text;
   final bool isFromStartup;
@@ -324,6 +350,7 @@ class ChatMessage {
     required this.timestamp,
   });
 
+  // Traduz os dados do Firebase para o formato que o aplicativo entende
   factory ChatMessage.fromFirestore(Map<String, dynamic> data) {
     return ChatMessage(
       text: data['text'] ?? '',

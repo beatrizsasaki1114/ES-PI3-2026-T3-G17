@@ -1,4 +1,4 @@
-//Bruno Machado
+// Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +7,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/App/config_page.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/main_layout.dart';
 
 class UserProfilePage extends StatefulWidget {
+  // Deixa um espaço para ver o perfil de um colega caso o ID seja passado
   final String? userId; 
 
   const UserProfilePage({super.key, this.userId});
@@ -25,9 +26,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
   @override
   void initState() {
     super.initState();
+    // Vai buscar as informações quando a tela abre
     _fetchUserData();
   }
 
+  // Pede os dados da pessoa para o banco de dados
   Future<void> _fetchUserData() async {
     try {
       final String? targetUid = widget.userId ?? FirebaseAuth.instance.currentUser?.uid;
@@ -55,6 +58,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     }
   }
 
+  // Janela flutuante para a pessoa trocar o texto da sua descrição
   void _editBioDialog() {
     final TextEditingController bioController = TextEditingController(text: userBio);
 
@@ -82,6 +86,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                 final newBio = bioController.text.trim();
                 final user = FirebaseAuth.instance.currentUser;
 
+                // Manda o novo texto para o banco
                 if (user != null) {
                   await FirebaseFirestore.instance
                       .collection('Usuários')
@@ -103,6 +108,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
     );
   }
 
+  // Lógica da medalha de prestígio dependendo de quantas compras a pessoa fez
   String get userStatus {
     int count = userInvestments.length;
     if (count >= 7) return "Investidor Expert";
@@ -124,9 +130,11 @@ class _UserProfilePageState extends State<UserProfilePage> {
     return const Color(0xFF0D47A1);
   }
 
+  // Desenha os cartões menores da lista inferior da tela
   Widget _buildInvestmentCard(Map<String, dynamic> investment) {
     final String startupName = investment['startupName'] ?? 'Desconhecida';
     
+    // Tratamento de datas para garantir que fique bonito independente de como venha da internet
     String dateStr = "Data não informada";
     dynamic rawDate = investment['data'] ?? investment['date'];
     
@@ -217,6 +225,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
               child: Column(
                 children: [
                   const SizedBox(height: 30),
+                  // ícone de perfil no topo da página
                   Center(
                     child: Container(
                       padding: const EdgeInsets.all(4),
@@ -236,6 +245,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                     userName,
                     style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.black87),
                   ),
+                  // nível de prestígio
                   Container(
                     margin: const EdgeInsets.symmetric(vertical: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -248,6 +258,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       style: GoogleFonts.poppins(fontSize: 14, fontWeight: FontWeight.bold, color: statusTextColor),
                     ),
                   ),
+                  // Botão invisível em cima da descrição para a pessoa clicar e editar
                   InkWell(
                     onTap: _editBioDialog,
                     borderRadius: BorderRadius.circular(10),
@@ -292,6 +303,7 @@ class _UserProfilePageState extends State<UserProfilePage> {
                       ),
                     )
                   else
+                    // Constrói os cartões usando a função contruída anteriormente
                     ...userInvestments.map((inv) => _buildInvestmentCard(inv)),
                     
                   const SizedBox(height: 30),

@@ -1,4 +1,4 @@
-//Bruno Machado
+// Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -32,6 +32,7 @@ class _WalletPageState extends State<WalletPage> {
     super.dispose();
   }
 
+  // Vai no banco de dados e traz a quantidade exata de moedas que a pessoa tem
   Future<void> _loadUserBalance() async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -52,6 +53,7 @@ class _WalletPageState extends State<WalletPage> {
     }
   }
 
+  // Adiciona a quantia desejada 
   Future<void> _addFunds(double amount) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return;
@@ -63,6 +65,7 @@ class _WalletPageState extends State<WalletPage> {
         'saldo': newBalance,
       });
 
+      // Se der tudo certo atualiza o número na tela
       setState(() {
         _currentBalance = newBalance;
       });
@@ -86,6 +89,7 @@ class _WalletPageState extends State<WalletPage> {
     }
   }
 
+  // Aba para a pessoa digitar o valor que quer colocar
   void _showValueInput(bool isPix) {
     _valueController.clear();
     showDialog(
@@ -101,6 +105,7 @@ class _WalletPageState extends State<WalletPage> {
           TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancelar')),
           ElevatedButton(
             onPressed: () {
+              // Garante que o texto digitado vire número sem quebrar
               double? value = double.tryParse(_valueController.text.replaceAll(',', '.'));
               if (value != null && value > 0) {
                 Navigator.pop(context);
@@ -114,6 +119,7 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
+  // Tela para colocar dados de cartão
   void _showCardPayment(double amount) {
     showDialog(
       context: context,
@@ -127,7 +133,7 @@ class _WalletPageState extends State<WalletPage> {
               const TextField(decoration: InputDecoration(labelText: 'Nome no Cartão')),
               Row(
                 children: [
-                  Expanded(child: const TextField(decoration: InputDecoration(labelText: 'Validade (MM/AA)'))),
+                  Expanded(child: const TextField(decoration: InputDecoration(labelText: 'Validade MM/AA'))),
                   const SizedBox(width: 10),
                   Expanded(child: const TextField(decoration: InputDecoration(labelText: 'CVV'))),
                 ],
@@ -146,6 +152,7 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
+  // Tela para pagar com o código do PIX
   void _showPixPayment(double amount) {
     showDialog(
       context: context,
@@ -199,6 +206,7 @@ class _WalletPageState extends State<WalletPage> {
           child: Column(
             children: [
               const SizedBox(height: 50),
+              // Combina um ícone de carteira com o número do saldo na frente
               Stack(
                 alignment: Alignment.center,
                 children: [
@@ -233,6 +241,7 @@ class _WalletPageState extends State<WalletPage> {
                 style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w500),
               ),
               const SizedBox(height: 20),
+              // Botões para escolher o pagamento
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 40),
                 child: Column(

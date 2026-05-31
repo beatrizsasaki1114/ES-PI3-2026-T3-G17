@@ -1,4 +1,4 @@
-//Bruno Machado
+// Bruno Machado
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +14,7 @@ class UserInvestmentsPage extends StatefulWidget {
 }
 
 class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
+  // Ferramenta que lê o que a pessoa digita na barra de pesquisa
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = "";
 
@@ -25,34 +26,41 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
 
   @override
   Widget build(BuildContext context) {
+    // Descobre quem é a pessoa usando o aplicativo agora
     final user = FirebaseAuth.instance.currentUser;
 
     return MainLayout(
       selectedIndex: 3,
       body: user == null
           ? const Center(child: Text("Usuário não autenticado"))
+          // Fica conectado na internet o tempo todo para ver se algo mudou
           : StreamBuilder<DocumentSnapshot>(
               stream: FirebaseFirestore.instance
                   .collection('Usuários')
                   .doc(user.uid)
                   .snapshots(),
               builder: (context, snapshot) {
+                // Mostra um loading enquanto a internet carrega os dados
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(child: CircularProgressIndicator());
                 }
 
+                // Avisa caso a conta da pessoa não seja encontrada
                 if (!snapshot.hasData || !snapshot.data!.exists) {
                   return const Center(child: Text("Dados não encontrados."));
                 }
 
+                // Pega a lista de todas as startups que a pessoa ajudou
                 final userData = snapshot.data!.data() as Map<String, dynamic>;
                 final List<dynamic> rawInvestments = userData['investimentos'] ?? [];
 
+                // Filtra a lista mostrando só o que tem o mesmo nome digitado na pesquisa
                 final filteredInvestments = rawInvestments.where((inv) {
                   final name = (inv['startupName'] ?? '').toString().toLowerCase();
                   return name.contains(_searchQuery.toLowerCase());
                 }).toList();
 
+                // Calculadora automática que soma todo o dinheiro gasto
                 double totalInvested = 0;
                 for (var inv in rawInvestments) {
                   totalInvested += (inv['amountSpent'] ?? 0).toDouble();
@@ -87,6 +95,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
 
                     Column(
                       children: [
+                        // Caixa que mostra o dinheiro total somado
                         Container(
                           margin: const EdgeInsets.all(16),
                           padding: const EdgeInsets.all(20),
@@ -123,6 +132,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                                 ],
                               ),
                               const SizedBox(height: 12),
+                              // Mostra o valor em reais trocando o ponto pela vírgula
                               Text(
                                 'R\$ ${totalInvested.toStringAsFixed(2).replaceAll('.', ',')}',
                                 style: GoogleFonts.poppins(
@@ -135,6 +145,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                           ),
                         ),
 
+                        // Barra cinza de pesquisa
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Container(
@@ -150,6 +161,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                                 Expanded(
                                   child: TextField(
                                     controller: _searchController,
+                                    // Toda vez que a pessoa digita uma letra a tela se arruma
                                     onChanged: (value) {
                                       setState(() {
                                         _searchQuery = value;
@@ -169,6 +181,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
 
                         const SizedBox(height: 20),
 
+                        // Lista vertical rolável com os cartões das empresas
                         Expanded(
                           child: filteredInvestments.isEmpty
                               ? Center(
@@ -195,6 +208,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
     );
   }
 
+  // Molde visual de como cada pedaço da lista vai aparecer
   Widget _buildInvestmentCard(Map<String, dynamic> investment) {
     final String startupName = investment['startupName'] ?? 'Desconhecida';
     final int tokenQuantity = investment['tokenQuantity'] ?? 0;
@@ -210,6 +224,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
       ),
       child: Row(
         children: [
+          // Cria um ícone com a primeira letra da empresa
           Container(
             width: 45,
             height: 45,
@@ -265,6 +280,7 @@ class _UserInvestmentsPageState extends State<UserInvestmentsPage> {
                 ),
               ),
               const SizedBox(height: 4),
+              // Link clicável que leva para o dashboard
               GestureDetector(
                 onTap: () {
                   Navigator.push(
