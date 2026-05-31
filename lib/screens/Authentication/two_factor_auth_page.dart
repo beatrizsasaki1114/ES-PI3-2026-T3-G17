@@ -1,11 +1,16 @@
 //Beatriz Naomi
+// Usada em dois fluxos:
+//   1. Login — resolver != null: completa o login com MultiFactorAssertion
+//   2. Cadastro/ativação do 2FA — resolver == null: valida o código e retorna true para a tela anterior 
 import 'package:flutter/material.dart';
 import 'package:projeto_integrador_3_grupo_17/screens/App/catalogue_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:projeto_integrador_3_grupo_17/services/authentication/auth_services.dart';
 
 class TwoFactorAuthPage extends StatefulWidget {
+  // ID de verificação retornado pelo Firebase ao enviar o SMS
   final String? verificationId;
+  // Resolver do Firebase — presente apenas no fluxo de login com 2FA ativo
   final MultiFactorResolver? resolver;
 
   const TwoFactorAuthPage({super.key, this.verificationId, this.resolver});
@@ -15,14 +20,18 @@ class TwoFactorAuthPage extends StatefulWidget {
 }
 
 class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
+   // Armazena o verificationId atualizado após reenvio de código
   late String _idAtivo;
+  // 6 controllers — um por dígito do código SMS
   final List<TextEditingController> _controllers = List.generate(
     6,
     (index) => TextEditingController(),
   );
+  // Concatena os 6 dígitos em uma única string para validação
   String get _fullCode => _controllers.map((c) => c.text).join();
   @override
   void dispose() {
+    // Libera todos os controllers ao sair da tela
     for (var controller in _controllers) {
       controller.dispose();
     }
@@ -75,7 +84,7 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                     ),
 
                     const SizedBox(height: 30),
-
+                    // 6 campos de um dígito cada — foco avança/retrocede automaticamente
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: List.generate(
@@ -123,7 +132,7 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                     ),
 
                     const SizedBox(height: 18),
-
+                    // Link de reenvio — chama sendLoginSms novamente e atualiza _idAtivo
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -136,9 +145,11 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                             await AuthService().sendLoginSms(
                               resolver: widget.resolver!,
                               onSmsSent: (vId) {
+                                // Atualiza o verificationId com o novo código enviado
                                 setState(() {
                                   _idAtivo = vId;
                                 });
+                                // Limpa os campos para o novo código
                                 for (var c in _controllers) {
                                   c.clear();
                                 }
@@ -187,6 +198,8 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                                 final String vId = widget.verificationId ?? "";
 
                                 if ( widget.resolver == null) {
+
+                                   // Fluxo de ativação do 2FA — valida o código e retorna à tela anterior
                                   if (vId.isEmpty) throw "ID de verificação ausente.";
                                   await AuthService().validateCode(
                                     verificationId: widget.verificationId ?? _idAtivo,
@@ -194,8 +207,11 @@ class _TwoFactorAuthPageState extends State<TwoFactorAuthPage> {
                                   );
                                   if (!context.mounted) return;
                                   Navigator.pop(context, true);
+
                                 } else if (widget.resolver != null) {
+                                  // Fluxo de login com 2FA — resolve o login com MultiFactorAssertion
                                   if (vId.isEmpty) throw "ID de verificação de login ausente.";
+                                  
                                   final credential = PhoneAuthProvider.credential(
                                     verificationId: widget.verificationId!,
                                     smsCode: codigoFinal,

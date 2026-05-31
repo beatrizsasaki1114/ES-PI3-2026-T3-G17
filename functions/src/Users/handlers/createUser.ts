@@ -4,17 +4,18 @@ import {setUser} from "../repositories/userRepository";
 import {CallableRequest, onCall, HttpsError} from "firebase-functions/v2/https";
 import type {Users} from "../types/index";
 
+// Cria o documento do usuário na coleção "Usuários" com os dados do perfil
 export const createUser = onCall(
   {region: "southamerica-east1"},
   async (request: CallableRequest<Users>) => {
-
+     // Verifica se o usuário está autenticado via Firebase Auth
     try {
       if (!request.auth) {
         throw new HttpsError("unauthenticated", "Usuário não autenticado");
       }
 
       const data = request.data;
-
+      // Validação dos campos obrigatórios
       if (!data.nome || typeof data.nome !== "string") {
         throw new HttpsError("invalid-argument", "Campo nome obrigatório");
       }
@@ -31,7 +32,7 @@ export const createUser = onCall(
         throw new HttpsError("invalid-argument", "Campo telefone obrigatório");
       }
 
-
+       // Cria o usuário no Firestore com saldo zerado e descrição padrão
       return setUser({
         uid: request.auth.uid,
         nome: data.nome,

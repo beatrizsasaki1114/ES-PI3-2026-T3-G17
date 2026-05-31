@@ -13,6 +13,7 @@ class CreateAccountPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<CreateAccountPage> {
+    // Controllers de cada campo do formulário
   TextEditingController firstNameController = TextEditingController();
   TextEditingController lastNameController = TextEditingController();
   TextEditingController emailController = TextEditingController();
@@ -21,15 +22,15 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
   TextEditingController cpfController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController confirmPasswordController = TextEditingController();
-
+   // Controla visibilidade do texto da senha
   bool _obscurePassword = true;
 
-
+  // Indicadores de validação da senha em tempo real
   bool _hasMinLength = false;
   bool _hasMinNumbers = false;
   bool _hasNoSpecialChars = false;
 
-
+  // Atualiza os indicadores conforme o usuário digita a senha
   void _validatePassword(String value) {
     setState(() {
       _hasMinLength = value.length >= 6;
@@ -145,6 +146,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                     const SizedBox(height: 8),
 
+                    // Campo de senha com validação em tempo real via _validatePassword
                     _buildFieldLabel("Senha"),
                     const SizedBox(height: 4),
                     _buildCustomInput(
@@ -158,6 +160,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                     const SizedBox(height: 8),
 
+                    // Indicadores visuais dos requisitos da senha
                     _buildPasswordRule("Pelo menos 6 dígitos", _hasMinLength),
                     _buildPasswordRule("No mínimo 2 números", _hasMinNumbers),
                     _buildPasswordRule("Sem caracteres especiais", _hasNoSpecialChars),
@@ -175,7 +178,8 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                     ),
 
                     const SizedBox(height: 30),
-
+                    
+                    // Botão de criar conta — valida todos os campos antes de chamar o serviço
                     SizedBox(
                       width: double.infinity,
                       height: 55,
@@ -188,6 +192,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                           elevation: 2,
                         ),
                         onPressed: () async {
+                          // Verifica se todos os campos estão preenchidos
                           if (emailController.text.trim().isEmpty ||
                               firstNameController.text.trim().isEmpty ||
                               lastNameController.text.trim().isEmpty ||
@@ -203,7 +208,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             );
                             return; 
                           } 
-                          
+                           // Verifica se a senha atende todos os requisitos
                           if (!_hasMinLength || !_hasMinNumbers || !_hasNoSpecialChars) {
                              ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -213,7 +218,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             );
                             return; 
                           }
-
+                           // Verifica se as senhas coincidem
                           if (passwordController.text != confirmPasswordController.text) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -224,7 +229,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             return; 
                           } 
                           
-
+                          // Verifica se os e-mails coincidem
                           if (emailController.text != confirmEmailController.text) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
@@ -234,8 +239,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                             );
                             return; 
                           } 
-                          
-
+                          // Tenta criar conta no Firebase Auth e o perfil no Firestore
                           try {
                             User? result = await AuthService().createAccount(
                               nome: firstNameController.text.trim(),
@@ -255,7 +259,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
                                   backgroundColor: Colors.green,
                                 ),
                               );
-
+                              //Redireciona para o login após cadastro bem-sucedido
                               Navigator.pushReplacement(
                                 context,
                                 MaterialPageRoute(
@@ -287,6 +291,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
 
                     const SizedBox(height: 25),
 
+                    // Link para tela de login
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -326,7 +331,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       ),
     );
   }
-
+  // Indicador visual de requisito de senha — ícone verde (válido) ou vermelho (inválido)
   Widget _buildPasswordRule(String text, bool isValid) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 4.0),
@@ -349,7 +354,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
       ),
     );
   }
-
+  // Label do campo com asterisco vermelho indicando obrigatoriedade
   Widget _buildFieldLabel(String label) {
     return Align(
       alignment: Alignment.centerLeft,
@@ -372,6 +377,7 @@ class _CreateAccountPageState extends State<CreateAccountPage> {
     );
   }
 
+ // Campo de texto customizado com suporte a senha e callback de validação em tempo real
   Widget _buildCustomInput({
     required String hint,
     TextEditingController? controller,

@@ -20,9 +20,13 @@ class StartupDetailsPage extends StatefulWidget {
 }
 
 class _StartupDetailsPageState extends State<StartupDetailsPage> {
+  // Índice do item de FAQ expandido — null quando todos estão fechados
   int? _expandedFaqIndex;
+  // Índice do item selecionado na barra de navegação inferior
   final int _selectedIndex = 2;
+  // Controller do player de vídeo YouTube — inicializado sob demanda
   YoutubePlayerController? _controller;
+  // Future dos detalhes completos da startup — carregado no initState
   late Future<Startup> _startupDetailsFuture;
 
   // Horário de abertura do mercado
@@ -32,6 +36,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     return hora >= 8 * 60 && hora < 18 * 60;
   }
 
+  // Mensagem exibida abaixo do botão quando o mercado está fechado
   String get _motivoMercadoFechado {
     final agora = DateTime.now().toUtc().subtract(const Duration(hours: 3));
     final hora = agora.hour * 60 + agora.minute;
@@ -48,6 +53,8 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     );
   }
 
+  // Inicializa o player YouTube com a URL do vídeo da startup
+  // Executado apenas uma vez — evita reinicialização desnecessária
   void _initializeVideo(String url) {
     if (_controller != null || url.isEmpty) return;
 
@@ -70,6 +77,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     super.dispose();
   }
 
+  // Botão de documento PDF — abre o arquivo no navegador externo
   Widget _buildDocumentButton({
     required String title,
     required String size,
@@ -199,6 +207,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
     );
   }
 
+  // Exibe o preço atual do token com seta de variação (↑ verde / ↓ vermelho)
   Widget _buildPrecoToken(double precoAtual, double? precoAnterior) {
     // Calcula variação se tiver preço anterior
     double? variacao;
@@ -230,6 +239,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                 ),
               ),
             ),
+            // Seta de variação — só exibida se houver preço anterior disponível
             if (variacao != null) ...[
               const SizedBox(width: 2),
               Icon(
@@ -245,7 +255,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
       ],
     );
   }
-
+// Card de evento com título, descrição, data e local 
   Widget _buildEventItem(StartupEvent evento) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -333,6 +343,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
       body: FutureBuilder<Startup>(
         future: _startupDetailsFuture,
         builder: (context, snapshot) {
+          // Estados de carregamento e erro
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
@@ -347,10 +358,12 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
 
           final fullStartup = snapshot.data!;
 
+          // Inicializa o player de vídeo se a startup tiver URL de pitch
           if (fullStartup.videoUrl.isNotEmpty) {
             _initializeVideo(fullStartup.videoUrl);
           }
 
+          // Capital captado em reais
           double capitalReais = fullStartup.capitalCaptadoCent;
 
           return SingleChildScrollView(
@@ -412,6 +425,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ],
                 ),
                 const SizedBox(height: 24),
+                  // Linha de métricas: preço do token, capital aportado, tokens disponíveis
                 Row(
                   children: [
                     Expanded(
@@ -438,6 +452,8 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ],
                 ),
                 const SizedBox(height: 24),
+
+                // Botão de investir — desabilitado fora do horário de mercado
                 Column(
                   children: [
                     SizedBox(
@@ -473,6 +489,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                         ),
                       ),
                     ),
+                     // Mensagem de mercado fechado com horário de reabertura
                     if (!_mercadoAberto) ...[
                       const SizedBox(height: 6),
                       Row(
@@ -497,6 +514,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ],
                 ),
                 const SizedBox(height: 24),
+                 // Gráfico de valorização do token (1D/1S/1M/6M/1A)
                 Container(
                   width: double.infinity,
                   padding: const EdgeInsets.all(16),
@@ -509,7 +527,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     children: [TokenPriceChart(startupId: widget.startup.id)],
                   ),
                 ),
-
+                // Descrição completa da startup
                 const SizedBox(height: 32),
                 Text(
                   "Sobre a Startup",
@@ -527,6 +545,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
+                // Vídeo pitch — exibido apenas se URL disponível e controller inicializado
                 if (fullStartup.videoUrl.isNotEmpty && _controller != null)
                   Container(
                     width: double.infinity,
@@ -563,6 +582,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 const SizedBox(height: 32),
 
+                 // Seção de eventos e atualizações da startup
                 Text(
                   'Eventos e Atualizações',
                   style: GoogleFonts.poppins(
@@ -585,7 +605,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     ),
                   ),
                 const SizedBox(height: 32),
-
+                   // Documentos públicos da startup (contratos, relatórios, etc.)
                 Text(
                   'Documentos Oficiais',
                   style: GoogleFonts.poppins(
@@ -611,6 +631,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                   ),
                 ),
                 const SizedBox(height: 32),
+                // FAQ — perguntas e respostas cadastradas pela startup
                 Text(
                   'FAQ',
                   style: GoogleFonts.poppins(
@@ -642,6 +663,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
                     ),
                   ),
                 const SizedBox(height: 32),
+                // Botão para acessar a tela de estrutura societária
                 Text(
                   'Estrutura Societária',
                   style: GoogleFonts.poppins(
@@ -691,6 +713,7 @@ class _StartupDetailsPageState extends State<StartupDetailsPage> {
   }
 }
 
+// Chip colorido para exibir tags da startup (estágio, tipo de token, setor)
 class InfoChip extends StatelessWidget {
   final String label;
   final Color color;

@@ -127,8 +127,10 @@ class _LoginPageState extends State<LoginPage> {
                           elevation: 2,
                         ),
                         onPressed: () async {
+                          // Validação se campos estão vazios
                           if (emailController.text == "" ||
                               passwordController.text == "") {
+                            // Exibe mensagem de erro
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
@@ -138,13 +140,16 @@ class _LoginPageState extends State<LoginPage> {
                               ),
                             );
                           } else {
+                            // tenta realizar login
                             try {
                               final userCredential = await AuthService().signIn(
                                 email: emailController.text,
                                 password: passwordController.text,
                               );
+                              // Se o login for sucesso
                               if (userCredential != null) {
                                 if (!context.mounted) return;
+                                // Vai para catálogo
                                 Navigator.pushReplacement(
                                   context,
                                   MaterialPageRoute(
@@ -153,9 +158,10 @@ class _LoginPageState extends State<LoginPage> {
                                 );
                               }
                             } on FirebaseAuthMultiFactorException catch (e) {
+                             // Se 2FA for exigido
                              await AuthService().sendLoginSms(
                                   resolver: e.resolver,
-                                  onSmsSent: (vId) {
+                                  onSmsSent: (vId) { // Ao enviar SMS
                                     Navigator.pushReplacement(
                                       context,
                                       MaterialPageRoute(
@@ -166,12 +172,13 @@ class _LoginPageState extends State<LoginPage> {
                                       ),
                                     );
                                   },
-                                  onError: (error) {
+                                  onError: (error) {// Em caso de erro no SMS
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(content: Text(error), backgroundColor: Colors.red),
                                     );
                                   },
                                 );
+                            // Erros do Firebase Auth
                             } on FirebaseAuthException catch (e) {
                               String mensagem;
 

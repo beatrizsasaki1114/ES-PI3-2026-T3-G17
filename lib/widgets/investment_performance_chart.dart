@@ -7,9 +7,9 @@ import 'package:projeto_integrador_3_grupo_17/widgets/token_price_chart.dart';
 import 'package:projeto_integrador_3_grupo_17/services/dashboards/dashboard_services.dart';
 
 class InvestmentPerformanceChart extends StatefulWidget {
-  final String  startupName;
-  final int     tokenQuantity;
-  final double  amountSpent;
+  final String startupName;
+  final int tokenQuantity;
+  final double amountSpent;
   final double? precoNaCompra;
 
   const InvestmentPerformanceChart({
@@ -27,42 +27,42 @@ class InvestmentPerformanceChart extends StatefulWidget {
 
 class _InvestmentPerformanceChartState
     extends State<InvestmentPerformanceChart> {
-
   // Período padrão ao abrir o gráfico
   PeriodoGrafico _periodo = PeriodoGrafico.semana;
-  double _precoAtualToken    = 0;
+  double _precoAtualToken = 0;
   double _precoAnteriorToken = 0;
-  bool   _carregando         = true;
+  bool _carregando = true;
 
   final _service = DashboardServices();
-  final Color _corLinha  = const Color(0xFF4D338E);
+  final Color _corLinha = const Color(0xFF4D338E);
   final Color _corSombra = const Color(0xFF4D338E);
 
   // Variação diária do token baseada nos preços atual e anterior
   // Limitada a ±5% para evitar distorções quando PrecoAnteriorToken
   double get _variacaoDiaria {
     if (_precoAnteriorToken <= 0) return 0;
-    final variacao = (_precoAtualToken - _precoAnteriorToken) / _precoAnteriorToken;
+    final variacao =
+        (_precoAtualToken - _precoAnteriorToken) / _precoAnteriorToken;
     return variacao.clamp(-0.05, 0.05);
   }
-
-  
 
   // Calcula o valor atual do investimento distribuindo a variação pro rata pelo pregão
   // Valor_{hora} = inicial × (1 + taxaDiaria)^(fracao_do_dia)
   double get _valorAtualHoje {
-    final agora         = DateTime.now().toUtc().subtract(const Duration(hours: 3));
-    final agoraMinutos  = agora.hour * 60 + agora.minute;
-    final aberturaMin   = 8 * 60;
+    final agora = DateTime.now().toUtc().subtract(const Duration(hours: 3));
+    final agoraMinutos = agora.hour * 60 + agora.minute;
+    final aberturaMin = 8 * 60;
     final fechamentoMin = 18 * 60;
     // Fração do dia de pregão que já passou (0.0 = abertura, 1.0 = fechamento)
     double fracaoDia = 0;
     if (agoraMinutos >= aberturaMin && agoraMinutos <= fechamentoMin) {
-      fracaoDia = (agoraMinutos - aberturaMin) / (fechamentoMin - aberturaMin).toDouble();
+      fracaoDia =
+          (agoraMinutos - aberturaMin) /
+          (fechamentoMin - aberturaMin).toDouble();
     } else if (agoraMinutos > fechamentoMin) {
       fracaoDia = 1.0;
     }
- 
+
     return widget.amountSpent * pow(1 + _variacaoDiaria, fracaoDia);
   }
 
@@ -72,27 +72,27 @@ class _InvestmentPerformanceChartState
     _buscarPrecosDaStartup();
   }
 
-  // Busca PrecoAtualToken e PrecoAnteriorToken 
+  // Busca PrecoAtualToken e PrecoAnteriorToken
   Future<void> _buscarPrecosDaStartup() async {
     setState(() => _carregando = true);
     try {
       final precos = await _service.buscarPrecosDaStartup(widget.startupName);
       setState(() {
-        _precoAtualToken    = precos.precoAtual;
+        _precoAtualToken = precos.precoAtual;
         _precoAnteriorToken = precos.precoAnterior;
-        _carregando         = false;
+        _carregando = false;
       });
     } catch (_) {
       setState(() => _carregando = false);
     }
   }
 
-// Gera pontos futuros a partir do valor atual
+  // Gera pontos futuros a partir do valor atual
   // valorNoDia = valorHoje × (1 + variacaoDiaria)^dia
   List<FlSpot> _gerarPontos() {
- final variacaoPorHora = _variacaoDiaria * 0.02;
+    final variacaoPorHora = _variacaoDiaria * 0.02;
     final variacaoEfetiva = variacaoPorHora * 10;
- 
+
     if (_periodo == PeriodoGrafico.dia) {
       return List.generate(11, (i) {
         final valor = _valorAtualHoje * pow(1 + variacaoPorHora, i.toDouble());
@@ -107,14 +107,14 @@ class _InvestmentPerformanceChartState
     }
     final dias = _diasDoPeriodo();
     return List.generate(dias + 1, (i) {
-      final variacaoTotal = (variacaoEfetiva * i).clamp(-0.30, 0.30);
+      final variacaoTotal = (variacaoEfetiva * i);
       final valor = _valorAtualHoje * (1 + variacaoTotal);
       return FlSpot(i.toDouble(), valor);
     });
   }
- 
+
   List<DateTime> _gerarDatas() {
-  if (_periodo == PeriodoGrafico.dia) {
+    if (_periodo == PeriodoGrafico.dia) {
       final hoje = DateTime.now().toUtc().subtract(const Duration(hours: 3));
       final abertura = DateTime(hoje.year, hoje.month, hoje.day, 8, 0);
       return List.generate(11, (i) => abertura.add(Duration(hours: i)));
@@ -130,15 +130,20 @@ class _InvestmentPerformanceChartState
 
   int _diasDoPeriodo() {
     switch (_periodo) {
-      case PeriodoGrafico.dia:       return 1;
-      case PeriodoGrafico.semana:    return 7;
-      case PeriodoGrafico.mes:       return 30;
-      case PeriodoGrafico.seisMeses: return 180;
-      case PeriodoGrafico.ano:       return 365;
+      case PeriodoGrafico.dia:
+        return 1;
+      case PeriodoGrafico.semana:
+        return 7;
+      case PeriodoGrafico.mes:
+        return 30;
+      case PeriodoGrafico.seisMeses:
+        return 180;
+      case PeriodoGrafico.ano:
+        return 365;
     }
   }
 
-    // Último valor projetado do período selecionado
+  // Último valor projetado do período selecionado
   // Usado no header e no badge — muda conforme o período escolhido
   double get _valorUltimoPonto {
     final spots = _gerarPontos();
@@ -146,26 +151,24 @@ class _InvestmentPerformanceChartState
     return spots.last.y;
   }
 
-
-   // Variação total no período: do primeiro ao último ponto gerado
+  // Variação total no período: do primeiro ao último ponto gerado
   double? get _variacaoPercent {
     if (_precoAnteriorToken <= 0) return null;
     final spots = _gerarPontos();
     if (spots.isEmpty) return null;
     final inicio = spots.first.y;
-    final fim    = spots.last.y;
+    final fim = spots.last.y;
     if (inicio == 0) return null;
     return ((fim - inicio) / inicio) * 100;
   }
- 
 
   LineChartData _mainData() {
-    final spots  = _gerarPontos();
-    final datas  = _gerarDatas();
+    final spots = _gerarPontos();
+    final datas = _gerarDatas();
     final valores = spots.map((s) => s.y).toList();
-    final minY   = valores.reduce((a, b) => a < b ? a : b);
-    final maxY   = valores.reduce((a, b) => a > b ? a : b);
-    final diff   = maxY - minY;
+    final minY = valores.reduce((a, b) => a < b ? a : b);
+    final maxY = valores.reduce((a, b) => a > b ? a : b);
+    final diff = maxY - minY;
     final margem = diff == 0 ? widget.amountSpent * 0.05 : diff * 0.15;
 
     return LineChartData(
@@ -177,14 +180,16 @@ class _InvestmentPerformanceChartState
             FlLine(color: Colors.grey.shade100, strokeWidth: 1),
       ),
       titlesData: FlTitlesData(
-        leftTitles:   const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        rightTitles:  const AxisTitles(sideTitles: SideTitles(showTitles: false)),
-        topTitles:    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        leftTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: const AxisTitles(sideTitles: SideTitles(showTitles: false)),
         bottomTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
             reservedSize: 28,
-            interval:  1,
+            interval: 1,
             getTitlesWidget: (value, meta) {
               final i = value.toInt();
               if (i < 0 || i >= datas.length) return const SizedBox.shrink();
@@ -192,9 +197,13 @@ class _InvestmentPerformanceChartState
               if (label.isEmpty) return const SizedBox.shrink();
               return SideTitleWidget(
                 meta: meta,
-                child: Text(label,
-                    style: GoogleFonts.poppins(
-                        fontSize: 10, color: Colors.black38)),
+                child: Text(
+                  label,
+                  style: GoogleFonts.poppins(
+                    fontSize: 10,
+                    color: Colors.black38,
+                  ),
+                ),
               );
             },
           ),
@@ -211,10 +220,10 @@ class _InvestmentPerformanceChartState
           getTooltipColor: (_) => const Color(0xFF4D338E),
           tooltipBorderRadius: BorderRadius.circular(8),
           getTooltipItems: (touchedSpots) => touchedSpots.map((spot) {
-            final i    = spot.x.toInt().clamp(0, datas.length - 1);
+            final i = spot.x.toInt().clamp(0, datas.length - 1);
             final valor = spot.y;
-            final var2  = ((valor - _valorAtualHoje) / _valorAtualHoje) * 100;
-            final data  = datas[i];
+            final var2 = ((valor - _valorAtualHoje) / _valorAtualHoje) * 100;
+            final data = datas[i];
             final label = _periodo == PeriodoGrafico.dia
                 ? '${data.hour.toString().padLeft(2, '0')}:00'
                 : '${data.day.toString().padLeft(2, '0')}/${data.month.toString().padLeft(2, '0')}';
@@ -223,9 +232,10 @@ class _InvestmentPerformanceChartState
               '${var2 >= 0 ? '+' : ''}${var2.toStringAsFixed(2)}%\n'
               '$label',
               GoogleFonts.poppins(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w600),
+                color: Colors.white,
+                fontSize: 11,
+                fontWeight: FontWeight.w600,
+              ),
             );
           }).toList(),
         ),
@@ -266,7 +276,7 @@ class _InvestmentPerformanceChartState
   }
 
   String _labelParaIndice(int i, List<DateTime> datas) {
-    final data  = datas[i];
+    final data = datas[i];
     final total = datas.length;
     switch (_periodo) {
       case PeriodoGrafico.dia:
@@ -282,33 +292,44 @@ class _InvestmentPerformanceChartState
       case PeriodoGrafico.mes:
         const marcas = {1, 5, 10, 15, 20, 25, 30};
         if (i == 0 || marcas.contains(data.day) || i == total - 1) {
-            return data.day.toString().padLeft(2, '0');
+          return data.day.toString().padLeft(2, '0');
         }
         return '';
-        
+
       case PeriodoGrafico.seisMeses:
-         if (data.day == 1) return _mesAbrev(data.month);
+        if (data.day == 1) return _mesAbrev(data.month);
 
         return '';
 
       case PeriodoGrafico.ano:
-          if (data.day == 1) return _mesAbrev(data.month);
+        if (data.day == 1) return _mesAbrev(data.month);
 
         return '';
     }
-
   }
 
-  static const _meses   = ['Jan','Fev','Mar','Abr','Mai','Jun',
-                            'Jul','Ago','Set','Out','Nov','Dez'];
-  static const _diasSem = ['Seg','Ter','Qua','Qui','Sex','Sáb','Dom'];
-  String _mesAbrev(int m)  => _meses[m - 1];
+  static const _meses = [
+    'Jan',
+    'Fev',
+    'Mar',
+    'Abr',
+    'Mai',
+    'Jun',
+    'Jul',
+    'Ago',
+    'Set',
+    'Out',
+    'Nov',
+    'Dez',
+  ];
+  static const _diasSem = ['Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb', 'Dom'];
+  String _mesAbrev(int m) => _meses[m - 1];
   String _diaSemana(int d) => _diasSem[d - 1];
 
   @override
   Widget build(BuildContext context) {
-    final variacao   = _variacaoPercent;
-    final valorAtual =  _valorUltimoPonto;
+    final variacao = _variacaoPercent;
+    final valorAtual = _valorUltimoPonto;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -334,22 +355,29 @@ class _InvestmentPerformanceChartState
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Valor Atual Estimado',
-                      style: GoogleFonts.poppins(
-                          fontSize: 12, color: Colors.black54)),
+                  Text(
+                    'Valor Atual Estimado',
+                    style: GoogleFonts.poppins(
+                      fontSize: 12,
+                      color: Colors.black54,
+                    ),
+                  ),
                   Text(
                     'R\$ ${valorAtual.toStringAsFixed(2).replaceAll('.', ',')}',
                     style: GoogleFonts.poppins(
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                        color: const Color(0xFF4D338E)),
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: const Color(0xFF4D338E),
+                    ),
                   ),
                 ],
               ),
               if (variacao != null)
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: variacao >= 0
                         ? const Color(0xFFE8F5E9)
@@ -380,42 +408,45 @@ class _InvestmentPerformanceChartState
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Row(
-              children: [
-                PeriodoGrafico.dia,
-                PeriodoGrafico.semana,
-                PeriodoGrafico.mes,
-                PeriodoGrafico.seisMeses,
-                PeriodoGrafico.ano,
-              ].map((periodo) {
-                final sel = periodo == _periodo;
-                return GestureDetector(
-                  onTap: () => setState(() => _periodo = periodo),
-                  child: Container(
-                    margin: const EdgeInsets.only(right: 8),
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 12, vertical: 6),
-                    decoration: BoxDecoration(
-                      color: sel
-                          ? const Color(0xFF4D338E)
-                          : Colors.transparent,
-                      borderRadius: BorderRadius.circular(20),
-                      border: Border.all(
-                        color: sel
-                            ? const Color(0xFF4D338E)
-                            : Colors.grey.shade300,
+              children:
+                  [
+                    PeriodoGrafico.dia,
+                    PeriodoGrafico.semana,
+                    PeriodoGrafico.mes,
+                    PeriodoGrafico.seisMeses,
+                    PeriodoGrafico.ano,
+                  ].map((periodo) {
+                    final sel = periodo == _periodo;
+                    return GestureDetector(
+                      onTap: () => setState(() => _periodo = periodo),
+                      child: Container(
+                        margin: const EdgeInsets.only(right: 8),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 6,
+                        ),
+                        decoration: BoxDecoration(
+                          color: sel
+                              ? const Color(0xFF4D338E)
+                              : Colors.transparent,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: sel
+                                ? const Color(0xFF4D338E)
+                                : Colors.grey.shade300,
+                          ),
+                        ),
+                        child: Text(
+                          periodo.label,
+                          style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: sel ? Colors.white : Colors.black54,
+                          ),
+                        ),
                       ),
-                    ),
-                    child: Text(
-                      periodo.label,
-                      style: GoogleFonts.poppins(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                        color: sel ? Colors.white : Colors.black54,
-                      ),
-                    ),
-                  ),
-                );
-              }).toList(),
+                    );
+                  }).toList(),
             ),
           ),
           const SizedBox(height: 16),
@@ -426,16 +457,22 @@ class _InvestmentPerformanceChartState
               height: 160,
               child: Center(
                 child: CircularProgressIndicator(
-                    color: Color(0xFF4D338E), strokeWidth: 2),
+                  color: Color(0xFF4D338E),
+                  strokeWidth: 2,
+                ),
               ),
             )
           else if (_precoAtualToken == 0)
             SizedBox(
               height: 160,
               child: Center(
-                child: Text('Não foi possível carregar os dados.',
-                    style: GoogleFonts.poppins(
-                        fontSize: 13, color: Colors.black38)),
+                child: Text(
+                  'Não foi possível carregar os dados.',
+                  style: GoogleFonts.poppins(
+                    fontSize: 13,
+                    color: Colors.black38,
+                  ),
+                ),
               ),
             )
           else
@@ -450,18 +487,19 @@ class _InvestmentPerformanceChartState
           // Legenda
           if (!_carregando && _precoAtualToken > 0) ...[
             const SizedBox(height: 8),
-            Row(children: [
-              Container(
-                  width: 16,
-                  height: 2,
-                  color: Colors.grey.shade400),
-              const SizedBox(width: 6),
-              Text(
-                'Valor investido: R\$ ${widget.amountSpent.toStringAsFixed(2).replaceAll('.', ',')}',
-                style: GoogleFonts.poppins(
-                    fontSize: 11, color: Colors.black45),
-              ),
-            ]),
+            Row(
+              children: [
+                Container(width: 16, height: 2, color: Colors.grey.shade400),
+                const SizedBox(width: 6),
+                Text(
+                  'Valor investido: R\$ ${widget.amountSpent.toStringAsFixed(2).replaceAll('.', ',')}',
+                  style: GoogleFonts.poppins(
+                    fontSize: 11,
+                    color: Colors.black45,
+                  ),
+                ),
+              ],
+            ),
           ],
         ],
       ),

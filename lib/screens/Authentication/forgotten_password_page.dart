@@ -11,6 +11,7 @@ class ForgottenPasswordPage extends StatefulWidget {
 }
 
 class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
+   // Controller do campo de e-mail
   TextEditingController emailController = TextEditingController();
   @override
   Widget build(BuildContext context) {
@@ -79,7 +80,9 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
                             elevation: 2,
                           ),
                           onPressed: () async {
+                             // Valida se o campo não está vazio 
                             if (emailController.text == "") {
+                              // exibe mensagem de erro
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
                                   content: Text(
@@ -90,6 +93,7 @@ class _ForgottenPasswordPageState extends State<ForgottenPasswordPage> {
                               );
                             } else {
                               try {
+                                // Envia e-mail de recuperação via Firebase Auth
                                 await AuthService().resetPassword(
                                   email: emailController.text,
                                 );

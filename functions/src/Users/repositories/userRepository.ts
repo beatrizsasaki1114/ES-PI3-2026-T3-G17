@@ -6,6 +6,7 @@ import {db} from "../../shared/firebase";
 const usuariosCollection = db.collection("Usuários");
 
 // function que adiciona um novo usuário na coleção Usuários
+// O ID do documento é o uid do Firebase Auth 
 export async function setUser(data: Users) {
 
   await usuariosCollection.doc(data.uid).set({

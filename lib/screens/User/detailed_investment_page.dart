@@ -7,7 +7,7 @@ import 'package:projeto_integrador_3_grupo_17/screens/User/private_chat.dart';
 import 'package:projeto_integrador_3_grupo_17/widgets/investment_performance_chart.dart';
 class DetailedInvestmentPage extends StatefulWidget {
   final Map<String, dynamic> investment;
-
+    // Mapa com os dados do investimento vindo do array "investimentos" do usuário no Firestore
   const DetailedInvestmentPage({super.key, required this.investment});
 
   @override
@@ -17,15 +17,14 @@ class DetailedInvestmentPage extends StatefulWidget {
 class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
   @override
   Widget build(BuildContext context) {
+    // Extrai os dados do investimento do mapa recebido
     final String startupName = widget.investment['startupName'] ?? 'Desconhecida';
     final int tokenQuantity = widget.investment['tokenQuantity'] ?? 0;
     final double amountSpent = (widget.investment['amountSpent'] ?? 0).toDouble();
-    final double? precoNaCompra = widget.investment['precoNaCompra'] != null
-        ? (widget.investment['precoNaCompra'] as num).toDouble()
-        : null;  
-
+     // Converte o Timestamp do Firestore para DateTime 
     final Timestamp? timestamp = widget.investment['date'] as Timestamp?;
     final DateTime date = timestamp != null ? timestamp.toDate() : DateTime.now();
+   // Formata a data para exibição no padrão brasileiro: DD/MM/AAAA às HH:MM
     final String formattedDate = 
         "${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year} às ${date.hour.toString().padLeft(2, '0')}:${date.minute.toString().padLeft(2, '0')}";
 
@@ -81,7 +80,7 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                     ],
                   ),
                 ),
-                
+                // Avatar com inicial da startup, nome e badge de quantidade de tokens
                 Padding(
                   padding: const EdgeInsets.all(20.0),
                   child: Center(
@@ -133,7 +132,7 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                     ),
                   ),
                 ),
-
+                // Card com data da compra e valor investido
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Container(
@@ -171,7 +170,7 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                 ),
                 
                 const SizedBox(height: 32),
-
+                // Título da seção de desempenho
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: Text(
@@ -184,13 +183,14 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
+                // Gráfico de desempenho — projeta o valor do investimento com base
+                // na variação diária do token (PrecoAtualToken vs PrecoAnteriorToken)
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0),
                   child: InvestmentPerformanceChart(
                     startupName:   startupName,
                     tokenQuantity: tokenQuantity,
-                    amountSpent:   amountSpent,
-                    precoNaCompra: precoNaCompra,
+                    amountSpent:   amountSpent
                   ),
                 ),
                 
@@ -199,6 +199,7 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
             ),
           ),
 
+           // Botão flutuante de chat — navega para o chat privado com a startup
           Positioned(
             bottom: 24,
             right: 24,
@@ -225,7 +226,8 @@ class _DetailedInvestmentPageState extends State<DetailedInvestmentPage> {
       ),
     );
   }
-
+  
+// Linha de detalhe com ícone, label e valor — reutilizada para data e valor investido
   Widget _buildDetailRow({
     required IconData icon,
     required String label,
